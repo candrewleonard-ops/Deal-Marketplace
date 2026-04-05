@@ -229,13 +229,13 @@ export default function Marketplace() {
 
         {/* ── LEFT: sticky map panel ── */}
         <div style={{
-          width: '420px', flexShrink: 0,
+          width: '500px', flexShrink: 0,
           position: 'sticky', top: '0',
           height: 'calc(100vh - 64px)',
           overflowY: 'auto',
           borderRight: '1px solid #1e1e2e',
           background: '#0d0d1a',
-          padding: '20px 16px',
+          padding: '16px 12px',
           display: 'flex', flexDirection: 'column', gap: '14px',
         }}>
           {/* Map header */}

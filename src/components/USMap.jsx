@@ -44,7 +44,7 @@ export default function USMap({ deals = [], selectedStates = [], onStateToggle }
         <ComposableMap
           projection="geoAlbersUsa"
           style={{ width: '100%', height: 'auto', display: 'block' }}
-          projectionConfig={{ scale: 1000 }}
+          projectionConfig={{ scale: 1050 }}
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>

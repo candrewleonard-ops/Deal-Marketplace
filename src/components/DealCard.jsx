@@ -57,7 +57,7 @@ export default function DealCard({ deal }) {
     position: 'relative',
   };
 
-  const inner = (
+  return (
     <div
       style={cardStyle}
       onMouseEnter={() => setHovered(true)}
