@@ -1,5 +1,49 @@
 export const users = [
   {
+    id: 'me',
+    name: 'Trial User',
+    username: 'trial_user',
+    email: 'trial@treim.com',
+    avatar: 'https://picsum.photos/seed/trialuser/200/200',
+    coverPhoto: 'https://picsum.photos/seed/trialcover/1200/400',
+    location: 'Dallas, TX',
+    bio: 'Just getting started with REI. Exploring the marketplace!',
+    tags: ['Wholesaler'],
+    followers: 12,
+    following: 24,
+    dealsPosted: 3,
+    isBusinessProfile: false,
+    joinedDate: '2025-10-20',
+    accountTier: 'Basic',
+    isTrialAccount: true,
+    isPrivate: false,
+    isCommunityLeader: false,
+    isAdmin: false,
+    phone: '(214) 555-0100',
+  },
+  {
+    id: 'admin-carson',
+    name: 'Carson Leonard',
+    username: 'carson_leonard',
+    email: 'carson@treim.com',
+    avatar: 'https://picsum.photos/seed/carson/200/200',
+    coverPhoto: 'https://picsum.photos/seed/carsoncover/1200/400',
+    location: 'Atlanta, GA',
+    bio: 'Founder of TREIM. Real estate investor for 15+ years. Here to help the community grow.',
+    tags: ['Wholesaler', 'Fix N Flipper', 'Cash Buyer'],
+    followers: 12400,
+    following: 320,
+    dealsPosted: 180,
+    isBusinessProfile: false,
+    joinedDate: '2017-01-01',
+    accountTier: 'VIP Max',
+    isTrialAccount: false,
+    isPrivate: false,
+    isCommunityLeader: true,
+    isAdmin: true,
+    phone: '(404) 555-0100',
+  },
+  {
     id: 1,
     name: 'Marcus Johnson',
     username: 'marcusj_rei',
@@ -204,4 +248,8 @@ export const users = [
 
 export const currentUser = users[0];
 
-export const getUserById = (id) => users.find(u => u.id === parseInt(id));
+export const getUserById = (id) => {
+  if (id === 'me' || id === 'admin-carson') return users.find(u => u.id === id);
+  const parsed = typeof id === 'string' && !isNaN(parseInt(id)) ? parseInt(id) : id;
+  return users.find(u => u.id === parsed) || users.find(u => String(u.id) === String(id));
+};
