@@ -30,7 +30,8 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<AppLayout><Marketplace /></AppLayout>} />
+        <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/marketplace" element={<AppLayout><Marketplace /></AppLayout>} />
         <Route path="/marketplace/:id" element={<AppLayout><DealDetail /></AppLayout>} />

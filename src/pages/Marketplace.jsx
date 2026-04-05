@@ -229,7 +229,7 @@ export default function Marketplace() {
 
         {/* ── LEFT: sticky map panel ── */}
         <div style={{
-          width: '500px', flexShrink: 0,
+          width: '600px', flexShrink: 0,
           position: 'sticky', top: '0',
           height: 'calc(100vh - 64px)',
           overflowY: 'auto',
