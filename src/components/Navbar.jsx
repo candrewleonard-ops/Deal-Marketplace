@@ -3,9 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
-  Crown, Shield, UsersRound
+  Crown, Shield, UsersRound, Heart
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import PostDealModal from './PostDealModal';
 
 const navLinks = [
   { to: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchVal, setSearchVal] = useState('');
+  const [showPostDeal, setShowPostDeal] = useState(false);
 
   const notifications = [
     { id: 1, text: 'Marcus Johnson liked your post', time: '2m ago', unread: true },
@@ -108,20 +110,20 @@ export default function Navbar() {
               </Link>
             )}
             {/* Post Deal Button */}
-            <Link
-              to="/my-deals"
+            <button
+              onClick={() => setShowPostDeal(true)}
               className="gradient-btn"
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '8px 16px', borderRadius: '8px',
-                color: '#fff', textDecoration: 'none',
+                color: '#fff', border: 'none', cursor: 'pointer',
                 fontSize: '14px', fontWeight: 600,
                 animation: 'pulse-glow 3s ease-in-out infinite',
               }}
             >
               <Plus size={16} />
               <span className="hidden sm:inline">Post a Deal</span>
-            </Link>
+            </button>
 
             {/* Notifications */}
             <div style={{ position: 'relative' }}>
@@ -173,6 +175,16 @@ export default function Navbar() {
                       </div>
                     </div>
                   ))}
+                  <Link
+                    to="/notifications"
+                    onClick={() => setNotifOpen(false)}
+                    style={{
+                      display: 'block', padding: '12px 16px', textAlign: 'center',
+                      color: '#8b5cf6', textDecoration: 'none', fontWeight: 700, fontSize: '13px',
+                    }}
+                  >
+                    View all notifications →
+                  </Link>
                 </div>
               )}
             </div>
@@ -223,6 +235,8 @@ export default function Navbar() {
                   {[
                     { icon: User, label: 'View Profile', to: `/profile/${currentUser?.id}` },
                     { icon: TrendingUp, label: 'My Deals', to: '/my-deals' },
+                    { icon: Heart, label: 'Saved Deals', to: '/saved' },
+                    { icon: Bell, label: 'Notifications', to: '/notifications' },
                     { icon: Crown, label: 'Upgrade to Premium', to: '/premium' },
                     { icon: Settings, label: 'Settings', to: '/auth' },
                   ].map(({ icon: Icon, label, to }) => (
@@ -314,6 +328,9 @@ export default function Navbar() {
           onClick={() => { setUserMenuOpen(false); setNotifOpen(false); }}
         />
       )}
+
+      {/* Post Deal Modal */}
+      {showPostDeal && <PostDealModal onClose={() => setShowPostDeal(false)} />}
     </nav>
   );
 }

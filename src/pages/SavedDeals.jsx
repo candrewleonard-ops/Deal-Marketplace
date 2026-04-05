@@ -1,0 +1,137 @@
+import { Link } from 'react-router-dom';
+import { Heart, ArrowRight, Trash2 } from 'lucide-react';
+import { deals } from '../data/deals';
+import { useSavedDeals } from '../hooks/useSavedDeals';
+import { useToast } from '../context/ToastContext';
+import DealCard from '../components/DealCard';
+
+export default function SavedDeals() {
+  const { savedIds, clear } = useSavedDeals();
+  const { toast } = useToast();
+  const savedDeals = deals.filter(d => savedIds.includes(String(d.id)));
+
+  const totalValue = savedDeals.reduce((sum, d) => sum + (d.listingPrice || d.price || 0), 0);
+  const totalProfit = savedDeals.reduce((sum, d) => sum + (d.potentialProfit || 0), 0);
+  const totalARV = savedDeals.reduce((sum, d) => sum + (d.arv || 0), 0);
+
+  return (
+    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+      {/* Header */}
+      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '24px 20px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+              <Heart size={22} fill="#ef4444" style={{ color: '#ef4444' }} />
+              <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', margin: 0 }}>Saved Deals</h1>
+            </div>
+            <p style={{ color: '#475569', margin: 0, fontSize: '13px' }}>
+              {savedDeals.length} deal{savedDeals.length !== 1 ? 's' : ''} saved to your list
+            </p>
+          </div>
+
+          {savedDeals.length > 0 && (
+            <button
+              onClick={() => { clear(); toast('All saved deals cleared', 'info'); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '9px 16px', borderRadius: '9px',
+                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
+                color: '#ef4444', cursor: 'pointer', fontWeight: 600, fontSize: '13px',
+              }}
+            >
+              <Trash2 size={14} /> Clear All
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 20px' }}>
+        {savedDeals.length === 0 ? (
+          <div style={{
+            background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px',
+            padding: '80px 40px', textAlign: 'center',
+          }}>
+            <div style={{
+              width: '72px', height: '72px', borderRadius: '50%',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: '18px',
+            }}>
+              <Heart size={32} style={{ color: '#ef4444' }} />
+            </div>
+            <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: '0 0 8px' }}>No saved deals yet</h2>
+            <p style={{ color: '#94a3b8', fontSize: '14px', margin: '0 0 24px', maxWidth: '400px', marginInline: 'auto', lineHeight: 1.6 }}>
+              Tap the heart icon on any deal to save it for later. Build your deal shortlist and come back when you're ready to move.
+            </p>
+            <Link
+              to="/marketplace"
+              className="gradient-btn"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '12px 24px', borderRadius: '10px',
+                color: '#fff', fontWeight: 700, fontSize: '14px',
+                textDecoration: 'none',
+              }}
+            >
+              Browse the Marketplace <ArrowRight size={15} />
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Summary stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+              {[
+                { label: 'Total List Price', value: totalValue, color: '#f8fafc' },
+                { label: 'Total ARV', value: totalARV, color: '#10b981' },
+                { label: 'Potential Profit', value: totalProfit, color: '#f59e0b' },
+                { label: 'Avg Per Deal', value: totalValue / savedDeals.length, color: '#06b6d4' },
+              ].map(({ label, value, color }) => (
+                <div key={label} style={{
+                  background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', padding: '16px',
+                }}>
+                  <div style={{ color: '#475569', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px' }}>{label}</div>
+                  <div style={{ color, fontWeight: 800, fontSize: '22px', marginTop: '4px' }}>
+                    ${Math.round(value).toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Business CTA */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.08))',
+              border: '1px solid rgba(139,92,246,0.2)', borderRadius: '12px',
+              padding: '16px 20px', marginBottom: '24px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap',
+            }}>
+              <div>
+                <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                  🔔 Get notified when similar deals hit the market
+                </div>
+                <div style={{ color: '#94a3b8', fontSize: '12px' }}>
+                  Set up deal alerts for your saved cities and price range
+                </div>
+              </div>
+              <Link
+                to="/premium"
+                style={{
+                  padding: '9px 16px', borderRadius: '9px',
+                  background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.35)',
+                  color: '#a78bfa', textDecoration: 'none', fontWeight: 700, fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Enable Alerts (VIP) →
+              </Link>
+            </div>
+
+            {/* Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '18px' }}>
+              {savedDeals.map(deal => <DealCard key={deal.id} deal={deal} />)}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import DealCard from '../components/DealCard';
 import USMap from '../components/USMap';
+import PostDealModal from '../components/PostDealModal';
 import { deals, dealTypes } from '../data/deals';
 
 const CITIES = [
@@ -57,6 +58,7 @@ export default function Marketplace() {
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [showPromote,     setShowPromote]     = useState(false);
+  const [showPostDeal,    setShowPostDeal]    = useState(false);
 
   function handleStateToggle(abbr) {
     if (abbr === '__CLEAR__') { setSelectedStates([]); return; }
@@ -136,7 +138,7 @@ export default function Marketplace() {
               <button onClick={() => setShowPromote(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
                 <TrendingUp size={14} /> Promote a Deal
               </button>
-              <button style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}>
+              <button onClick={() => setShowPostDeal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}>
                 + Post a Deal
               </button>
             </div>
@@ -377,6 +379,9 @@ export default function Marketplace() {
           </div>
         </div>
       )}
+
+      {/* Post Deal Modal */}
+      {showPostDeal && <PostDealModal onClose={() => setShowPostDeal(false)} />}
     </div>
   );
 }

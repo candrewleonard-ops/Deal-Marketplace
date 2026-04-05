@@ -12,6 +12,8 @@ import ImageCarousel from '../components/ImageCarousel';
 import AddressRequestModal from '../components/AddressRequestModal';
 import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { useSavedDeals } from '../hooks/useSavedDeals';
 
 const dealTypeLabels = {
   'fix-flip': 'Fix & Flip',
@@ -40,13 +42,14 @@ export default function DealDetail() {
   const { id } = useParams();
   const deal = getDealById(id);
   const { currentUser, isLoggedIn } = useAuth();
-  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
+  const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const [showPromote, setShowPromote] = useState(false);
-  const [showRequest, setShowRequest] = useState(false);
   const [showAddressReq, setShowAddressReq] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [addressGranted, setAddressGranted] = useState(false);
   const [budget, setBudget] = useState(20);
+  const saved = deal ? isSaved(deal.id) : false;
 
   if (!deal) {
     return (
@@ -296,18 +299,30 @@ export default function DealDetail() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <button
-                  onClick={() => setShowRequest(true)}
-                  className="gradient-btn"
-                  style={{
+                {addressGranted ? (
+                  <div style={{
                     width: '100%', padding: '14px', borderRadius: '12px',
-                    color: '#fff', fontWeight: 800, fontSize: '16px',
+                    background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
+                    color: '#10b981', fontWeight: 800, fontSize: '15px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  }}
-                >
-                  <CheckCircle size={18} />
-                  Send Address Request
-                </button>
+                  }}>
+                    <CheckCircle size={18} />
+                    Address Unlocked
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowAddressReq(true)}
+                    className="gradient-btn"
+                    style={{
+                      width: '100%', padding: '14px', borderRadius: '12px',
+                      color: '#fff', fontWeight: 800, fontSize: '16px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    }}
+                  >
+                    <CheckCircle size={18} />
+                    Send Address Request
+                  </button>
+                )}
 
                 <Link
                   to="/messages"
@@ -325,7 +340,7 @@ export default function DealDetail() {
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
-                    onClick={() => setSaved(!saved)}
+                    onClick={() => { const nowSaved = toggleSaved(deal.id); toast(nowSaved ? 'Saved to your list' : 'Removed from saved', nowSaved ? 'success' : 'info'); }}
                     style={{
                       flex: 1, padding: '11px', borderRadius: '10px',
                       background: saved ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)',
@@ -438,97 +453,13 @@ export default function DealDetail() {
         </div>
       </div>
 
-      {/* Send Address Request Modal */}
-      {showRequest && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 200,
-          background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '20px',
-        }}>
-          <div style={{
-            background: '#12121e', border: '1px solid #1e1e2e',
-            borderRadius: '20px', width: '100%', maxWidth: '480px',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
-          }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Send Address Request</h2>
-              <button onClick={() => setShowRequest(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
-            </div>
-            <div style={{ padding: '24px' }}>
-              {/* ⚠️ Interference warning */}
-              <div style={{
-                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
-                borderRadius: '12px', padding: '14px', marginBottom: '18px',
-              }}>
-                <div style={{ color: '#ef4444', fontWeight: 800, fontSize: '13px', marginBottom: '6px' }}>
-                  ⚠️ IMPORTANT — READ BEFORE REQUESTING
-                </div>
-                <p style={{ color: '#fca5a5', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-                  By requesting this address you agree <strong>NOT to interfere</strong> with the existing contract.
-                  Contacting the seller, buyer, or property owner directly without express written permission
-                  from <strong>{deal.sellerName}</strong> constitutes interference and subjects you to a
-                  <strong> $75,000 penalty fee</strong> due to {deal.sellerName}.
-                </p>
-              </div>
-
-              <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '16px', marginBottom: '18px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>DEAL SUMMARY</div>
-                <div style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '4px' }}>{deal.city}, {deal.state}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                  <span style={{ color: '#94a3b8', fontSize: '13px' }}>Listing Price</span>
-                  <span style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '18px' }}>{formatCurrency(deal.listingPrice || deal.price)}</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Your Full Name</label>
-                  <input defaultValue="Trial User" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
-                </div>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Phone Number</label>
-                  <input defaultValue="" placeholder="(555) 000-0000" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
-                </div>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Message to Seller (optional)</label>
-                  <textarea
-                    placeholder="Hi! I'm a cash buyer and interested in this deal…"
-                    className="input-dark"
-                    rows={3}
-                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', resize: 'vertical' }}
-                  />
-                </div>
-                {/* Agreement checkbox */}
-                <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
-                  <input type="checkbox" style={{ marginTop: '2px', accentColor: '#8b5cf6', width: '16px', height: '16px', flexShrink: 0 }} />
-                  <span style={{ color: '#94a3b8', fontSize: '12px', lineHeight: 1.6 }}>
-                    I agree NOT to interfere with the contract in place. I understand that doing so would result
-                    in a <strong style={{ color: '#ef4444' }}>$75,000 fee due to {deal.sellerName}</strong>.
-                  </span>
-                </label>
-                <button
-                  onClick={() => { setShowRequest(false); }}
-                  className="gradient-btn"
-                  style={{ padding: '14px', borderRadius: '12px', color: '#fff', fontWeight: 700, fontSize: '15px' }}
-                >
-                  Send Address Request
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Address Request Modal */}
       {showAddressReq && (
         <AddressRequestModal
           deal={deal}
           sellerName={deal.sellerName}
           onClose={() => setShowAddressReq(false)}
-          onSubmit={() => setAddressGranted(true)}
+          onSubmit={() => { setAddressGranted(true); toast(`Address request sent to ${deal.sellerName}. You'll get a notification when they respond.`, 'success', 4500); }}
         />
       )}
 
@@ -560,13 +491,25 @@ export default function DealDetail() {
                   <div style={{ color: '#94a3b8', fontSize: '12px' }}>{deal.city}, {deal.state}</div>
                 </div>
               </div>
-              <button
-                onClick={() => { setShowShare(false); alert('Posted to feed!'); }}
-                className="gradient-btn"
-                style={{ width: '100%', padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px' }}
-              >
-                Post to Feed
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => { setShowShare(false); toast('Posted to your feed!', 'success'); }}
+                  className="gradient-btn"
+                  style={{ flex: 1, padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px' }}
+                >
+                  Post to Feed
+                </button>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/marketplace/${deal.id}`;
+                    try { navigator.clipboard.writeText(url); } catch {}
+                    toast('Link copied to clipboard', 'info');
+                  }}
+                  style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
           </div>
         </div>

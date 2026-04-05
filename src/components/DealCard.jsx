@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar } from 'lucide-react';
+import { useSavedDeals } from '../hooks/useSavedDeals';
 
 const DEAL_TYPE_LABELS = {
   'fix-flip': 'Fix & Flip',
@@ -30,8 +31,9 @@ function blurStreetNumber(address) {
 }
 
 export default function DealCard({ deal }) {
-  const [saved, setSaved] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const { isSaved, toggle: toggleSaved } = useSavedDeals();
+  const saved = isSaved(deal.id);
   const typeColor = DEAL_TYPE_COLORS[deal.dealType] || DEAL_TYPE_COLORS['fix-flip'];
 
   function openDeal(e) {
@@ -119,7 +121,7 @@ export default function DealCard({ deal }) {
 
         {/* Save heart — top right */}
         <button
-          onClick={e => { e.stopPropagation(); setSaved(s => !s); }}
+          onClick={e => { e.stopPropagation(); toggleSaved(deal.id); }}
           style={{
             position: 'absolute', top: '10px', right: '10px',
             width: '34px', height: '34px', borderRadius: '50%',

@@ -30,7 +30,21 @@ export default function Auth() {
   const [step, setStep] = useState(1);
   const [teamEmails, setTeamEmails] = useState(['']);
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  // Password strength: 0 (empty) - 4 (strong)
+  const pwStrength = (() => {
+    if (!password) return 0;
+    let s = 0;
+    if (password.length >= 8) s++;
+    if (/[A-Z]/.test(password)) s++;
+    if (/[0-9]/.test(password)) s++;
+    if (/[^A-Za-z0-9]/.test(password)) s++;
+    return s;
+  })();
+  const pwLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const pwColors = ['#1e1e2e', '#ef4444', '#f59e0b', '#06b6d4', '#10b981'];
 
   const usernameValidation = username ? validateUsername(username, users) : null;
 
@@ -112,9 +126,42 @@ export default function Auth() {
                 <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', marginBottom: '8px', textAlign: 'center' }}>
                   Welcome Back
                 </h2>
-                <p style={{ color: '#475569', textAlign: 'center', marginBottom: '28px', fontSize: '14px' }}>
+                <p style={{ color: '#475569', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
                   Sign in to access your deals and network
                 </p>
+
+                {/* Social Sign-In */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+                  {[
+                    { name: 'Google',   icon: '🔵' },
+                    { name: 'Apple',    icon: '🍎' },
+                    { name: 'Facebook', icon: '📘' },
+                  ].map(({ name, icon }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => navigate('/marketplace')}
+                      style={{
+                        padding: '11px 16px', borderRadius: '10px',
+                        background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
+                        color: '#f8fafc', fontWeight: 600, fontSize: '13px',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#8b5cf6'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e2e'; }}
+                    >
+                      <span>{icon}</span> Continue with {name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                  <div style={{ flex: 1, height: '1px', background: '#1e1e2e' }} />
+                  <span style={{ color: '#475569', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px' }}>OR CONTINUE WITH EMAIL</span>
+                  <div style={{ flex: 1, height: '1px', background: '#1e1e2e' }} />
+                </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
@@ -330,6 +377,8 @@ export default function Auth() {
                         <div style={{ position: 'relative' }}>
                           <input
                             type={showPw ? 'text' : 'password'}
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
                             placeholder="Min 8 characters"
                             className="input-dark"
                             style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', paddingRight: '44px' }}
@@ -342,6 +391,31 @@ export default function Auth() {
                             {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
                         </div>
+                        {/* Password strength meter */}
+                        {password && (
+                          <div style={{ marginTop: '8px' }}>
+                            <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
+                              {[1,2,3,4].map(n => (
+                                <div key={n} style={{
+                                  flex: 1, height: '4px', borderRadius: '2px',
+                                  background: n <= pwStrength ? pwColors[pwStrength] : '#1e1e2e',
+                                  transition: 'all 0.2s',
+                                }} />
+                              ))}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                              <span style={{ color: pwColors[pwStrength], fontWeight: 600 }}>
+                                {pwLabels[pwStrength]}
+                              </span>
+                              <span style={{ color: '#475569' }}>
+                                {password.length < 8 ? '8+ chars' : ''}
+                                {password.length >= 8 && !/[A-Z]/.test(password) ? ' · uppercase' : ''}
+                                {password.length >= 8 && !/[0-9]/.test(password) ? ' · number' : ''}
+                                {password.length >= 8 && !/[^A-Za-z0-9]/.test(password) ? ' · symbol' : ''}
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </>
