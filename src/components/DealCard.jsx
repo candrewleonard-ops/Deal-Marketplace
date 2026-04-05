@@ -1,260 +1,269 @@
 import { useState } from 'react';
-import { Heart, Crown, Eye, Home, Maximize2, Calendar } from 'lucide-react';
+import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar } from 'lucide-react';
 
-const dealTypeLabels = {
+const DEAL_TYPE_LABELS = {
   'fix-flip': 'Fix & Flip',
   'rental': 'Rental',
-  'creative': 'Creative',
+  'creative': 'Creative Finance',
   'commercial': 'Commercial',
   'land': 'Land',
 };
 
-const dealTypeBadgeClass = {
-  'fix-flip': 'badge-fix-flip',
-  'rental': 'badge-rental',
-  'creative': 'badge-creative',
-  'commercial': 'badge-commercial',
-  'land': 'badge-land',
+const DEAL_TYPE_COLORS = {
+  'fix-flip':   { bg: 'rgba(239,68,68,0.85)',   text: '#fff' },
+  'rental':     { bg: 'rgba(16,185,129,0.85)',  text: '#fff' },
+  'creative':   { bg: 'rgba(245,158,11,0.85)',  text: '#fff' },
+  'commercial': { bg: 'rgba(6,182,212,0.85)',   text: '#fff' },
+  'land':       { bg: 'rgba(139,92,246,0.85)',  text: '#fff' },
 };
 
-function formatCurrency(n) {
+function fmt(n) {
+  if (!n) return '$0';
   if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`;
   if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`;
   return `$${n}`;
 }
 
-// Blur house number / any leading digits — leave descriptor words visible
-function blurTitle(title) {
-  if (!title) return '****';
-  // Replace leading numbers (e.g. "2847 Peachtree Rd" → "**** Peachtree Rd")
-  return title.replace(/^\d+\s*/, '**** ').trim();
+function blurStreetNumber(address) {
+  if (!address) return '****';
+  return address.replace(/^\d+\s*/, '**** ').trim();
 }
 
-function CardContent({ deal, saved, setSaved }) {
+export default function DealCard({ deal }) {
+  const [saved, setSaved] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const typeColor = DEAL_TYPE_COLORS[deal.dealType] || DEAL_TYPE_COLORS['fix-flip'];
+
   function openDeal(e) {
     e.preventDefault();
     window.open(`/marketplace/${deal.id}`, '_blank', 'noopener,noreferrer');
   }
 
-  return (
-    <>
-      {/* Clickable image → opens deal in new tab */}
+  const cardStyle = {
+    background: '#12121e',
+    border: deal.isFeatured
+      ? 'none'
+      : deal.isSponsored
+        ? '1px solid rgba(139,92,246,0.25)'
+        : '1px solid #1e1e2e',
+    borderRadius: '14px',
+    overflow: 'hidden',
+    cursor: 'default',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+    boxShadow: hovered
+      ? '0 12px 40px rgba(0,0,0,0.5)'
+      : '0 2px 12px rgba(0,0,0,0.25)',
+    position: 'relative',
+  };
+
+  const inner = (
+    <div
+      style={cardStyle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* ── Photo ── */}
       <div
         onClick={openDeal}
-        style={{ position: 'relative', overflow: 'hidden', height: '200px', cursor: 'pointer' }}
+        style={{ position: 'relative', height: '210px', overflow: 'hidden', cursor: 'pointer' }}
       >
         <img
-          src={deal.images[0]}
-          alt={deal.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-          onError={e => { e.target.src = `https://picsum.photos/seed/fallback${deal.id}/800/600`; }}
+          src={deal.images?.[0]}
+          alt="Property"
+          style={{
+            width: '100%', height: '100%', objectFit: 'cover',
+            transition: 'transform 0.4s ease',
+            transform: hovered ? 'scale(1.04)' : 'scale(1)',
+          }}
+          onError={e => { e.target.src = `https://picsum.photos/seed/fb${deal.id}/800/600`; }}
         />
 
-        {/* Gradient overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 60%)', pointerEvents: 'none' }} />
+        {/* bottom gradient */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.7) 0%, transparent 55%)', pointerEvents: 'none' }} />
 
-        {/* Featured badge */}
+        {/* Deal type chip — top left */}
+        <div style={{
+          position: 'absolute', top: '12px', left: '12px',
+          background: typeColor.bg, color: typeColor.text,
+          borderRadius: '6px', padding: '3px 9px',
+          fontSize: '11px', fontWeight: 700, letterSpacing: '0.3px',
+          backdropFilter: 'blur(4px)',
+        }}>
+          {DEAL_TYPE_LABELS[deal.dealType]}
+        </div>
+
+        {/* Featured crown — top left, alongside deal type if present */}
         {deal.isFeatured && (
           <div style={{
             position: 'absolute', top: '12px', left: '12px',
-            display: 'flex', alignItems: 'center', gap: '6px',
-            background: 'rgba(0,0,0,0.8)', borderRadius: '20px',
+            display: 'flex', alignItems: 'center', gap: '5px',
+            background: 'rgba(0,0,0,0.75)', borderRadius: '20px',
             padding: '4px 10px', backdropFilter: 'blur(8px)',
           }}>
-            <Crown size={14} style={{ color: '#f59e0b' }} />
-            <span className="shimmer-badge" style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.5px' }}>
-              FEATURED
-            </span>
+            <Crown size={13} style={{ color: '#f59e0b' }} />
+            <span className="shimmer-badge" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px' }}>FEATURED</span>
           </div>
         )}
 
-        {/* Sponsored badge */}
+        {/* Sponsored chip — below featured or deal type */}
         {deal.isSponsored && !deal.isFeatured && (
           <div className="sponsored-badge" style={{
-            position: 'absolute', top: '12px', left: '12px',
-            background: 'rgba(139, 92, 246, 0.85)', borderRadius: '20px',
-            padding: '3px 10px', backdropFilter: 'blur(8px)',
+            position: 'absolute', top: '12px', left: '90px',
+            background: 'rgba(139,92,246,0.85)', borderRadius: '6px',
+            padding: '3px 9px', backdropFilter: 'blur(4px)',
           }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>SPONSORED</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>Sponsored</span>
           </div>
         )}
 
-        {/* Under contract badge */}
-        {deal.status === 'under contract' && (
-          <div style={{
-            position: 'absolute', top: '12px', right: deal.isSponsored ? '44px' : '12px',
-            background: 'rgba(239, 68, 68, 0.85)', borderRadius: '20px', padding: '3px 10px',
-          }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>UNDER CONTRACT</span>
-          </div>
-        )}
-
-        {/* Heart button — stops propagation so click doesn't open deal page */}
+        {/* Save heart — top right */}
         <button
-          onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+          onClick={e => { e.stopPropagation(); setSaved(s => !s); }}
           style={{
-            position: 'absolute', top: '12px', right: '12px',
-            background: saved ? 'rgba(239,68,68,0.9)' : 'rgba(0,0,0,0.6)',
-            border: 'none', borderRadius: '50%', width: '32px', height: '32px',
+            position: 'absolute', top: '10px', right: '10px',
+            width: '34px', height: '34px', borderRadius: '50%',
+            background: 'rgba(10,10,15,0.65)', border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.2s',
-            zIndex: 2,
+            cursor: 'pointer', backdropFilter: 'blur(6px)',
+            transition: 'background 0.15s',
           }}
         >
-          <Heart size={14} fill={saved ? '#fff' : 'none'} style={{ color: saved ? '#fff' : '#f8fafc' }} />
+          <Heart
+            size={15}
+            fill={saved ? '#ef4444' : 'none'}
+            style={{ color: saved ? '#ef4444' : '#f8fafc' }}
+          />
         </button>
 
-        {/* Deal type badge */}
-        <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
-          <span className={dealTypeBadgeClass[deal.dealType]} style={{ borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
-            {dealTypeLabels[deal.dealType]}
-          </span>
-        </div>
+        {/* Under contract ribbon */}
+        {deal.status === 'under contract' && (
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            background: 'rgba(239,68,68,0.9)', textAlign: 'center',
+            padding: '5px', fontSize: '11px', fontWeight: 700, color: '#fff',
+            letterSpacing: '0.5px',
+          }}>
+            UNDER CONTRACT
+          </div>
+        )}
 
-        {/* Days listed */}
-        <div style={{ position: 'absolute', bottom: '12px', right: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Calendar size={11} style={{ color: '#94a3b8' }} />
-          <span style={{ color: '#94a3b8', fontSize: '11px' }}>{deal.daysListed}d listed</span>
-        </div>
+        {/* Days listed — bottom right */}
+        {deal.status !== 'under contract' && (
+          <div style={{
+            position: 'absolute', bottom: '10px', right: '10px',
+            background: 'rgba(10,10,15,0.7)', borderRadius: '5px',
+            padding: '2px 8px', fontSize: '11px', color: '#cbd5e1', backdropFilter: 'blur(4px)',
+          }}>
+            {deal.daysListed}d listed
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      <div style={{ padding: '16px' }}>
+      {/* ── Info panel ── */}
+      <div style={{ padding: '14px 16px 16px' }}>
         {/* Price */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <div>
-            <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>LISTING PRICE</span>
-            <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', lineHeight: 1 }}>
-              {formatCurrency(deal.listingPrice || deal.price)}
-            </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '6px' }}>
+          <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>
+            {fmt(deal.listingPrice || deal.price)}
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>POTENTIAL PROFIT</span>
-            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '16px', lineHeight: 1.2 }}>
-              +{formatCurrency(deal.potentialProfit)}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <span style={{ color: '#475569', fontSize: '11px' }}>ARV</span>
+            <span style={{ color: '#10b981', fontWeight: 700, fontSize: '13px' }}>{fmt(deal.arv)}</span>
           </div>
         </div>
 
-        {/* Blurred title + city/state (no zip) */}
-        <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 2px', fontFamily: 'monospace', letterSpacing: '0.5px' }}>
-          {blurTitle(deal.address)}
-        </p>
-        <p style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', margin: '0 0 12px' }} className="line-clamp-1">
+        {/* Blurred address line */}
+        <div style={{ color: '#64748b', fontSize: '12px', fontFamily: 'monospace', marginBottom: '2px' }}>
+          {blurStreetNumber(deal.address)}
+        </div>
+        <div style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, marginBottom: '10px' }}>
           {deal.city}, {deal.state}
-        </p>
+        </div>
 
-        {/* Stats row */}
+        {/* Beds / Baths / Sqft / Year */}
         {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Home size={13} style={{ color: '#94a3b8' }} />
-              <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.beds}bd</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ color: '#94a3b8', fontSize: '13px' }}>🛁</span>
-              <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.baths}ba</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Maximize2 size={13} style={{ color: '#94a3b8' }} />
-              <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.sqft?.toLocaleString()} sqft</span>
-            </div>
-            {deal.yearBuilt && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Calendar size={13} style={{ color: '#94a3b8' }} />
-                <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.yearBuilt}</span>
+          <div style={{
+            display: 'flex', gap: '0', marginBottom: '12px',
+            background: '#0f0f18', borderRadius: '8px', overflow: 'hidden',
+            border: '1px solid #1e1e2e',
+          }}>
+            {[
+              { icon: Bed, val: `${deal.beds} bd` },
+              { icon: Bath, val: `${deal.baths} ba` },
+              { icon: Maximize2, val: `${(deal.sqft || 0).toLocaleString()} ft²` },
+              ...(deal.yearBuilt ? [{ icon: Calendar, val: `${deal.yearBuilt}` }] : []),
+            ].map(({ icon: Icon, val }, i, arr) => (
+              <div key={i} style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '4px', padding: '7px 4px',
+                borderRight: i < arr.length - 1 ? '1px solid #1e1e2e' : 'none',
+              }}>
+                <Icon size={11} style={{ color: '#475569', flexShrink: 0 }} />
+                <span style={{ color: '#cbd5e1', fontSize: '11px', fontWeight: 600, whiteSpace: 'nowrap' }}>{val}</span>
               </div>
+            ))}
+          </div>
+        )}
+
+        {/* Repair cost chip (only if relevant) */}
+        {deal.repairCost > 0 && (
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <span style={{
+              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)',
+              borderRadius: '6px', padding: '3px 10px', fontSize: '11px', fontWeight: 600,
+              color: '#ef4444',
+            }}>
+              Est. Repairs: {fmt(deal.repairCost)}
+            </span>
+            {deal.potentialProfit > 0 && (
+              <span style={{
+                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)',
+                borderRadius: '6px', padding: '3px 10px', fontSize: '11px', fontWeight: 600,
+                color: '#10b981',
+              }}>
+                +{fmt(deal.potentialProfit)} profit
+              </span>
             )}
           </div>
         )}
 
-        {/* ARV / Repair Cost */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-          <div style={{
-            flex: 1, background: 'rgba(16, 185, 129, 0.08)', borderRadius: '8px',
-            padding: '8px', border: '1px solid rgba(16, 185, 129, 0.15)',
-          }}>
-            <div style={{ color: '#94a3b8', fontSize: '10px', fontWeight: 600, marginBottom: '2px' }}>ARV</div>
-            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '14px' }}>{formatCurrency(deal.arv)}</div>
-          </div>
-          {deal.repairCost > 0 && (
-            <div style={{
-              flex: 1, background: 'rgba(239, 68, 68, 0.08)', borderRadius: '8px',
-              padding: '8px', border: '1px solid rgba(239, 68, 68, 0.15)',
-            }}>
-              <div style={{ color: '#94a3b8', fontSize: '10px', fontWeight: 600, marginBottom: '2px' }}>REPAIRS</div>
-              <div style={{ color: '#ef4444', fontWeight: 700, fontSize: '14px' }}>{formatCurrency(deal.repairCost)}</div>
-            </div>
-          )}
-        </div>
+        {/* Divider */}
+        <div style={{ height: '1px', background: '#1e1e2e', marginBottom: '12px' }} />
 
-        {/* Seller */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid #1e1e2e' }}>
+        {/* Seller + View */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img
             src={deal.sellerAvatar}
             alt={deal.sellerName}
-            style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+            style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
           />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, margin: 0 }}>{deal.sellerName}</p>
-            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-              {deal.tags.slice(0, 2).map(tag => (
-                <span key={tag} style={{
-                  background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6',
-                  borderRadius: '20px', padding: '1px 6px', fontSize: '10px', fontWeight: 600,
-                }}>
-                  {tag}
-                </span>
+            <div style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {deal.sellerName}
+            </div>
+            <div style={{ display: 'flex', gap: '3px' }}>
+              {deal.tags?.slice(0, 2).map(t => (
+                <span key={t} style={{ color: '#8b5cf6', fontSize: '10px', fontWeight: 600 }}>#{t.replace(/\s/g,'')}</span>
               ))}
             </div>
           </div>
-          {/* View Deal button only */}
           <button
             onClick={openDeal}
             style={{
-              display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 12px',
+              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '7px 14px', borderRadius: '8px',
               background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-              border: 'none', borderRadius: '8px',
-              color: '#fff', fontWeight: 600, fontSize: '13px',
-              cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap',
+              border: 'none', color: '#fff', fontWeight: 700, fontSize: '12px',
+              cursor: 'pointer', flexShrink: 0,
+              transition: 'opacity 0.15s',
             }}
           >
-            <Eye size={13} />
-            View Deal
+            <Eye size={12} />
+            View
           </button>
         </div>
       </div>
-    </>
-  );
-}
-
-export default function DealCard({ deal }) {
-  const [saved, setSaved] = useState(false);
-
-  if (deal.isFeatured) {
-    return (
-      <div className="featured-card" style={{ borderRadius: '14px' }}>
-        <div className="featured-card-inner card-hover" style={{ height: '100%' }}>
-          <CardContent deal={deal} saved={saved} setSaved={setSaved} />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="card-hover"
-      style={{
-        background: '#12121e',
-        border: deal.isSponsored ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid #1e1e2e',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        transition: 'all 0.2s',
-      }}
-    >
-      <CardContent deal={deal} saved={saved} setSaved={setSaved} />
     </div>
   );
 }
