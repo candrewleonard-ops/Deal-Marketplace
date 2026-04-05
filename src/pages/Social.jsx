@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Image, Video, Link as LinkIcon, Smile, TrendingUp, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Image, Video, Link as LinkIcon, Smile, TrendingUp, UserPlus, Users, MapPin, Lock } from 'lucide-react';
 import PostCard from '../components/PostCard';
 import { posts, stories } from '../data/posts';
 import { users } from '../data/users';
+import { getUserGroups } from '../data/groups';
+import { cities } from '../data/cities';
+import { useAuth } from '../context/AuthContext';
 
 const trendingMarkets = [
   { city: 'Atlanta, GA', growth: '+18%', deals: 47 },
@@ -15,8 +19,12 @@ const trendingMarkets = [
 const suggestedUsers = users.slice(2, 7);
 
 export default function Social() {
+  const { currentUser } = useAuth();
   const [postContent, setPostContent] = useState('');
   const [activeStory, setActiveStory] = useState(null);
+  const [feedFilter, setFeedFilter] = useState('all');
+  const myGroups = getUserGroups(currentUser.id);
+  const topCities = cities.slice(0, 10);
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
@@ -70,10 +78,51 @@ export default function Social() {
           </div>
         </div>
 
-        {/* Main Layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '24px', alignItems: 'flex-start' }}>
+        {/* Main Layout with left sidebar */}
+        <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr 300px', gap: '20px', alignItems: 'flex-start' }}>
+          {/* Left Sidebar */}
+          <div style={{ position: 'sticky', top: '84px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+                <Users size={16} style={{ color: '#8b5cf6' }} />
+                <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px', margin: 0 }}>REI Custom Groups</h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {myGroups.slice(0, 6).map((g, i) => (
+                  <Link key={g.id} to="/groups" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '6px', textDecoration: 'none', color: '#94a3b8', fontSize: '12px' }}>
+                    {g.isPrivate && <Lock size={10} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</span>
+                    {i % 2 === 0 && <span style={{ background: '#8b5cf6', color: '#fff', borderRadius: '10px', padding: '1px 6px', fontSize: '9px', fontWeight: 700 }}>{i + 1}</span>}
+                  </Link>
+                ))}
+                <Link to="/groups" style={{ color: '#8b5cf6', fontSize: '11px', fontWeight: 700, textDecoration: 'none', marginTop: '4px', padding: '4px 8px' }}>See All →</Link>
+              </div>
+            </div>
+
+            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+                <MapPin size={16} style={{ color: '#06b6d4' }} />
+                <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px', margin: 0 }}>Public City Discussions</h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '340px', overflowY: 'auto' }}>
+                {topCities.map(c => (
+                  <Link key={c.id} to={`/city/${c.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', borderRadius: '6px', textDecoration: 'none', color: '#94a3b8', fontSize: '12px' }}>
+                    <span>{c.name}, {c.state}</span>
+                    <span style={{ color: '#475569', fontSize: '10px' }}>{(c.memberCount / 1000).toFixed(1)}k</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Feed */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Filter Tabs */}
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {['all', 'my groups', 'following'].map(f => (
+                <button key={f} onClick={() => setFeedFilter(f)} style={{ padding: '6px 14px', borderRadius: '20px', background: feedFilter === f ? 'rgba(139, 92, 246, 0.2)' : '#12121e', border: `1px solid ${feedFilter === f ? '#8b5cf6' : '#1e1e2e'}`, color: feedFilter === f ? '#8b5cf6' : '#94a3b8', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textTransform: 'capitalize' }}>{f}</button>
+              ))}
+            </div>
             {/* Create Post */}
             <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '20px' }}>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>

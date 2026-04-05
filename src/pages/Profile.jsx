@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   MapPin, Calendar, Users, TrendingUp, MessageSquare, UserPlus,
-  Edit3, Building2, Shield, Image, Video, FileText, Clock, Briefcase
+  Edit3, Building2, Shield, Image, Video, FileText, Clock, Briefcase, X, Lock
 } from 'lucide-react';
-import { getUserById, currentUser } from '../data/users';
+import { getUserById, currentUser, users } from '../data/users';
 import { deals } from '../data/deals';
 import PostCard from '../components/PostCard';
 import DealCard from '../components/DealCard';
@@ -34,10 +34,13 @@ const auditLog = [
 
 export default function Profile() {
   const { id } = useParams();
-  const profile = getUserById(parseInt(id)) || getUserById(1);
+  const profile = getUserById(id) || getUserById(1);
   const isOwnProfile = profile.id === currentUser.id;
   const [activeTab, setActiveTab] = useState('posts');
   const [following, setFollowing] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(null); // 'followers' | 'following' | null
+
+  const joinedDate = profile.joinedDate ? new Date(profile.joinedDate).toLocaleString('en-US', { month: 'long', year: 'numeric' }) : '';
 
   const userDeals = deals.filter(d => d.sellerId === profile.id);
   const userPosts = posts.filter(p => p.userId === profile.id);
@@ -194,18 +197,26 @@ export default function Profile() {
           )}
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
             {[
-              { value: profile.followers?.toLocaleString(), label: 'Followers' },
-              { value: profile.following?.toLocaleString(), label: 'Following' },
+              { value: profile.followers?.toLocaleString(), label: 'Followers', clickable: 'followers' },
+              { value: profile.following?.toLocaleString(), label: 'Following', clickable: 'following' },
               { value: profile.dealsPosted, label: 'Deals Posted' },
-              { value: profile.dealsClosed, label: 'Deals Closed' },
-            ].map(({ value, label }) => (
-              <div key={label} style={{ textAlign: 'center' }}>
+            ].map(({ value, label, clickable }) => (
+              <button
+                key={label}
+                onClick={() => clickable && setShowFollowers(clickable)}
+                style={{ background: 'none', border: 'none', padding: 0, cursor: clickable ? 'pointer' : 'default', textAlign: 'center' }}
+              >
                 <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
                 <div style={{ color: '#475569', fontSize: '13px', marginTop: '2px' }}>{label}</div>
-              </div>
+              </button>
             ))}
+            {joinedDate && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569', fontSize: '13px', paddingLeft: '8px', borderLeft: '1px solid #1e1e2e' }}>
+                <Calendar size={13} /> Joined {joinedDate}
+              </div>
+            )}
           </div>
         </div>
 
@@ -370,6 +381,36 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      {showFollowers && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowFollowers(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', width: '100%', maxWidth: '420px', maxHeight: '70vh', overflowY: 'auto' }}>
+            <div style={{ padding: '18px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: '#f8fafc', fontSize: '17px', fontWeight: 800, margin: 0, textTransform: 'capitalize' }}>{showFollowers}</h3>
+              <button onClick={() => setShowFollowers(null)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={18} /></button>
+            </div>
+            <div style={{ padding: '8px' }}>
+              {profile.isPrivate && showFollowers === 'following' && !isOwnProfile ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: '#94a3b8' }}>
+                  <Lock size={24} style={{ color: '#f59e0b', marginBottom: '10px' }} />
+                  <p style={{ fontSize: '14px', margin: 0 }}>This user's following list is private</p>
+                </div>
+              ) : (
+                users.slice(1, 8).map(u => (
+                  <Link key={u.id} to={`/profile/${u.id}`} onClick={() => setShowFollowers(null)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', textDecoration: 'none', color: '#f8fafc' }}>
+                    <img src={u.avatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600 }}>{u.name}</div>
+                      <div style={{ color: '#475569', fontSize: '12px' }}>@{u.username}</div>
+                    </div>
+                    <button className="gradient-btn" style={{ padding: '5px 12px', borderRadius: '6px', color: '#fff', fontSize: '11px', fontWeight: 700, border: 'none', cursor: 'pointer' }}>Follow</button>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

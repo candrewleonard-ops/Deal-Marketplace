@@ -2,12 +2,16 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
-  Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp
+  Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
+  Crown, Shield, UsersRound
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const navLinks = [
   { to: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
+  { to: '/my-deals', label: 'My Deals', icon: TrendingUp },
   { to: '/social', label: 'Social', icon: Users },
+  { to: '/groups', label: 'Groups', icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
   { to: '/meetups', label: 'Meetups', icon: Calendar },
 ];
@@ -15,6 +19,7 @@ const navLinks = [
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -88,6 +93,19 @@ export default function Navbar() {
 
           {/* Right Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+            {currentUser?.isAdmin && (
+              <Link
+                to="/admin"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '7px 12px', borderRadius: '8px',
+                  background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#ef4444', textDecoration: 'none', fontSize: '13px', fontWeight: 700,
+                }}
+              >
+                <Shield size={14} /> Admin
+              </Link>
+            )}
             {/* Post Deal Button */}
             <Link
               to="/marketplace"
@@ -181,7 +199,7 @@ export default function Navbar() {
                 }}
               >
                 <img
-                  src="https://picsum.photos/seed/user1/100/100"
+                  src={currentUser?.avatar}
                   alt="avatar"
                   style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
                 />
@@ -197,12 +215,12 @@ export default function Navbar() {
                   overflow: 'hidden',
                 }}>
                   <div style={{ padding: '12px 16px', borderBottom: '1px solid #1e1e2e' }}>
-                    <p style={{ color: '#f8fafc', fontWeight: 600, margin: 0, fontSize: '14px' }}>Marcus Johnson</p>
-                    <p style={{ color: '#475569', margin: '2px 0 0', fontSize: '12px' }}>@marcusj_rei</p>
+                    <p style={{ color: '#f8fafc', fontWeight: 600, margin: 0, fontSize: '14px' }}>{currentUser?.name}</p>
+                    <p style={{ color: '#475569', margin: '2px 0 0', fontSize: '12px' }}>@{currentUser?.username}</p>
                   </div>
                   {[
-                    { icon: User, label: 'My Profile', to: '/profile/1' },
-                    { icon: TrendingUp, label: 'My Deals', to: '/marketplace' },
+                    { icon: User, label: 'View Profile', to: `/profile/${currentUser?.id}` },
+                    { icon: Crown, label: 'Upgrade to Premium', to: '/premium' },
                     { icon: Settings, label: 'Settings', to: '/auth' },
                   ].map(({ icon: Icon, label, to }) => (
                     <Link

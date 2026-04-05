@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Eye, EyeOff, Check, User, Building2, ArrowRight } from 'lucide-react';
+import { Home, Eye, EyeOff, Check, User, Building2, ArrowRight, AlertCircle } from 'lucide-react';
+import { validateUsername } from '../utils/username';
+import { users } from '../data/users';
 
 const userTags = [
   'Fix N Flipper', 'Wholesaler', 'Marketer', 'Realtor', 'Cash Buyer',
@@ -27,7 +29,10 @@ export default function Auth() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [step, setStep] = useState(1);
   const [teamEmails, setTeamEmails] = useState(['']);
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
+
+  const usernameValidation = username ? validateUsername(username, users) : null;
 
   const toggleTag = (tag) => {
     setSelectedTags(prev =>
@@ -256,6 +261,28 @@ export default function Auth() {
                           className="input-dark"
                           style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }}
                         />
+                      </div>
+
+                      <div>
+                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Username</label>
+                        <input
+                          type="text"
+                          value={username}
+                          onChange={e => setUsername(e.target.value)}
+                          placeholder="your_username"
+                          className="input-dark"
+                          style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', borderColor: usernameValidation && !usernameValidation.valid ? '#ef4444' : undefined }}
+                        />
+                        {usernameValidation && !usernameValidation.valid && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', color: '#ef4444', fontSize: '12px', fontWeight: 600 }}>
+                            <AlertCircle size={12} /> {usernameValidation.error}
+                          </div>
+                        )}
+                        {usernameValidation && usernameValidation.valid && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', color: '#10b981', fontSize: '12px', fontWeight: 600 }}>
+                            <Check size={12} /> Username is available
+                          </div>
+                        )}
                       </div>
 
                       {profileType === 'business' && (

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, X, ChevronDown, TrendingUp } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, TrendingUp, MapPin } from 'lucide-react';
 import DealCard from '../components/DealCard';
+import USMap from '../components/USMap';
 import { deals, dealTypes } from '../data/deals';
 
 const cities = ['All Cities', 'Atlanta, GA', 'Phoenix, AZ', 'Dallas, TX', 'Houston, TX', 'Memphis, TN', 'Indianapolis, IN', 'Kansas City, MO', 'Birmingham, AL', 'Jacksonville, FL', 'Tampa, FL', 'Orlando, FL', 'Charlotte, NC', 'Detroit, MI', 'Cleveland, OH', 'Cincinnati, OH', 'St. Louis, MO', 'Baltimore, MD', 'Philadelphia, PA', 'Las Vegas, NV', 'Columbus, OH'];
@@ -10,9 +11,14 @@ export default function Marketplace() {
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [city, setCity] = useState('All Cities');
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceValue, setPriceValue] = useState(1000000);
+  const [priceMode, setPriceMode] = useState('max'); // 'min' or 'max'
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [minBeds, setMinBeds] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
+  const [stateFilter, setStateFilter] = useState(null);
+  const [showMap, setShowMap] = useState(true);
+  const [newestOnly, setNewestOnly] = useState(false);
 
   const filtered = useMemo(() => {
     return deals.filter(d => {
@@ -21,22 +27,31 @@ export default function Marketplace() {
         const [c, s] = city.split(', ');
         if (d.city !== c || d.state !== s) return false;
       }
-      if (d.price < priceRange[0] || d.price > priceRange[1]) return false;
+      if (stateFilter && d.state !== stateFilter) return false;
+      const listPrice = d.listingPrice || d.price;
+      if (priceMode === 'max' && listPrice > priceValue) return false;
+      if (priceMode === 'min' && listPrice < priceValue) return false;
       if (minBeds > 0 && d.beds < minBeds) return false;
+      if (newestOnly && d.daysListed > 7) return false;
       if (search) {
         const q = search.toLowerCase();
-        if (!d.title.toLowerCase().includes(q) && !d.city.toLowerCase().includes(q) && !d.address.toLowerCase().includes(q)) return false;
+        if (!d.title.toLowerCase().includes(q) && !d.city.toLowerCase().includes(q)) return false;
       }
       return true;
     });
-  }, [activeType, search, city, priceRange, minBeds]);
+  }, [activeType, search, city, priceValue, priceMode, minBeds, stateFilter, newestOnly]);
 
-  // Sponsored first
   const sorted = useMemo(() => {
-    const sponsored = filtered.filter(d => d.isSponsored);
-    const regular = filtered.filter(d => !d.isSponsored);
+    const arr = [...filtered];
+    if (sortBy === 'price-low') arr.sort((a, b) => (a.listingPrice || a.price) - (b.listingPrice || b.price));
+    else if (sortBy === 'price-high') arr.sort((a, b) => (b.listingPrice || b.price) - (a.listingPrice || a.price));
+    else if (sortBy === 'views') arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+    else arr.sort((a, b) => a.daysListed - b.daysListed); // newest
+    // Sponsored first
+    const sponsored = arr.filter(d => d.isSponsored);
+    const regular = arr.filter(d => !d.isSponsored);
     return [...sponsored, ...regular];
-  }, [filtered]);
+  }, [filtered, sortBy]);
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
@@ -116,7 +131,7 @@ export default function Marketplace() {
             >
               <SlidersHorizontal size={16} />
               Filters
-              {(priceRange[1] < 100000 || minBeds > 0) && (
+              {(priceValue < 1000000 || minBeds > 0 || stateFilter) && (
                 <span style={{
                   background: '#8b5cf6', color: '#fff',
                   borderRadius: '50%', width: '18px', height: '18px',
@@ -135,23 +150,39 @@ export default function Marketplace() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px',
             }}>
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
-                  MAX PRICE (Assignment Fee)
-                </label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <label style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700 }}>
+                    {priceMode === 'max' ? 'MAX' : 'MIN'} LISTING PRICE
+                  </label>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {['min', 'max'].map(m => (
+                      <button key={m} onClick={() => setPriceMode(m)} style={{ padding: '3px 10px', borderRadius: '12px', background: priceMode === m ? 'rgba(139, 92, 246, 0.2)' : '#1a1a2e', border: `1px solid ${priceMode === m ? '#8b5cf6' : '#1e1e2e'}`, color: priceMode === m ? '#8b5cf6' : '#94a3b8', cursor: 'pointer', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{m}</button>
+                    ))}
+                  </div>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <input
                     type="range"
                     min={0}
-                    max={100000}
-                    step={1000}
-                    value={priceRange[1]}
-                    onChange={e => setPriceRange([0, parseInt(e.target.value)])}
+                    max={1000000}
+                    step={5000}
+                    value={priceValue}
+                    onChange={e => setPriceValue(parseInt(e.target.value))}
                     style={{ flex: 1, accentColor: '#8b5cf6' }}
                   />
-                  <span style={{ color: '#f8fafc', fontWeight: 700, minWidth: '70px', fontSize: '14px' }}>
-                    ${priceRange[1].toLocaleString()}
+                  <span style={{ color: '#f8fafc', fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
+                    {priceValue >= 1000000 ? 'No Max' : `$${priceValue.toLocaleString()}`}
                   </span>
                 </div>
+              </div>
+              <div>
+                <label style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: '10px' }}>SORT BY</label>
+                <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="input-dark" style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                  <option value="newest">Newest First</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="views">Most Views</option>
+                </select>
               </div>
               <div>
                 <label style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
@@ -178,7 +209,7 @@ export default function Marketplace() {
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                 <button
-                  onClick={() => { setPriceRange([0, 100000]); setMinBeds(0); setCity('All Cities'); setSearch(''); }}
+                  onClick={() => { setPriceValue(1000000); setPriceMode('max'); setMinBeds(0); setCity('All Cities'); setSearch(''); setStateFilter(null); setNewestOnly(false); }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
                     padding: '10px 16px', borderRadius: '8px',
@@ -214,15 +245,53 @@ export default function Marketplace() {
         </div>
       </div>
 
+      {/* US Map Collapsible + Newest Button */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 20px 0' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            onClick={() => setNewestOnly(!newestOnly)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', borderRadius: '20px',
+              background: newestOnly ? 'linear-gradient(135deg, #8b5cf6, #06b6d4)' : 'rgba(255,255,255,0.04)',
+              border: newestOnly ? 'none' : '1px solid #1e1e2e',
+              color: newestOnly ? '#fff' : '#94a3b8', fontWeight: 700, fontSize: '13px', cursor: 'pointer',
+            }}
+          >
+            <TrendingUp size={14} /> Newest Deals {newestOnly && '(7d)'}
+          </button>
+          {stateFilter && (
+            <button onClick={() => setStateFilter(null)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '20px', background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8b5cf6', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+              State: {stateFilter} <X size={12} />
+            </button>
+          )}
+        </div>
+        <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', overflow: 'hidden' }}>
+          <button
+            onClick={() => setShowMap(!showMap)}
+            style={{ width: '100%', padding: '14px 18px', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#f8fafc' }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '14px' }}>
+              <MapPin size={16} style={{ color: '#8b5cf6' }} /> View Deals by State
+            </span>
+            {showMap ? <ChevronUp size={18} style={{ color: '#94a3b8' }} /> : <ChevronDown size={18} style={{ color: '#94a3b8' }} />}
+          </button>
+          {showMap && (
+            <div style={{ borderTop: '1px solid #1e1e2e' }}>
+              <USMap deals={deals} onStateClick={(state) => setStateFilter(state)} />
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Deals Grid */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 20px' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px' }}>
         {sorted.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏚️</div>
             <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>No deals found</h3>
             <p style={{ color: '#475569', fontSize: '14px' }}>Try adjusting your filters or search terms</p>
             <button
-              onClick={() => { setActiveType('all'); setSearch(''); setCity('All Cities'); setPriceRange([0, 100000]); setMinBeds(0); }}
+              onClick={() => { setActiveType('all'); setSearch(''); setCity('All Cities'); setPriceValue(1000000); setMinBeds(0); setStateFilter(null); setNewestOnly(false); }}
               style={{
                 marginTop: '20px', padding: '12px 24px', borderRadius: '10px',
                 background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',

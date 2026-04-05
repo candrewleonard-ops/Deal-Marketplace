@@ -109,9 +109,9 @@ function CardContent({ deal, saved, setSaved }) {
         {/* Price */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
           <div>
-            <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>ASSIGNMENT FEE</span>
+            <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>LISTING PRICE</span>
             <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', lineHeight: 1 }}>
-              {formatCurrency(deal.price)}
+              {formatCurrency(deal.listingPrice || deal.price)}
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -122,12 +122,9 @@ function CardContent({ deal, saved, setSaved }) {
           </div>
         </div>
 
-        {/* Address */}
-        <p style={{ color: '#f8fafc', fontWeight: 600, fontSize: '14px', margin: '0 0 2px' }} className="line-clamp-1">
-          {deal.address}
-        </p>
-        <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 12px' }}>
-          {deal.city}, {deal.state} {deal.zip}
+        {/* City / State only - no street address */}
+        <p style={{ color: '#f8fafc', fontWeight: 600, fontSize: '14px', margin: '0 0 12px' }} className="line-clamp-1">
+          {deal.city}, {deal.state}
         </p>
 
         {/* Stats row */}
@@ -145,6 +142,12 @@ function CardContent({ deal, saved, setSaved }) {
               <Maximize2 size={13} style={{ color: '#94a3b8' }} />
               <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.sqft?.toLocaleString()} sqft</span>
             </div>
+            {deal.yearBuilt && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Calendar size={13} style={{ color: '#94a3b8' }} />
+                <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 500 }}>{deal.yearBuilt}</span>
+              </div>
+            )}
           </div>
         )}
 

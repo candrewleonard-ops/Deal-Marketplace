@@ -8,6 +8,10 @@ import {
 import { getDealById, getSimilarDeals } from '../data/deals';
 import { getUserById } from '../data/users';
 import DealCard from '../components/DealCard';
+import ImageCarousel from '../components/ImageCarousel';
+import AddressRequestModal from '../components/AddressRequestModal';
+import { getDisplayAddress } from '../utils/address';
+import { useAuth } from '../context/AuthContext';
 
 const dealTypeLabels = {
   'fix-flip': 'Fix & Flip',
@@ -35,10 +39,13 @@ function formatCurrency(n) {
 export default function DealDetail() {
   const { id } = useParams();
   const deal = getDealById(id);
-  const [imgIdx, setImgIdx] = useState(0);
+  const { currentUser, isLoggedIn } = useAuth();
   const [saved, setSaved] = useState(false);
   const [showPromote, setShowPromote] = useState(false);
   const [showRequest, setShowRequest] = useState(false);
+  const [showAddressReq, setShowAddressReq] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [addressGranted, setAddressGranted] = useState(false);
   const [budget, setBudget] = useState(20);
 
   if (!deal) {
@@ -86,105 +93,40 @@ export default function DealDetail() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'flex-start' }}>
           {/* Left column */}
           <div>
-            {/* Image Gallery */}
-            <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', marginBottom: '24px', background: '#12121e' }}>
-              <img
-                src={deal.images[imgIdx]}
-                alt={`Property ${imgIdx + 1}`}
-                style={{ width: '100%', height: '480px', objectFit: 'cover' }}
-              />
-
-              {/* Featured overlay */}
-              {deal.isFeatured && (
-                <div style={{
-                  position: 'absolute', top: '20px', left: '20px',
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  background: 'rgba(0,0,0,0.85)', borderRadius: '24px',
-                  padding: '8px 16px', backdropFilter: 'blur(8px)',
-                }}>
-                  <Crown size={18} style={{ color: '#f59e0b' }} />
-                  <span className="shimmer-badge" style={{ fontSize: '14px', fontWeight: 800, letterSpacing: '0.5px' }}>
-                    FEATURED DEAL
-                  </span>
-                </div>
-              )}
-
-              {/* Gallery nav */}
-              {deal.images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setImgIdx(Math.max(0, imgIdx - 1))}
-                    style={{
-                      position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)',
-                      background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%',
-                      width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', color: '#fff', backdropFilter: 'blur(8px)',
-                      opacity: imgIdx === 0 ? 0.3 : 1,
-                    }}
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={() => setImgIdx(Math.min(deal.images.length - 1, imgIdx + 1))}
-                    style={{
-                      position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)',
-                      background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%',
-                      width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', color: '#fff', backdropFilter: 'blur(8px)',
-                      opacity: imgIdx === deal.images.length - 1 ? 0.3 : 1,
-                    }}
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </>
-              )}
-
-              {/* Image counter */}
-              <div style={{
-                position: 'absolute', bottom: '16px', right: '16px',
-                background: 'rgba(0,0,0,0.7)', borderRadius: '20px',
-                padding: '4px 12px', backdropFilter: 'blur(8px)',
-                color: '#f8fafc', fontSize: '13px', fontWeight: 600,
-              }}>
-                {imgIdx + 1} / {deal.images.length}
-              </div>
+            {/* Image Gallery with YouTube support */}
+            <div style={{ marginBottom: '24px' }}>
+              <ImageCarousel images={deal.images} youtubeId={deal.youtubeId} height={480} />
             </div>
-
-            {/* Thumbnails */}
-            {deal.images.length > 1 && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', overflowX: 'auto' }}>
-                {deal.images.map((img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt={`Thumb ${i + 1}`}
-                    onClick={() => setImgIdx(i)}
-                    style={{
-                      width: '100px', height: '70px', objectFit: 'cover',
-                      borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
-                      border: `2px solid ${imgIdx === i ? '#8b5cf6' : 'transparent'}`,
-                      transition: 'all 0.2s',
-                    }}
-                  />
-                ))}
-              </div>
-            )}
 
             {/* Title & Address */}
             <div style={{ marginBottom: '24px' }}>
               <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', marginBottom: '8px', lineHeight: 1.2 }}>
                 {deal.title}
               </h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', flexWrap: 'wrap' }}>
                 <MapPin size={16} />
-                <span style={{ fontSize: '16px' }}>{deal.address}, {deal.city}, {deal.state} {deal.zip}</span>
+                <span style={{ fontSize: '16px', fontFamily: addressGranted ? 'inherit' : 'monospace' }}>
+                  {getDisplayAddress(deal, addressGranted)}, {deal.city}, {deal.state} {deal.zip}
+                </span>
+                {!addressGranted && (
+                  <button
+                    onClick={() => setShowAddressReq(true)}
+                    style={{
+                      marginLeft: '8px', padding: '4px 12px', borderRadius: '16px',
+                      background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.4)',
+                      color: '#8b5cf6', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                    }}
+                  >
+                    Request Address
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '24px' }}>
               {[
-                { label: 'Assignment Fee', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
+                { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
                 { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
                 { label: 'Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
                 { label: 'Potential Profit', value: formatCurrency(deal.potentialProfit), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)' },
@@ -242,7 +184,7 @@ export default function DealDetail() {
                 }} />
                 <MapPin size={48} style={{ color: '#8b5cf6', marginBottom: '12px', position: 'relative' }} />
                 <p style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', margin: 0, position: 'relative' }}>{deal.city}, {deal.state}</p>
-                <p style={{ color: '#475569', fontSize: '14px', margin: '4px 0 0', position: 'relative' }}>{deal.address}</p>
+                <p style={{ color: '#475569', fontSize: '14px', margin: '4px 0 0', position: 'relative' }}>{getDisplayAddress(deal, addressGranted)}</p>
               </div>
             </div>
 
@@ -340,7 +282,7 @@ export default function DealDetail() {
               boxShadow: '0 4px 30px rgba(0,0,0,0.3)',
             }}>
               <div style={{ marginBottom: '16px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '4px' }}>ASSIGNMENT FEE</div>
+                <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '4px' }}>LISTING PRICE</div>
                 <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: '40px', lineHeight: 1 }}>{formatCurrency(deal.price)}</div>
               </div>
 
@@ -413,6 +355,7 @@ export default function DealDetail() {
                     {saved ? 'Saved' : 'Save'}
                   </button>
                   <button
+                    onClick={() => setShowShare(true)}
                     style={{
                       flex: 1, padding: '11px', borderRadius: '10px',
                       background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
@@ -422,7 +365,7 @@ export default function DealDetail() {
                     }}
                   >
                     <Share2 size={15} />
-                    Share
+                    Share to Feed
                   </button>
                 </div>
               </div>
@@ -534,9 +477,9 @@ export default function DealDetail() {
               <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
                 <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>DEAL SUMMARY</div>
                 <div style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '4px' }}>{deal.title}</div>
-                <div style={{ color: '#475569', fontSize: '13px', marginBottom: '12px' }}>{deal.address}, {deal.city}, {deal.state}</div>
+                <div style={{ color: '#475569', fontSize: '13px', marginBottom: '12px' }}>{getDisplayAddress(deal, addressGranted)}, {deal.city}, {deal.state}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#94a3b8', fontSize: '13px' }}>Assignment Fee</span>
+                  <span style={{ color: '#94a3b8', fontSize: '13px' }}>Listing Price</span>
                   <span style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '18px' }}>{formatCurrency(deal.price)}</span>
                 </div>
               </div>
@@ -567,6 +510,56 @@ export default function DealDetail() {
                   Send Assignment Request
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Address Request Modal */}
+      {showAddressReq && (
+        <AddressRequestModal
+          deal={deal}
+          sellerName={deal.sellerName}
+          onClose={() => setShowAddressReq(false)}
+          onSubmit={() => setAddressGranted(true)}
+        />
+      )}
+
+      {/* Share to Feed Modal */}
+      {showShare && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+        }}>
+          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '520px' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>Share to Feed</h2>
+              <button onClick={() => setShowShare(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <textarea
+                defaultValue={`Check out this deal in ${deal.city}, ${deal.state}!\n\n${deal.title}\n\nListing Price: ${formatCurrency(deal.listingPrice || deal.price)}\nARV: ${formatCurrency(deal.arv)}\n\nhttps://treim.com/marketplace/${deal.id}`}
+                className="input-dark"
+                rows={6}
+                style={{ width: '100%', padding: '12px', borderRadius: '10px', fontSize: '14px', resize: 'vertical', marginBottom: '12px' }}
+              />
+              <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px', marginBottom: '16px', display: 'flex', gap: '10px' }}>
+                <img src={deal.images[0]} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                <div>
+                  <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{deal.title}</div>
+                  <div style={{ color: '#94a3b8', fontSize: '12px' }}>{deal.city}, {deal.state}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => { setShowShare(false); alert('Posted to feed!'); }}
+                className="gradient-btn"
+                style={{ width: '100%', padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px' }}
+              >
+                Post to Feed
+              </button>
             </div>
           </div>
         </div>

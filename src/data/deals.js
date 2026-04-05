@@ -913,6 +913,48 @@ export const deals = [
   },
 ];
 
+// Trial user's own deals (for MyDeals page)
+deals.push(
+  {
+    id: 1001, title: 'My First Wholesale - Oak Cliff Fixer', address: '1425 S Marsalis Ave', city: 'Dallas', state: 'TX', zip: '75216',
+    price: 15000, arv: 195000, repairCost: 42000, potentialProfit: 138000, beds: 3, baths: 2, sqft: 1340, dealType: 'fix-flip',
+    images: ['https://picsum.photos/seed/trialdeal1/800/600', 'https://picsum.photos/seed/trialdeal1b/800/600'],
+    description: 'My first wholesale deal! Clean title, motivated seller, ready to close in 14 days. Oak Cliff is appreciating fast.',
+    daysListed: 3, isSponsored: false, isFeatured: false,
+    sellerId: 'me', sellerName: 'Trial User', sellerAvatar: 'https://picsum.photos/seed/trialuser/200/200',
+    tags: ['Wholesaler'], yearBuilt: 1962, lotSize: '0.17 acres', status: 'available',
+  },
+  {
+    id: 1002, title: 'North Dallas Probate SFR', address: '8822 Stults Rd', city: 'Dallas', state: 'TX', zip: '75243',
+    price: 22000, arv: 285000, repairCost: 55000, potentialProfit: 208000, beds: 4, baths: 2, sqft: 1780, dealType: 'fix-flip',
+    images: ['https://picsum.photos/seed/trialdeal2/800/600'],
+    description: 'Probate release, heirs need fast cash close. Great Richardson ISD schools.',
+    daysListed: 6, isSponsored: false, isFeatured: false,
+    sellerId: 'me', sellerName: 'Trial User', sellerAvatar: 'https://picsum.photos/seed/trialuser/200/200',
+    tags: ['Wholesaler'], yearBuilt: 1971, lotSize: '0.22 acres', status: 'available',
+  },
+  {
+    id: 1003, title: 'Arlington Duplex - Cash Flow', address: '612 W Park Row Dr', city: 'Arlington', state: 'TX', zip: '76010',
+    price: 35000, arv: 340000, repairCost: 40000, potentialProfit: 265000, beds: 4, baths: 4, sqft: 2100, dealType: 'rental',
+    images: ['https://picsum.photos/seed/trialdeal3/800/600'],
+    description: 'Both units rented. Immediate cash flow day one.',
+    daysListed: 10, isSponsored: false, isFeatured: false,
+    sellerId: 'me', sellerName: 'Trial User', sellerAvatar: 'https://picsum.photos/seed/trialuser/200/200',
+    tags: ['Wholesaler'], yearBuilt: 1985, lotSize: '0.2 acres', status: 'under contract',
+  }
+);
+
+// Enrich deals: add contractedPrice (70% of listingPrice), listingPrice alias, and youtubeId on first 4
+deals.forEach((d, i) => {
+  // Treat existing "price" as the LISTING PRICE (publicly visible)
+  d.listingPrice = d.price;
+  // contractedPrice is private, roughly 65% of listing price
+  d.contractedPrice = Math.round(d.price * 0.65 / 100) * 100;
+  if (i < 4) d.youtubeId = 'dQw4w9WgXcQ';
+  d.views = d.views || Math.floor(Math.random() * 500) + 50;
+  d.inquiries = d.inquiries || Math.floor(Math.random() * 15) + 1;
+});
+
 export const dealTypes = [
   { value: 'all', label: 'All Deals' },
   { value: 'fix-flip', label: 'Fix & Flip' },

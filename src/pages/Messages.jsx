@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Search, Send, Image, Paperclip, MoreVertical, Phone, Video, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Send, Image, Paperclip, MoreVertical, Phone, Video, ArrowLeft, Crown } from 'lucide-react';
 import { users } from '../data/users';
+import { useAuth } from '../context/AuthContext';
+import UserHoverCard from '../components/UserHoverCard';
 
 const conversations = [
   {
@@ -65,9 +68,23 @@ const messageHistory = {
   ],
 };
 
+const messageRequests = [
+  { id: 101, userId: 6, lastMessage: 'Hi! Would love to connect about Indy market deals.', time: '4h ago' },
+  { id: 102, userId: 10, lastMessage: 'Are you doing STR deals? I have a lead.', time: '1d ago' },
+  { id: 103, userId: 9, lastMessage: 'Hey, interested in lending on your next flip!', time: '2d ago' },
+];
+
+const DM_LIMITS = { Basic: 5, VIP: 30, 'VIP Max': 100 };
+
 export default function Messages() {
+  const { currentUser } = useAuth();
   const [activeConv, setActiveConv] = useState(null);
   const [message, setMessage] = useState('');
+  const [inboxTab, setInboxTab] = useState('inbox');
+  const [requestSort, setRequestSort] = useState('recent');
+
+  const dmLimit = DM_LIMITS[currentUser?.accountTier] || 5;
+  const dmsUsed = 2;
   const [messages, setMessages] = useState(messageHistory);
   const [typing, setTyping] = useState(false);
   const [mobileView, setMobileView] = useState('list'); // 'list' or 'chat'
@@ -106,7 +123,19 @@ export default function Messages() {
       }} className="hidden md:flex flex-col">
         {/* Header */}
         <div style={{ padding: '20px 16px', borderBottom: '1px solid #1e1e2e' }}>
-          <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: '0 0 14px' }}>Messages</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Messages</h2>
+            <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 600 }}>
+              DMs today: <strong style={{ color: '#8b5cf6' }}>{dmsUsed} / {dmLimit}</strong>
+            </div>
+          </div>
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: '4px', marginBottom: '12px' }}>
+            <button onClick={() => setInboxTab('inbox')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'inbox' ? 'rgba(139, 92, 246, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'inbox' ? '#8b5cf6' : '#1e1e2e'}`, color: inboxTab === 'inbox' ? '#8b5cf6' : '#94a3b8', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Inbox</button>
+            <button onClick={() => setInboxTab('requests')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'requests' ? 'rgba(139, 92, 246, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'requests' ? '#8b5cf6' : '#1e1e2e'}`, color: inboxTab === 'requests' ? '#8b5cf6' : '#94a3b8', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+              Requests ({messageRequests.length})
+            </button>
+          </div>
           <div style={{ position: 'relative' }}>
             <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
             <input
@@ -115,11 +144,49 @@ export default function Messages() {
               style={{ width: '100%', padding: '9px 14px 9px 36px', borderRadius: '10px', fontSize: '14px' }}
             />
           </div>
+          {inboxTab === 'requests' && (
+            <div style={{ marginTop: '10px' }}>
+              <select value={requestSort} onChange={e => setRequestSort(e.target.value)} className="input-dark" style={{ width: '100%', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}>
+                <option value="recent">Sort: Most Recent</option>
+                <option value="vip">Sort: VIP Status</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Convs */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          {conversations.map(conv => {
+          {inboxTab === 'requests' ? (
+            [...messageRequests].sort((a, b) => {
+              if (requestSort === 'vip') {
+                const tierRank = { 'VIP Max': 3, 'VIP': 2, 'Basic': 1 };
+                const ua = users.find(u => u.id === a.userId);
+                const ub = users.find(u => u.id === b.userId);
+                return (tierRank[ub?.accountTier] || 1) - (tierRank[ua?.accountTier] || 1);
+              }
+              return 0;
+            }).map(req => {
+              const u = users.find(u => u.id === req.userId);
+              const tier = u?.accountTier || 'Basic';
+              return (
+                <div key={req.id} style={{ padding: '12px 14px', borderBottom: '1px solid #1e1e2e', display: 'flex', gap: '10px' }}>
+                  <img src={u?.avatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                      <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 700 }}>{u?.name}</span>
+                      {tier === 'VIP Max' && <Crown size={11} style={{ color: '#f59e0b' }} />}
+                      {tier === 'VIP' && <Crown size={11} style={{ color: '#8b5cf6' }} />}
+                    </div>
+                    <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 6px' }} className="line-clamp-1">{req.lastMessage}</p>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button style={{ padding: '3px 10px', borderRadius: '12px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Accept</button>
+                      <button style={{ padding: '3px 10px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Decline</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : conversations.map(conv => {
             const user = users.find(u => u.id === conv.userId);
             const isActive = activeConv?.id === conv.id;
             return (
@@ -133,18 +200,20 @@ export default function Messages() {
                   borderLeft: isActive ? '3px solid #8b5cf6' : '3px solid transparent',
                 }}
               >
-                <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <img
-                    src={user?.avatar}
-                    alt={user?.name}
-                    style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }}
-                  />
-                  <div style={{
-                    position: 'absolute', bottom: '0', right: '0',
-                    width: '12px', height: '12px', borderRadius: '50%',
-                    background: '#10b981', border: '2px solid #0d0d1a',
-                  }} />
-                </div>
+                <UserHoverCard user={user}>
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <img
+                      src={user?.avatar}
+                      alt={user?.name}
+                      style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                    <div style={{
+                      position: 'absolute', bottom: '0', right: '0',
+                      width: '12px', height: '12px', borderRadius: '50%',
+                      background: '#10b981', border: '2px solid #0d0d1a',
+                    }} />
+                  </div>
+                </UserHoverCard>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                     <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{user?.name}</span>
@@ -188,22 +257,24 @@ export default function Messages() {
               >
                 <ArrowLeft size={20} />
               </button>
-              <div style={{ position: 'relative' }}>
-                <img
-                  src={activeUser.avatar}
-                  alt={activeUser.name}
-                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
-                />
-                <div style={{
-                  position: 'absolute', bottom: 0, right: 0,
-                  width: '12px', height: '12px', borderRadius: '50%',
-                  background: '#10b981', border: '2px solid #0d0d1a',
-                }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px' }}>{activeUser.name}</div>
-                <div style={{ color: '#10b981', fontSize: '12px', fontWeight: 500 }}>Active now</div>
-              </div>
+              <Link to={`/profile/${activeUser.id}`} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flex: 1 }}>
+                <div style={{ position: 'relative' }}>
+                  <img
+                    src={activeUser.avatar}
+                    alt={activeUser.name}
+                    style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                  <div style={{
+                    position: 'absolute', bottom: 0, right: 0,
+                    width: '12px', height: '12px', borderRadius: '50%',
+                    background: '#10b981', border: '2px solid #0d0d1a',
+                  }} />
+                </div>
+                <div>
+                  <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px' }}>{activeUser.name}</div>
+                  <div style={{ color: '#10b981', fontSize: '12px', fontWeight: 500 }}>Active now</div>
+                </div>
+              </Link>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {[Phone, Video, MoreVertical].map((Icon, i) => (
                   <button

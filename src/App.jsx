@@ -9,6 +9,11 @@ import Messages from './pages/Messages';
 import Contractors from './pages/Contractors';
 import Meetups from './pages/Meetups';
 import Auth from './pages/Auth';
+import MyDeals from './pages/MyDeals';
+import Groups from './pages/Groups';
+import CityDiscussion from './pages/CityDiscussion';
+import Admin from './pages/Admin';
+import Premium from './pages/Premium';
 import './index.css';
 
 function AppLayout({ children }) {
@@ -26,34 +31,18 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
-        <Route
-          path="/marketplace"
-          element={<AppLayout><Marketplace /></AppLayout>}
-        />
-        <Route
-          path="/marketplace/:id"
-          element={<AppLayout><DealDetail /></AppLayout>}
-        />
-        <Route
-          path="/social"
-          element={<AppLayout><Social /></AppLayout>}
-        />
-        <Route
-          path="/profile/:id"
-          element={<AppLayout><Profile /></AppLayout>}
-        />
-        <Route
-          path="/messages"
-          element={<AppLayout><Messages /></AppLayout>}
-        />
-        <Route
-          path="/contractors"
-          element={<AppLayout><Contractors /></AppLayout>}
-        />
-        <Route
-          path="/meetups"
-          element={<AppLayout><Meetups /></AppLayout>}
-        />
+        <Route path="/marketplace" element={<AppLayout><Marketplace /></AppLayout>} />
+        <Route path="/marketplace/:id" element={<AppLayout><DealDetail /></AppLayout>} />
+        <Route path="/my-deals" element={<AppLayout><MyDeals /></AppLayout>} />
+        <Route path="/social" element={<AppLayout><Social /></AppLayout>} />
+        <Route path="/groups" element={<AppLayout><Groups /></AppLayout>} />
+        <Route path="/city/:cityId" element={<AppLayout><CityDiscussion /></AppLayout>} />
+        <Route path="/profile/:id" element={<AppLayout><Profile /></AppLayout>} />
+        <Route path="/messages" element={<AppLayout><Messages /></AppLayout>} />
+        <Route path="/contractors" element={<AppLayout><Contractors /></AppLayout>} />
+        <Route path="/meetups" element={<AppLayout><Meetups /></AppLayout>} />
+        <Route path="/premium" element={<AppLayout><Premium /></AppLayout>} />
+        <Route path="/admin" element={<AppLayout><Admin /></AppLayout>} />
       </Routes>
     </Router>
   );
