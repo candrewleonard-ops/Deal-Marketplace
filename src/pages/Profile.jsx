@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, Calendar, Users, TrendingUp, MessageSquare, UserPlus,
-  Edit3, Building2, Shield, Image, Video, FileText, Clock, Briefcase, X, Lock
+  Edit3, Building2, Shield, Image, Video, FileText, Clock, Briefcase, X, Lock,
+  Share2, Check, Copy, ExternalLink
 } from 'lucide-react';
 import { getUserById, currentUser, users } from '../data/users';
 import { deals } from '../data/deals';
@@ -34,30 +35,71 @@ const auditLog = [
 
 export default function Profile() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const profile = getUserById(id) || getUserById(1);
   const isOwnProfile = profile.id === currentUser.id;
   const [activeTab, setActiveTab] = useState('posts');
   const [following, setFollowing] = useState(false);
-  const [showFollowers, setShowFollowers] = useState(null); // 'followers' | 'following' | null
+  const [followerCount, setFollowerCount] = useState(profile.followers || 0);
+  const [showFollowers, setShowFollowers] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: profile.name,
+    bio: profile.bio || '',
+    location: profile.location || '',
+    tags: profile.tags || [],
+    coverPhoto: profile.coverPhoto || '',
+    avatar: profile.avatar || '',
+  });
+  const [editForm, setEditForm] = useState({ ...profileData });
 
   const joinedDate = profile.joinedDate ? new Date(profile.joinedDate).toLocaleString('en-US', { month: 'long', year: 'numeric' }) : '';
 
   const userDeals = deals.filter(d => d.sellerId === profile.id);
   const userPosts = posts.filter(p => p.userId === profile.id);
 
+  const allTags = ['Wholesaler', 'Fix N Flipper', 'Marketer', 'Realtor', 'Cash Buyer', 'Hard Money Lender', 'Private Lender', 'Contractor', 'Property Manager', 'Agent/Broker'];
+
   const tabs = [
     { id: 'posts', label: 'Posts', icon: FileText },
     { id: 'deals', label: 'Deals', icon: TrendingUp },
     { id: 'about', label: 'About', icon: Users },
+    { id: 'photos', label: 'Photos', icon: Image },
+    { id: 'videos', label: 'Videos', icon: Video },
     ...(profile.isBusinessProfile ? [{ id: 'audit', label: 'Activity Log', icon: Clock }] : []),
   ];
+
+  function handleFollow() {
+    if (following) {
+      setFollowerCount(c => c - 1);
+    } else {
+      setFollowerCount(c => c + 1);
+    }
+    setFollowing(!following);
+  }
+
+  function handleSaveProfile() {
+    setProfileData({ ...editForm });
+    setShowEditModal(false);
+  }
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(`https://treim.app/profile/${profile.id}`).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  const photoSeeds = Array.from({ length: 12 }, (_, i) => `deal${i + 1}`);
+  const videoSeeds = Array.from({ length: 6 }, (_, i) => `video${i + 1}`);
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
       {/* Cover Photo */}
       <div style={{
         height: '280px', position: 'relative',
-        background: `linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.3)), url(${profile.coverPhoto})`,
+        background: `linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.3)), url(${profileData.coverPhoto || profile.coverPhoto})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
         overflow: 'hidden',
       }}>
@@ -88,8 +130,8 @@ export default function Profile() {
             overflow: 'hidden', background: '#12121e',
           }}>
             <img
-              src={profile.avatar}
-              alt={profile.name}
+              src={profileData.avatar || profile.avatar}
+              alt={profileData.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
@@ -97,32 +139,49 @@ export default function Profile() {
           {/* Action buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', flexWrap: 'wrap' }}>
             {isOwnProfile ? (
-              <button style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '9px 18px', borderRadius: '10px',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                color: '#f8fafc', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
-                transition: 'all 0.2s',
-              }}>
-                <Edit3 size={15} />
-                Edit Profile
-              </button>
+              <>
+                <button
+                  onClick={() => { setEditForm({ ...profileData }); setShowEditModal(true); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '9px 18px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+                    color: '#f8fafc', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Edit3 size={15} />
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '9px 18px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                  }}
+                >
+                  <Share2 size={15} />
+                  Share
+                </button>
+              </>
             ) : (
               <>
                 <button
-                  onClick={() => setFollowing(!following)}
+                  onClick={handleFollow}
                   className={following ? '' : 'gradient-btn'}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
                     padding: '9px 18px', borderRadius: '10px',
-                    background: following ? 'rgba(255,255,255,0.05)' : undefined,
-                    border: following ? '1px solid #1e1e2e' : 'none',
-                    color: following ? '#94a3b8' : '#fff',
+                    background: following ? 'rgba(16,185,129,0.1)' : undefined,
+                    border: following ? '1px solid rgba(16,185,129,0.3)' : 'none',
+                    color: following ? '#10b981' : '#fff',
                     cursor: 'pointer', fontWeight: 600, fontSize: '14px',
                     transition: 'all 0.2s',
                   }}
                 >
-                  <UserPlus size={15} />
+                  {following ? <Check size={15} /> : <UserPlus size={15} />}
                   {following ? 'Following' : 'Follow'}
                 </button>
                 <Link
@@ -138,6 +197,29 @@ export default function Profile() {
                   <MessageSquare size={15} />
                   Message
                 </Link>
+                <Link
+                  to={`/marketplace?seller=${profile.id}`}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '9px 18px', borderRadius: '10px',
+                    background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)',
+                    color: '#8b5cf6', textDecoration: 'none', fontWeight: 600, fontSize: '14px',
+                  }}
+                >
+                  <TrendingUp size={15} />
+                  View Deals
+                </Link>
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '9px 14px', borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                  }}
+                >
+                  <Share2 size={15} />
+                </button>
               </>
             )}
           </div>
@@ -146,7 +228,7 @@ export default function Profile() {
         {/* Name / Info */}
         <div style={{ paddingTop: '80px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
-            <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', margin: 0 }}>{profile.name}</h1>
+            <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', margin: 0 }}>{profileData.name}</h1>
             {profile.isBusinessProfile && (
               <span style={{
                 display: 'flex', alignItems: 'center', gap: '4px',
@@ -163,7 +245,7 @@ export default function Profile() {
 
           {/* Tags */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-            {profile.tags.map(tag => {
+            {profileData.tags.map(tag => {
               const color = tagColors[tag] || '#8b5cf6';
               return (
                 <span key={tag} style={{
@@ -180,7 +262,7 @@ export default function Profile() {
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '14px' }}>
               <MapPin size={14} />
-              {profile.location}
+              {profileData.location || profile.location}
             </div>
             {profile.isBusinessProfile && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '14px' }}>
@@ -190,16 +272,16 @@ export default function Profile() {
             )}
           </div>
 
-          {profile.bio && (
+          {(profileData.bio || profile.bio) && (
             <p style={{ color: '#e2e8f0', fontSize: '15px', lineHeight: 1.7, marginBottom: '20px', maxWidth: '600px' }}>
-              {profile.bio}
+              {profileData.bio || profile.bio}
             </p>
           )}
 
           {/* Stats */}
           <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
             {[
-              { value: profile.followers?.toLocaleString(), label: 'Followers', clickable: 'followers' },
+              { value: followerCount?.toLocaleString(), label: 'Followers', clickable: 'followers' },
               { value: profile.following?.toLocaleString(), label: 'Following', clickable: 'following' },
               { value: profile.dealsPosted, label: 'Deals Posted' },
             ].map(({ value, label, clickable }) => (
@@ -219,6 +301,30 @@ export default function Profile() {
             )}
           </div>
         </div>
+
+        {/* Business CTA for other profiles */}
+        {!isOwnProfile && userDeals.length > 0 && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.05))',
+            border: '1px solid rgba(139,92,246,0.2)',
+            borderRadius: '12px', padding: '14px 18px',
+            marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap',
+          }}>
+            <div>
+              <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>
+                {profile.name} has {userDeals.length} active deal{userDeals.length !== 1 ? 's' : ''} on the market
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: '13px', marginTop: '2px' }}>Browse their listings and request address access</div>
+            </div>
+            <Link
+              to={`/marketplace?seller=${profile.id}`}
+              className="gradient-btn"
+              style={{ padding: '9px 18px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '13px', textDecoration: 'none' }}
+            >
+              View Active Deals →
+            </Link>
+          </div>
+        )}
 
         {/* Business Profile: Team Members */}
         {profile.isBusinessProfile && profile.teamMembers && (
@@ -274,9 +380,17 @@ export default function Profile() {
             {userPosts.length > 0 ? (
               userPosts.map(post => <PostCard key={post.id} post={post} />)
             ) : (
-              <div style={{ textAlign: 'center', padding: '60px 20px', color: '#475569' }}>
-                <FileText size={48} style={{ marginBottom: '16px', opacity: 0.4 }} />
-                <p>No posts yet</p>
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px' }}>
+                <FileText size={48} style={{ marginBottom: '16px', opacity: 0.3, color: '#8b5cf6' }} />
+                <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>No posts yet</h3>
+                <p style={{ color: '#475569', fontSize: '14px', marginBottom: '16px' }}>
+                  {isOwnProfile ? 'Share your first market update or deal insight' : `${profile.name} hasn't posted yet`}
+                </p>
+                {isOwnProfile && (
+                  <Link to="/social" className="gradient-btn" style={{ display: 'inline-block', padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
+                    Create First Post
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -289,9 +403,17 @@ export default function Profile() {
                 {userDeals.map(deal => <DealCard key={deal.id} deal={deal} />)}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '60px 20px', color: '#475569' }}>
-                <TrendingUp size={48} style={{ marginBottom: '16px', opacity: 0.4 }} />
-                <p>No deals posted yet</p>
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px' }}>
+                <TrendingUp size={48} style={{ marginBottom: '16px', opacity: 0.3, color: '#8b5cf6' }} />
+                <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>No deals posted yet</h3>
+                <p style={{ color: '#475569', fontSize: '14px', marginBottom: '16px' }}>
+                  {isOwnProfile ? 'Post your first deal and start getting address requests' : `${profile.name} hasn't listed any deals yet`}
+                </p>
+                {isOwnProfile && (
+                  <Link to="/my-deals" className="gradient-btn" style={{ display: 'inline-block', padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
+                    Post Your First Deal
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -300,14 +422,14 @@ export default function Profile() {
         {activeTab === 'about' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px' }}>
-              <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '20px' }}>About {profile.name}</h3>
+              <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '20px' }}>About {profileData.name}</h3>
               <div style={{ display: 'grid', gap: '16px' }}>
                 {[
-                  { label: 'Bio', value: profile.bio },
-                  { label: 'Location', value: profile.location },
+                  { label: 'Bio', value: profileData.bio || profile.bio },
+                  { label: 'Location', value: profileData.location || profile.location },
                   { label: 'Email', value: profile.email },
                   { label: 'Phone', value: profile.phone },
-                  { label: 'Member Since', value: new Date(profile.joinedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) },
+                  { label: 'Member Since', value: profile.joinedDate ? new Date(profile.joinedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : null },
                   ...(profile.isBusinessProfile ? [{ label: 'Company', value: profile.companyName }] : []),
                 ].map(({ label, value }) => value && (
                   <div key={label} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: '12px', alignItems: 'flex-start' }}>
@@ -316,6 +438,57 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
+            </div>
+            {!isOwnProfile && (
+              <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.05))', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
+                <h4 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>Ready to connect with {profile.name.split(' ')[0]}?</h4>
+                <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '16px' }}>Send a message to discuss deals, partnerships, or market opportunities.</p>
+                <Link to="/messages" className="gradient-btn" style={{ display: 'inline-block', padding: '10px 24px', borderRadius: '10px', color: '#fff', fontWeight: 700, textDecoration: 'none' }}>
+                  Send a Message
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'photos' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+              {photoSeeds.map((seed, i) => (
+                <div key={i} style={{ aspectRatio: '1', borderRadius: '10px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <img
+                    src={`https://picsum.photos/seed/${seed}/400/400`}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'videos' && (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px' }}>
+              {videoSeeds.map((seed, i) => (
+                <div key={i} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', overflow: 'hidden', cursor: 'pointer' }}>
+                  <div style={{ position: 'relative', aspectRatio: '16/9' }}>
+                    <img src={`https://picsum.photos/seed/${seed}vid/600/340`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(139,92,246,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: 0, height: 0, borderLeft: '18px solid #fff', borderTop: '11px solid transparent', borderBottom: '11px solid transparent', marginLeft: '4px' }} />
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: '10px 12px' }}>
+                    <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '13px', marginBottom: '4px' }}>Deal Walkthrough #{i + 1}</div>
+                    <div style={{ color: '#475569', fontSize: '12px' }}>{(Math.random() * 10 + 1).toFixed(1)}k views • {i + 1}d ago</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -382,6 +555,7 @@ export default function Profile() {
         )}
       </div>
 
+      {/* Followers/Following Modal */}
       {showFollowers && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowFollowers(null)}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', width: '100%', maxWidth: '420px', maxHeight: '70vh', overflowY: 'auto' }}>
@@ -407,6 +581,118 @@ export default function Profile() {
                   </Link>
                 ))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowEditModal(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '19px', margin: 0 }}>Edit Profile</h2>
+              <button onClick={() => setShowEditModal(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {[
+                { label: 'Display Name', key: 'name', type: 'text' },
+                { label: 'Location', key: 'location', type: 'text' },
+                { label: 'Cover Photo URL', key: 'coverPhoto', type: 'text' },
+                { label: 'Avatar URL', key: 'avatar', type: 'text' },
+              ].map(({ label, key, type }) => (
+                <div key={key}>
+                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{label}</label>
+                  <input
+                    type={type}
+                    value={editForm[key]}
+                    onChange={e => setEditForm({ ...editForm, [key]: e.target.value })}
+                    className="input-dark"
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }}
+                  />
+                </div>
+              ))}
+              <div>
+                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Bio</label>
+                <textarea
+                  value={editForm.bio}
+                  onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
+                  className="input-dark"
+                  rows={3}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px', resize: 'vertical' }}
+                />
+              </div>
+              <div>
+                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Investor Tags</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {allTags.map(tag => {
+                    const active = editForm.tags.includes(tag);
+                    const color = tagColors[tag] || '#8b5cf6';
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setEditForm(prev => ({
+                            ...prev,
+                            tags: active ? prev.tags.filter(t => t !== tag) : [...prev.tags, tag],
+                          }));
+                        }}
+                        style={{
+                          padding: '5px 12px', borderRadius: '20px',
+                          background: active ? `${color}20` : 'rgba(255,255,255,0.04)',
+                          border: `1px solid ${active ? color : '#1e1e2e'}`,
+                          color: active ? color : '#94a3b8',
+                          cursor: 'pointer', fontSize: '12px', fontWeight: 600,
+                        }}
+                      >
+                        {active && '✓ '}{tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', paddingTop: '8px' }}>
+                <button onClick={() => setShowEditModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '14px' }}>
+                  Cancel
+                </button>
+                <button onClick={handleSaveProfile} className="gradient-btn" style={{ flex: 2, padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Profile Modal */}
+      {showShareModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowShareModal(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '400px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
+            <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '17px', margin: 0 }}>Share Profile</h3>
+              <button onClick={() => setShowShareModal(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={18} /></button>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ color: '#94a3b8', fontSize: '13px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  https://treim.app/profile/{profile.id}
+                </span>
+                <button
+                  onClick={handleCopyLink}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '8px', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(139,92,246,0.15)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : 'rgba(139,92,246,0.3)'}`, color: copied ? '#10b981' : '#8b5cf6', cursor: 'pointer', fontWeight: 600, fontSize: '13px', flexShrink: 0 }}
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {['Twitter/X', 'Facebook', 'LinkedIn'].map(s => (
+                  <button key={s} style={{ flex: 1, padding: '9px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontSize: '12px', fontWeight: 600 }}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

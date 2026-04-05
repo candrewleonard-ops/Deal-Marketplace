@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Home, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
+  Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
   Crown, Shield, UsersRound
 } from 'lucide-react';
@@ -45,9 +45,8 @@ export default function Navbar() {
               width: '36px', height: '36px', borderRadius: '8px',
               background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '16px', fontWeight: 900, color: '#fff'
             }}>
-              T
+              <Building2 size={18} style={{ color: '#fff' }} />
             </div>
             <span style={{
               background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
@@ -67,10 +66,12 @@ export default function Navbar() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
                   padding: '6px 12px', borderRadius: '8px', textDecoration: 'none',
-                  fontSize: '14px', fontWeight: 500,
+                  fontSize: '14px', fontWeight: 600,
                   color: location.pathname === to ? '#8b5cf6' : '#94a3b8',
                   background: location.pathname === to ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+                  borderBottom: location.pathname === to ? '2px solid #8b5cf6' : '2px solid transparent',
                   transition: 'all 0.2s',
+                  paddingBottom: '4px',
                 }}
               >
                 <Icon size={16} />
@@ -108,13 +109,14 @@ export default function Navbar() {
             )}
             {/* Post Deal Button */}
             <Link
-              to="/marketplace"
+              to="/my-deals"
               className="gradient-btn"
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '8px 16px', borderRadius: '8px',
                 color: '#fff', textDecoration: 'none',
                 fontSize: '14px', fontWeight: 600,
+                animation: 'pulse-glow 3s ease-in-out infinite',
               }}
             >
               <Plus size={16} />
@@ -220,6 +222,7 @@ export default function Navbar() {
                   </div>
                   {[
                     { icon: User, label: 'View Profile', to: `/profile/${currentUser?.id}` },
+                    { icon: TrendingUp, label: 'My Deals', to: '/my-deals' },
                     { icon: Crown, label: 'Upgrade to Premium', to: '/premium' },
                     { icon: Settings, label: 'Settings', to: '/auth' },
                   ].map(({ icon: Icon, label, to }) => (

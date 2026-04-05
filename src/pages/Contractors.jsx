@@ -10,6 +10,7 @@ export default function Contractors() {
   const [revealed, setRevealed] = useState({});
   const [search, setSearch] = useState('');
   const [purchased, setPurchased] = useState({});
+  const [tradeFilter, setTradeFilter] = useState('All');
 
   const filteredCities = contractorCities.filter(c =>
     search === '' ||
@@ -123,22 +124,34 @@ export default function Contractors() {
           />
         </div>
 
-        {/* Trade Legend */}
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '32px', justifyContent: 'center' }}>
-          {tradeTypes.map((trade, i) => (
-            <div
-              key={trade}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                background: `${Object.values(tradeColors)[i]}14`,
-                border: `1px solid ${Object.values(tradeColors)[i]}30`,
-                borderRadius: '20px', padding: '4px 12px',
-              }}
-            >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: Object.values(tradeColors)[i] }} />
-              <span style={{ color: Object.values(tradeColors)[i], fontSize: '12px', fontWeight: 600 }}>{trade}</span>
-            </div>
-          ))}
+        {/* Trade Filter */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px', justifyContent: 'center' }}>
+          <button
+            onClick={() => setTradeFilter('All')}
+            style={{ padding: '6px 16px', borderRadius: '20px', background: tradeFilter === 'All' ? 'linear-gradient(135deg, #8b5cf6, #06b6d4)' : 'rgba(255,255,255,0.04)', border: tradeFilter === 'All' ? 'none' : '1px solid #1e1e2e', color: tradeFilter === 'All' ? '#fff' : '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+          >
+            All Trades
+          </button>
+          {tradeTypes.map((trade, i) => {
+            const color = Object.values(tradeColors)[i];
+            const isActive = tradeFilter === trade;
+            return (
+              <button
+                key={trade}
+                onClick={() => setTradeFilter(isActive ? 'All' : trade)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: isActive ? `${color}20` : `${color}0a`,
+                  border: `1px solid ${isActive ? color : color + '30'}`,
+                  borderRadius: '20px', padding: '5px 14px',
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: color }} />
+                <span style={{ color: color, fontSize: '12px', fontWeight: 600 }}>{trade}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* City Cards Grid */}
@@ -244,6 +257,32 @@ export default function Contractors() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Business CTAs */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+          <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.07))', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '16px', padding: '24px' }}>
+            <div style={{ fontSize: '28px', marginBottom: '10px' }}>💼</div>
+            <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', margin: '0 0 8px' }}>Need a full renovation team?</h3>
+            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.6, margin: '0 0 16px' }}>
+              Our curated contractor lists save you 10+ hours of calling around. One purchase, 14 vetted pros ready to go.
+            </p>
+            <button onClick={() => { const first = filteredCities[0]; if (first) openModal(first); }} className="gradient-btn" style={{ padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer' }}>
+              Get My City's List →
+            </button>
+          </div>
+          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px' }}>
+            <div style={{ fontSize: '28px', marginBottom: '10px' }}>🏗️</div>
+            <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', margin: '0 0 8px' }}>Are you a contractor?</h3>
+            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.6, margin: '0 0 16px' }}>
+              Get in front of active real estate investors in your area. List your services free and get direct leads.
+            </p>
+            <button style={{ padding: '10px 20px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+              List Your Services Free →
+            </button>
+          </div>
         </div>
       </div>
 

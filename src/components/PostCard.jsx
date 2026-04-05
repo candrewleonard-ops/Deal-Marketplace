@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, X, Copy, Check } from 'lucide-react';
 
 const tagColors = {
   'Wholesaler': '#8b5cf6',
@@ -20,10 +20,34 @@ export default function PostCard({ post }) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [localComments, setLocalComments] = useState(post.comments || []);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [shareText, setShareText] = useState('');
 
   function handleLike() {
     setLiked(!liked);
     setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+  }
+
+  function handleSendComment() {
+    if (!newComment.trim()) return;
+    const comment = {
+      id: Date.now(),
+      userName: 'Marcus Johnson',
+      userAvatar: 'https://picsum.photos/seed/user1/100/100',
+      content: newComment,
+      likes: 0,
+      timestamp: 'Just now',
+    };
+    setLocalComments([...localComments, comment]);
+    setNewComment('');
+  }
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(`https://treim.app/post/${post.id}`).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -96,7 +120,7 @@ export default function PostCard({ post }) {
             onClick={() => setCommentsOpen(!commentsOpen)}
             style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '13px', padding: 0 }}
           >
-            {post.comments.length} comments
+            {localComments.length} comments
           </button>
         </div>
         <span style={{ color: '#475569', fontSize: '13px' }}>{post.shares} shares</span>
@@ -109,8 +133,8 @@ export default function PostCard({ post }) {
       }}>
         {[
           { icon: Heart, label: 'Like', action: handleLike, active: liked, activeColor: '#ef4444' },
-          { icon: MessageCircle, label: 'Comment', action: () => setCommentsOpen(!commentsOpen), active: false },
-          { icon: Share2, label: 'Share', action: () => {}, active: false },
+          { icon: MessageCircle, label: 'Comment', action: () => setCommentsOpen(!commentsOpen), active: commentsOpen, activeColor: '#8b5cf6' },
+          { icon: Share2, label: 'Share', action: () => setShareOpen(true), active: false },
           { icon: Bookmark, label: 'Save', action: () => setSaved(!saved), active: saved, activeColor: '#8b5cf6' },
         ].map(({ icon: Icon, label, action, active, activeColor }) => (
           <button
@@ -144,16 +168,19 @@ export default function PostCard({ post }) {
               <input
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSendComment()}
                 placeholder="Write a comment..."
                 className="input-dark"
                 style={{ flex: 1, borderRadius: '20px', padding: '8px 16px', fontSize: '13px' }}
               />
               <button
+                onClick={handleSendComment}
                 style={{
                   background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
                   border: 'none', borderRadius: '50%', width: '36px', height: '36px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', flexShrink: 0,
+                  opacity: newComment.trim() ? 1 : 0.5,
                 }}
               >
                 <Send size={14} style={{ color: '#fff' }} />
@@ -163,7 +190,7 @@ export default function PostCard({ post }) {
 
           {/* Comments list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {post.comments.map(comment => (
+            {localComments.map(comment => (
               <div key={comment.id} style={{ display: 'flex', gap: '10px' }}>
                 <img
                   src={comment.userAvatar}
@@ -190,6 +217,65 @@ export default function PostCard({ post }) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {shareOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={() => setShareOpen(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '440px', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}
+          >
+            <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '17px', margin: 0 }}>Share Post</h3>
+              <button onClick={() => setShareOpen(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={18} /></button>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Share to your feed</label>
+                <textarea
+                  value={shareText}
+                  onChange={e => setShareText(e.target.value)}
+                  placeholder="Add a thought before sharing..."
+                  className="input-dark"
+                  rows={3}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', resize: 'none' }}
+                />
+              </div>
+              <button
+                className="gradient-btn"
+                style={{ padding: '11px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}
+                onClick={() => setShareOpen(false)}
+              >
+                Share to Feed
+              </button>
+              <div style={{ borderTop: '1px solid #1e1e2e', paddingTop: '14px' }}>
+                <div style={{ color: '#475569', fontSize: '12px', fontWeight: 600, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Or share via</div>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={handleCopyLink}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 16px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : '#1e1e2e'}`, color: copied ? '#10b981' : '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s' }}
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </button>
+                  {[
+                    { label: 'Twitter/X', color: '#1DA1F2', bg: 'rgba(29,161,242,0.1)', border: 'rgba(29,161,242,0.2)' },
+                    { label: 'Facebook', color: '#4267B2', bg: 'rgba(66,103,178,0.1)', border: 'rgba(66,103,178,0.2)' },
+                    { label: 'LinkedIn', color: '#0077B5', bg: 'rgba(0,119,181,0.1)', border: 'rgba(0,119,181,0.2)' },
+                  ].map(s => (
+                    <button key={s.label} style={{ padding: '9px 14px', borderRadius: '10px', background: s.bg, border: `1px solid ${s.border}`, color: s.color, cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
