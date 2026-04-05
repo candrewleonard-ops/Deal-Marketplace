@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  ArrowLeft, Heart, Share2, Calendar, Home, Maximize2,
+  ArrowLeft, Heart, Share2, MapPin, Calendar, Home, Maximize2,
   ChevronLeft, ChevronRight, MessageSquare, TrendingUp, Crown,
   Shield, CheckCircle, X, Zap, Eye
 } from 'lucide-react';
