@@ -16,7 +16,7 @@ export default function Marketplace() {
   const [showPromoteModal, setShowPromoteModal] = useState(false);
   const [minBeds, setMinBeds] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
-  const [stateFilter, setStateFilter] = useState(null);
+  const [selectedStates, setSelectedStates] = useState([]);
   const [showMap, setShowMap] = useState(true);
   const [newestOnly, setNewestOnly] = useState(false);
 
@@ -27,7 +27,7 @@ export default function Marketplace() {
         const [c, s] = city.split(', ');
         if (d.city !== c || d.state !== s) return false;
       }
-      if (stateFilter && d.state !== stateFilter) return false;
+      if (selectedStates.length > 0 && !selectedStates.includes(d.state)) return false;
       const listPrice = d.listingPrice || d.price;
       if (priceMode === 'max' && listPrice > priceValue) return false;
       if (priceMode === 'min' && listPrice < priceValue) return false;
@@ -39,7 +39,14 @@ export default function Marketplace() {
       }
       return true;
     });
-  }, [activeType, search, city, priceValue, priceMode, minBeds, stateFilter, newestOnly]);
+  }, [activeType, search, city, priceValue, priceMode, minBeds, selectedStates, newestOnly]);
+
+  function handleStateToggle(abbr) {
+    if (abbr === '__CLEAR__') { setSelectedStates([]); return; }
+    setSelectedStates(prev =>
+      prev.includes(abbr) ? prev.filter(s => s !== abbr) : [...prev, abbr]
+    );
+  }
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -131,7 +138,7 @@ export default function Marketplace() {
             >
               <SlidersHorizontal size={16} />
               Filters
-              {(priceValue < 1000000 || minBeds > 0 || stateFilter) && (
+              {(priceValue < 1000000 || minBeds > 0 || selectedStates.length > 0) && (
                 <span style={{
                   background: '#8b5cf6', color: '#fff',
                   borderRadius: '50%', width: '18px', height: '18px',
@@ -259,9 +266,9 @@ export default function Marketplace() {
           >
             <TrendingUp size={14} /> Newest Deals {newestOnly && '(7d)'}
           </button>
-          {stateFilter && (
-            <button onClick={() => setStateFilter(null)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '20px', background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8b5cf6', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-              State: {stateFilter} <X size={12} />
+          {selectedStates.length > 0 && (
+            <button onClick={() => setSelectedStates([])} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '20px', background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8b5cf6', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+              {selectedStates.length} State{selectedStates.length > 1 ? 's' : ''} Selected <X size={12} />
             </button>
           )}
         </div>
@@ -277,7 +284,7 @@ export default function Marketplace() {
           </button>
           {showMap && (
             <div style={{ borderTop: '1px solid #1e1e2e' }}>
-              <USMap deals={deals} onStateClick={(state) => setStateFilter(state)} />
+              <USMap deals={deals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
             </div>
           )}
         </div>

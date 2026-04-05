@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  ArrowLeft, Heart, Share2, MapPin, Calendar, Home, Maximize2,
+  ArrowLeft, Heart, Share2, Calendar, Home, Maximize2,
   ChevronLeft, ChevronRight, MessageSquare, TrendingUp, Crown,
   Shield, CheckCircle, X, Zap, Eye
 } from 'lucide-react';
@@ -63,6 +63,8 @@ export default function DealDetail() {
   const similar = getSimilarDeals(deal, 3);
   const fee = (budget * 0.15).toFixed(2);
   const total = (budget + parseFloat(fee)).toFixed(2);
+  // Only the deal owner sees promote/edit tools
+  const isOwner = isLoggedIn && currentUser && String(currentUser.id) === String(deal.sellerId);
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
@@ -168,27 +170,8 @@ export default function DealDetail() {
               <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
             </div>
 
-            {/* Map Placeholder */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', overflow: 'hidden', marginBottom: '32px' }}>
-              <div style={{
-                height: '300px',
-                background: 'linear-gradient(135deg, #1a1a2e, #12121e)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                position: 'relative',
-              }}>
-                {/* Grid pattern */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  backgroundImage: 'linear-gradient(rgba(30,30,46,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(30,30,46,0.5) 1px, transparent 1px)',
-                  backgroundSize: '40px 40px',
-                }} />
-                <MapPin size={48} style={{ color: '#8b5cf6', marginBottom: '12px', position: 'relative' }} />
-                <p style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', margin: 0, position: 'relative' }}>{deal.city}, {deal.state}</p>
-                <p style={{ color: '#475569', fontSize: '14px', margin: '4px 0 0', position: 'relative' }}>{getDisplayAddress(deal, addressGranted)}</p>
-              </div>
-            </div>
-
-            {/* Promote Section */}
+            {/* Promote Section — owner only */}
+            {isOwner && (
             <div style={{
               background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(139, 92, 246, 0.08))',
               border: '1px solid rgba(245, 158, 11, 0.2)',
@@ -261,6 +244,7 @@ export default function DealDetail() {
                 </div>
               </div>
             </div>
+            )} {/* end isOwner promote block */}
 
             {/* Similar Deals */}
             {similar.length > 0 && (
@@ -322,7 +306,7 @@ export default function DealDetail() {
                   }}
                 >
                   <CheckCircle size={18} />
-                  Request Assignment
+                  Send Address Request
                 </button>
 
                 <Link
@@ -454,7 +438,7 @@ export default function DealDetail() {
         </div>
       </div>
 
-      {/* Request Assignment Modal */}
+      {/* Send Address Request Modal */}
       {showRequest && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 200,
@@ -468,46 +452,69 @@ export default function DealDetail() {
             boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
           }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Request Assignment</h2>
+              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Send Address Request</h2>
               <button onClick={() => setShowRequest(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
             <div style={{ padding: '24px' }}>
-              <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+              {/* ⚠️ Interference warning */}
+              <div style={{
+                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
+                borderRadius: '12px', padding: '14px', marginBottom: '18px',
+              }}>
+                <div style={{ color: '#ef4444', fontWeight: 800, fontSize: '13px', marginBottom: '6px' }}>
+                  ⚠️ IMPORTANT — READ BEFORE REQUESTING
+                </div>
+                <p style={{ color: '#fca5a5', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
+                  By requesting this address you agree <strong>NOT to interfere</strong> with the existing contract.
+                  Contacting the seller, buyer, or property owner directly without express written permission
+                  from <strong>{deal.sellerName}</strong> constitutes interference and subjects you to a
+                  <strong> $75,000 penalty fee</strong> due to {deal.sellerName}.
+                </p>
+              </div>
+
+              <div style={{ background: '#1a1a2e', borderRadius: '12px', padding: '16px', marginBottom: '18px' }}>
                 <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>DEAL SUMMARY</div>
-                <div style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '4px' }}>{deal.title}</div>
-                <div style={{ color: '#475569', fontSize: '13px', marginBottom: '12px' }}>{getDisplayAddress(deal, addressGranted)}, {deal.city}, {deal.state}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '4px' }}>{deal.city}, {deal.state}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
                   <span style={{ color: '#94a3b8', fontSize: '13px' }}>Listing Price</span>
-                  <span style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '18px' }}>{formatCurrency(deal.price)}</span>
+                  <span style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '18px' }}>{formatCurrency(deal.listingPrice || deal.price)}</span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Your Full Name</label>
-                  <input defaultValue="Marcus Johnson" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
+                  <input defaultValue="Trial User" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
                 </div>
                 <div>
                   <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Phone Number</label>
-                  <input defaultValue="(404) 555-0128" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
+                  <input defaultValue="" placeholder="(555) 000-0000" className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }} />
                 </div>
                 <div>
                   <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Message to Seller (optional)</label>
                   <textarea
-                    defaultValue="Hi! I'm interested in this deal. I'm a cash buyer and can close quickly. Please send me the contract details."
+                    placeholder="Hi! I'm a cash buyer and interested in this deal…"
                     className="input-dark"
                     rows={3}
                     style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', resize: 'vertical' }}
                   />
                 </div>
+                {/* Agreement checkbox */}
+                <label style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
+                  <input type="checkbox" style={{ marginTop: '2px', accentColor: '#8b5cf6', width: '16px', height: '16px', flexShrink: 0 }} />
+                  <span style={{ color: '#94a3b8', fontSize: '12px', lineHeight: 1.6 }}>
+                    I agree NOT to interfere with the contract in place. I understand that doing so would result
+                    in a <strong style={{ color: '#ef4444' }}>$75,000 fee due to {deal.sellerName}</strong>.
+                  </span>
+                </label>
                 <button
                   onClick={() => { setShowRequest(false); }}
                   className="gradient-btn"
                   style={{ padding: '14px', borderRadius: '12px', color: '#fff', fontWeight: 700, fontSize: '15px' }}
                 >
-                  Send Assignment Request
+                  Send Address Request
                 </button>
               </div>
             </div>

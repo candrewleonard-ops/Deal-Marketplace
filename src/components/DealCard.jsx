@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Crown, Eye, TrendingUp, Wrench, Home, Maximize2, Calendar, Zap } from 'lucide-react';
+import { Heart, Crown, Eye, Home, Maximize2, Calendar } from 'lucide-react';
 
 const dealTypeLabels = {
   'fix-flip': 'Fix & Flip',
@@ -24,20 +23,37 @@ function formatCurrency(n) {
   return `$${n}`;
 }
 
+// Blur house number / any leading digits — leave descriptor words visible
+function blurTitle(title) {
+  if (!title) return '****';
+  // Replace leading numbers (e.g. "2847 Peachtree Rd" → "**** Peachtree Rd")
+  return title.replace(/^\d+\s*/, '**** ').trim();
+}
+
 function CardContent({ deal, saved, setSaved }) {
+  function openDeal(e) {
+    e.preventDefault();
+    window.open(`/marketplace/${deal.id}`, '_blank', 'noopener,noreferrer');
+  }
+
   return (
     <>
-      {/* Image */}
-      <div style={{ position: 'relative', overflow: 'hidden', height: '200px' }}>
+      {/* Clickable image → opens deal in new tab */}
+      <div
+        onClick={openDeal}
+        style={{ position: 'relative', overflow: 'hidden', height: '200px', cursor: 'pointer' }}
+      >
         <img
           src={deal.images[0]}
           alt={deal.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.35s ease' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
           onError={e => { e.target.src = `https://picsum.photos/seed/fallback${deal.id}/800/600`; }}
         />
 
         {/* Gradient overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 60%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 60%)', pointerEvents: 'none' }} />
 
         {/* Featured badge */}
         {deal.isFeatured && (
@@ -54,7 +70,7 @@ function CardContent({ deal, saved, setSaved }) {
           </div>
         )}
 
-        {/* Sponsored badge (non-featured) */}
+        {/* Sponsored badge */}
         {deal.isSponsored && !deal.isFeatured && (
           <div className="sponsored-badge" style={{
             position: 'absolute', top: '12px', left: '12px',
@@ -65,32 +81,32 @@ function CardContent({ deal, saved, setSaved }) {
           </div>
         )}
 
-        {/* Status badge */}
+        {/* Under contract badge */}
         {deal.status === 'under contract' && (
           <div style={{
             position: 'absolute', top: '12px', right: deal.isSponsored ? '44px' : '12px',
-            background: 'rgba(239, 68, 68, 0.85)', borderRadius: '20px',
-            padding: '3px 10px',
+            background: 'rgba(239, 68, 68, 0.85)', borderRadius: '20px', padding: '3px 10px',
           }}>
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>UNDER CONTRACT</span>
           </div>
         )}
 
-        {/* Heart button */}
+        {/* Heart button — stops propagation so click doesn't open deal page */}
         <button
-          onClick={e => { e.preventDefault(); setSaved(!saved); }}
+          onClick={e => { e.stopPropagation(); setSaved(!saved); }}
           style={{
             position: 'absolute', top: '12px', right: '12px',
             background: saved ? 'rgba(239,68,68,0.9)' : 'rgba(0,0,0,0.6)',
             border: 'none', borderRadius: '50%', width: '32px', height: '32px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.2s',
+            zIndex: 2,
           }}
         >
           <Heart size={14} fill={saved ? '#fff' : 'none'} style={{ color: saved ? '#fff' : '#f8fafc' }} />
         </button>
 
-        {/* Deal type badge on image bottom */}
+        {/* Deal type badge */}
         <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
           <span className={dealTypeBadgeClass[deal.dealType]} style={{ borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>
             {dealTypeLabels[deal.dealType]}
@@ -122,8 +138,11 @@ function CardContent({ deal, saved, setSaved }) {
           </div>
         </div>
 
-        {/* City / State only - no street address */}
-        <p style={{ color: '#f8fafc', fontWeight: 600, fontSize: '14px', margin: '0 0 12px' }} className="line-clamp-1">
+        {/* Blurred title + city/state (no zip) */}
+        <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 2px', fontFamily: 'monospace', letterSpacing: '0.5px' }}>
+          {blurTitle(deal.address)}
+        </p>
+        <p style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', margin: '0 0 12px' }} className="line-clamp-1">
           {deal.city}, {deal.state}
         </p>
 
@@ -172,13 +191,13 @@ function CardContent({ deal, saved, setSaved }) {
         </div>
 
         {/* Seller */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px', paddingTop: '12px', borderTop: '1px solid #1e1e2e' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid #1e1e2e' }}>
           <img
             src={deal.sellerAvatar}
             alt={deal.sellerName}
             style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
           />
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, margin: 0 }}>{deal.sellerName}</p>
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
               {deal.tags.slice(0, 2).map(tag => (
@@ -191,35 +210,19 @@ function CardContent({ deal, saved, setSaved }) {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Link
-            to={`/marketplace/${deal.id}`}
+          {/* View Deal button only */}
+          <button
+            onClick={openDeal}
             style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: '6px', padding: '10px',
+              display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 12px',
               background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-              borderRadius: '8px', textDecoration: 'none',
-              color: '#fff', fontWeight: 600, fontSize: '14px',
-              transition: 'all 0.2s',
+              border: 'none', borderRadius: '8px',
+              color: '#fff', fontWeight: 600, fontSize: '13px',
+              cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap',
             }}
           >
-            <Eye size={15} />
+            <Eye size={13} />
             View Deal
-          </Link>
-          <button style={{
-            padding: '10px 12px',
-            background: 'rgba(245, 158, 11, 0.1)',
-            border: '1px solid rgba(245, 158, 11, 0.2)',
-            borderRadius: '8px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: '4px',
-            color: '#f59e0b', fontSize: '12px', fontWeight: 600,
-            transition: 'all 0.2s',
-          }}>
-            <Zap size={14} />
-            Promote
           </button>
         </div>
       </div>
