@@ -14,6 +14,7 @@ import Groups from './pages/Groups';
 import CityDiscussion from './pages/CityDiscussion';
 import Admin from './pages/Admin';
 import Premium from './pages/Premium';
+import GroupDetail from './pages/GroupDetail';
 import './index.css';
 
 function AppLayout({ children }) {
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/meetups" element={<AppLayout><Meetups /></AppLayout>} />
         <Route path="/premium" element={<AppLayout><Premium /></AppLayout>} />
         <Route path="/admin" element={<AppLayout><Admin /></AppLayout>} />
+        <Route path="/groups/:groupId" element={<AppLayout><GroupDetail /></AppLayout>} />
       </Routes>
     </Router>
   );

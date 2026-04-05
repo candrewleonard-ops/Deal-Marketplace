@@ -109,9 +109,18 @@ export default function Groups() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#475569', fontSize: '12px' }}>
                       <Users size={12} /> {g.memberCount.toLocaleString()} members
                     </div>
-                    <button style={{ padding: '6px 12px', borderRadius: '8px', background: activeTab === 'mine' ? 'rgba(139, 92, 246, 0.1)' : 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: activeTab === 'mine' ? '1px solid rgba(139, 92, 246, 0.3)' : 'none', color: activeTab === 'mine' ? '#8b5cf6' : '#fff', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
-                      {activeTab === 'mine' ? 'View' : (g.isPrivate ? 'Request' : 'Join')}
-                    </button>
+                    {activeTab === 'mine' ? (
+                      <Link
+                        to={`/groups/${g.id}`}
+                        style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8b5cf6', fontWeight: 700, fontSize: '12px', cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }}
+                      >
+                        View
+                      </Link>
+                    ) : (
+                      <button style={{ padding: '6px 12px', borderRadius: '8px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>
+                        {g.isPrivate ? 'Request' : 'Join'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
