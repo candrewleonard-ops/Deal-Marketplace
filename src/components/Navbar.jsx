@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
-  Crown, Shield, UsersRound, Heart
+  Crown, Shield, UsersRound, Heart, CheckSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
@@ -11,6 +11,7 @@ import PostDealModal from './PostDealModal';
 const navLinks = [
   { to: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
   { to: '/my-deals', label: 'My Deals', icon: TrendingUp },
+  { to: '/projects', label: 'Projects', icon: CheckSquare },
   { to: '/social', label: 'Social', icon: Users },
   { to: '/groups', label: 'Groups', icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },

@@ -18,6 +18,8 @@ import Premium from './pages/Premium';
 import GroupDetail from './pages/GroupDetail';
 import SavedDeals from './pages/SavedDeals';
 import Notifications from './pages/Notifications';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
 import NotFound from './pages/NotFound';
 import './index.css';
 
@@ -41,6 +43,8 @@ export default function App() {
         <Route path="/marketplace" element={<AppLayout hideFooter><Marketplace /></AppLayout>} />
         <Route path="/marketplace/:id" element={<AppLayout><DealDetail /></AppLayout>} />
         <Route path="/my-deals" element={<AppLayout><MyDeals /></AppLayout>} />
+        <Route path="/projects" element={<AppLayout><Projects /></AppLayout>} />
+        <Route path="/projects/:id" element={<AppLayout><ProjectDetail /></AppLayout>} />
         <Route path="/social" element={<AppLayout><Social /></AppLayout>} />
         <Route path="/groups" element={<AppLayout><Groups /></AppLayout>} />
         <Route path="/city/:cityId" element={<AppLayout><CityDiscussion /></AppLayout>} />
