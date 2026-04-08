@@ -159,7 +159,7 @@ export default function Navbar() {
                 }}>
                   <div style={{ padding: '16px', borderBottom: '1px solid #1e1e2e', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
-                    <button style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: '13px' }}>Mark all read</button>
+                    <button onClick={() => alert('All notifications marked as read')} style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'opacity 0.2s' }} onMouseEnter={e => e.target.style.opacity = '0.8'} onMouseLeave={e => e.target.style.opacity = '1'}>Mark all read</button>
                   </div>
                   {notifications.map(n => (
                     <div key={n.id} style={{

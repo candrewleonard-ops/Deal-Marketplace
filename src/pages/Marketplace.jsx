@@ -58,6 +58,7 @@ export default function Marketplace() {
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [showPromote,     setShowPromote]     = useState(false);
+  const [selectedTier,    setSelectedTier]    = useState(null);
   const [showPostDeal,    setShowPostDeal]    = useState(false);
 
   function handleStateToggle(abbr) {
@@ -361,7 +362,7 @@ export default function Marketplace() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px' }}>{price}</div>
-                    <button style={{ marginTop: '4px', padding: '4px 12px', borderRadius: '20px', background: `${color}20`, border: `1px solid ${color}35`, color, cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>Select</button>
+                    <button onClick={() => { setSelectedTier(tier); alert(`Tier "${tier}" selected at ${price}. Proceeding to checkout...`); setShowPromote(false); }} style={{ marginTop: '4px', padding: '4px 12px', borderRadius: '20px', background: selectedTier === tier ? color : `${color}20`, border: `1px solid ${color}35`, color: selectedTier === tier ? '#12121e' : color, cursor: 'pointer', fontSize: '11px', fontWeight: 700, transition: 'all 0.2s' }} onMouseEnter={e => e.target.style.opacity = '0.8'} onMouseLeave={e => e.target.style.opacity = '1'}>Select</button>
                   </div>
                 </div>
               ))}

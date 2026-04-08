@@ -24,6 +24,8 @@ export default function PostCard({ post }) {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareText, setShareText] = useState('');
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [commentLikes, setCommentLikes] = useState({});
 
   function handleLike() {
     setLiked(!liked);
@@ -83,9 +85,17 @@ export default function PostCard({ post }) {
           </div>
           <span style={{ color: '#475569', fontSize: '13px' }}>{post.timestamp}</span>
         </div>
-        <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '4px' }}>
-          <MoreHorizontal size={18} />
-        </button>
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setShowMoreMenu(!showMoreMenu)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '4px', transition: 'color 0.2s' }}>
+            <MoreHorizontal size={18} />
+          </button>
+          {showMoreMenu && (
+            <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: '4px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '8px', zIndex: 50, minWidth: '140px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+              <button onClick={() => { navigator.clipboard.writeText(post.content); setShowMoreMenu(false); }} style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600, borderBottom: '1px solid #1e1e2e', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#8b5cf6'} onMouseLeave={e => e.target.style.color = '#94a3b8'}>Copy Text</button>
+              <button onClick={() => { setShowMoreMenu(false); alert('Post reported'); }} style={{ width: '100%', padding: '10px 14px', textAlign: 'left', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.opacity = '0.8'} onMouseLeave={e => e.target.style.opacity = '1'}>Report Post</button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -206,10 +216,10 @@ export default function PostCard({ post }) {
                     <span style={{ color: '#cbd5e1', fontSize: '14px' }}>{comment.content}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '16px', padding: '4px 8px' }}>
-                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
-                      Like ({comment.likes})
+                    <button onClick={() => setCommentLikes(prev => ({ ...prev, [comment.id]: (prev[comment.id] || 0) + 1 }))} style={{ background: 'none', border: 'none', color: commentLikes[comment.id] ? '#ef4444' : '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500, transition: 'color 0.2s' }}>
+                      Like ({comment.likes + (commentLikes[comment.id] || 0)})
                     </button>
-                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
+                    <button onClick={() => setNewComment(`@${comment.userName} `)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#8b5cf6'} onMouseLeave={e => e.target.style.color = '#475569'}>
                       Reply
                     </button>
                     <span style={{ color: '#334155', fontSize: '12px' }}>{comment.timestamp}</span>
@@ -269,7 +279,7 @@ export default function PostCard({ post }) {
                     { label: 'Facebook', color: '#4267B2', bg: 'rgba(66,103,178,0.1)', border: 'rgba(66,103,178,0.2)' },
                     { label: 'LinkedIn', color: '#0077B5', bg: 'rgba(0,119,181,0.1)', border: 'rgba(0,119,181,0.2)' },
                   ].map(s => (
-                    <button key={s.label} style={{ padding: '9px 14px', borderRadius: '10px', background: s.bg, border: `1px solid ${s.border}`, color: s.color, cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                    <button key={s.label} onClick={() => alert(`Opening ${s.label} share dialog...`)} style={{ padding: '9px 14px', borderRadius: '10px', background: s.bg, border: `1px solid ${s.border}`, color: s.color, cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s' }} onMouseEnter={e => { e.target.style.background = s.bg.replace('0.1', '0.2'); }} onMouseLeave={e => { e.target.style.background = s.bg; }}>
                       {s.label}
                     </button>
                   ))}

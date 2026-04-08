@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function UserHoverCard({ user, children }) {
   const [show, setShow] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const timerRef = useRef(null);
 
   if (!user) return children;
@@ -77,13 +78,19 @@ export default function UserHoverCard({ user, children }) {
               </p>
             )}
             <button
-              className="gradient-btn"
+              onClick={() => setIsFollowing(!isFollowing)}
+              className={isFollowing ? '' : 'gradient-btn'}
               style={{
                 marginTop: '10px', width: '100%', padding: '7px',
-                borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '12px',
+                borderRadius: '8px', color: isFollowing ? '#8b5cf6' : '#fff', fontWeight: 700, fontSize: '12px',
+                background: isFollowing ? 'rgba(139,92,246,0.15)' : undefined,
+                border: isFollowing ? '1px solid rgba(139,92,246,0.3)' : 'none',
+                cursor: 'pointer', transition: 'all 0.2s',
               }}
+              onMouseEnter={e => e.target.style.opacity = '0.8'}
+              onMouseLeave={e => e.target.style.opacity = '1'}
             >
-              Follow
+              {isFollowing ? 'Following' : 'Follow'}
             </button>
           </div>
         </div>
