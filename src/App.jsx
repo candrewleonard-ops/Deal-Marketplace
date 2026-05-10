@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MobileTabBar from './components/MobileTabBar';
+import { useIsMobile } from './hooks/useIsMobile';
 import Landing from './pages/Landing';
 import Marketplace from './pages/Marketplace';
 import DealDetail from './pages/DealDetail';
@@ -22,11 +24,31 @@ import NotFound from './pages/NotFound';
 import './index.css';
 
 function AppLayout({ children, hideFooter }) {
+  const isMobile = useIsMobile();
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0a0a0f', color: '#f8fafc', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div
+      style={{
+        backgroundColor: '#0a0a0f',
+        color: '#f8fafc',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100dvh',
+      }}
+    >
       <Navbar />
-      <main style={{ flex: 1 }}>{children}</main>
-      {!hideFooter && <Footer />}
+      <main
+        style={{
+          flex: 1,
+          /* Reserve space for the bottom tab bar on mobile so content isn't hidden */
+          paddingBottom: isMobile
+            ? 'calc(72px + env(safe-area-inset-bottom))'
+            : 0,
+        }}
+      >
+        {children}
+      </main>
+      {!hideFooter && !isMobile && <Footer />}
+      {isMobile && <MobileTabBar />}
     </div>
   );
 }

@@ -155,8 +155,8 @@ export default function Marketplace() {
     <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
 
       {/* ── Top header bar ── */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '18px 20px' }}>
-        <div style={{ maxWidth: '1500px', margin: '0 auto' }}>
+      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: isMobile ? '12px 14px' : '18px 20px' }}>
+        <div style={{ maxWidth: 1500, margin: '0 auto' }}>
           {/* Title row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
@@ -278,7 +278,7 @@ export default function Marketplace() {
       </div>
 
       {/* ── Body: map+deals on desktop, deals-only on mobile ── */}
-      <div style={{ maxWidth: '1500px', margin: '0 auto', display: 'flex', gap: '0', minHeight: 'calc(100vh - 200px)' }}>
+      <div style={{ maxWidth: 1500, margin: '0 auto', display: 'flex', gap: 0, minHeight: 'calc(100vh - 200px)', flexDirection: isMobile ? 'column' : 'row' }}>
 
         {/* ── LEFT: sticky map panel (hidden on mobile) ── */}
         <div style={{

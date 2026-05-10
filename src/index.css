@@ -78,6 +78,14 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  background-color: #0a0a0f;
+}
+
 body {
   background-color: #0a0a0f;
   color: #f8fafc;
@@ -86,6 +94,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
+  /* No horizontal scroll, ever */
+  overflow-x: hidden;
+  /* iOS rubber-band only on Y */
+  overscroll-behavior-y: contain;
 }
 
 #root {
@@ -93,6 +105,35 @@ body {
   min-height: 100vh;
   text-align: left;
 }
+
+/* Mobile-first defaults */
+@media (max-width: 767px) {
+  /* Larger tap targets */
+  button, [role="button"], a {
+    min-height: 44px;
+  }
+  /* Default inputs friendlier on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* prevents iOS auto-zoom on focus */
+  }
+  /* Tight body lines */
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Active-press feedback (native feel) */
+button:active, [role="button"]:active, a:active {
+  transition: transform 0.05s;
+}
+
+/* Momentum scrolling on iOS */
+main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile tab bar safe-area padding (already in component but reinforced) */
+.mobile-tab-bar { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
