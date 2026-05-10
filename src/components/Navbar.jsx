@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
@@ -182,47 +183,45 @@ export default function Navbar() {
                 )}
               </button>
 
-              {notifOpen && (
+              {notifOpen && (isMobile ? (
+                typeof document !== 'undefined' && createPortal((
+                  <>
+                    <div
+                      onClick={() => setNotifOpen(false)}
+                      style={{ position: 'fixed', inset: 0, zIndex: 190, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)' }}
+                    />
+                    <div style={{
+                      position: 'fixed',
+                      right: 12, left: 12,
+                      top: 'calc(56px + env(safe-area-inset-top))',
+                      background: '#12121e',
+                      border: '1px solid #1e1e2e',
+                      borderRadius: 14,
+                      maxHeight: '70vh',
+                      overflowY: 'auto',
+                      WebkitOverflowScrolling: 'touch',
+                      zIndex: 195,
+                      boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+                    }}>
+                      <NotifList notifications={notifications} onCloseAfterNav={() => setNotifOpen(false)} />
+                    </div>
+                  </>
+                ), document.body)
+              ) : (
                 <div style={{
-                  position: isMobile ? 'fixed' : 'absolute',
-                  right: isMobile ? 12 : 0,
-                  left: isMobile ? 12 : 'auto',
-                  top: isMobile ? 64 : 48,
+                  position: 'absolute', right: 0, top: 48,
                   background: '#12121e',
                   border: '1px solid #1e1e2e',
                   borderRadius: 14,
-                  width: isMobile ? 'auto' : 320,
+                  width: 320,
                   maxHeight: '70vh',
                   overflowY: 'auto',
                   zIndex: 100,
                   boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
                 }}>
-                  <div style={{ padding: 14, borderBottom: '1px solid #1e1e2e', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
-                    <button style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
-                  </div>
-                  {notifications.map(n => (
-                    <div key={n.id} style={{
-                      padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start',
-                      borderBottom: '1px solid #1e1e2e',
-                      background: n.unread ? 'rgba(139,92,246,0.05)' : 'transparent',
-                    }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#8b5cf6' : 'transparent', marginTop: 6, flexShrink: 0 }} />
-                      <div>
-                        <p style={{ color: '#f8fafc', fontSize: 13, margin: 0, lineHeight: 1.4 }}>{n.text}</p>
-                        <p style={{ color: '#475569', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <Link
-                    to="/notifications"
-                    onClick={() => setNotifOpen(false)}
-                    style={{ display: 'block', padding: '14px', textAlign: 'center', color: '#8b5cf6', textDecoration: 'none', fontWeight: 700, fontSize: 13 }}
-                  >
-                    View all →
-                  </Link>
+                  <NotifList notifications={notifications} onCloseAfterNav={() => setNotifOpen(false)} />
                 </div>
-              )}
+              ))}
             </div>
 
             {/* Messages — desktop only (mobile has it in drawer) */}
@@ -285,15 +284,16 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile drawer — slides from right */}
-      {isMobile && (
+      {/* Mobile drawer — rendered via Portal to escape nav's backdrop-filter containing block */}
+      {isMobile && typeof document !== 'undefined' && createPortal((
         <>
           <div
             onClick={() => setDrawerOpen(false)}
             style={{
-              position: 'fixed', inset: 0, zIndex: 60,
+              position: 'fixed', inset: 0, zIndex: 200,
               background: 'rgba(0,0,0,0.55)',
               backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
               opacity: drawerOpen ? 1 : 0,
               pointerEvents: drawerOpen ? 'auto' : 'none',
               transition: 'opacity 0.25s',
@@ -305,7 +305,7 @@ export default function Navbar() {
               width: 'min(86vw, 320px)',
               background: '#0d0d1a',
               borderLeft: '1px solid #1e1e2e',
-              zIndex: 70,
+              zIndex: 210,
               transform: drawerOpen ? 'translateX(0)' : 'translateX(100%)',
               transition: 'transform 0.3s cubic-bezier(.2,.9,.3,1)',
               display: 'flex', flexDirection: 'column',
@@ -385,7 +385,7 @@ export default function Navbar() {
             </div>
           </div>
         </>
-      )}
+      ), document.body)}
 
       {/* Backdrop for desktop dropdowns */}
       {!isMobile && (userMenuOpen || notifOpen) && (
@@ -475,5 +475,36 @@ function DrawerItem({ to, icon: Icon, label, active, danger, onClick }) {
       <Icon size={18} />
       {label}
     </Link>
+  );
+}
+
+function NotifList({ notifications, onCloseAfterNav }) {
+  return (
+    <>
+      <div style={{ padding: 14, borderBottom: '1px solid #1e1e2e', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
+        <button style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
+      </div>
+      {notifications.map(n => (
+        <div key={n.id} style={{
+          padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start',
+          borderBottom: '1px solid #1e1e2e',
+          background: n.unread ? 'rgba(139,92,246,0.05)' : 'transparent',
+        }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#8b5cf6' : 'transparent', marginTop: 6, flexShrink: 0 }} />
+          <div>
+            <p style={{ color: '#f8fafc', fontSize: 13, margin: 0, lineHeight: 1.4 }}>{n.text}</p>
+            <p style={{ color: '#475569', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
+          </div>
+        </div>
+      ))}
+      <Link
+        to="/notifications"
+        onClick={onCloseAfterNav}
+        style={{ display: 'block', padding: '14px', textAlign: 'center', color: '#8b5cf6', textDecoration: 'none', fontWeight: 700, fontSize: 13 }}
+      >
+        View all →
+      </Link>
+    </>
   );
 }
