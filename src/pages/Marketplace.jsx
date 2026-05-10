@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search, SlidersHorizontal, X, TrendingUp, ChevronDown, ChevronUp,
   RotateCcw, MapPin
@@ -7,6 +7,33 @@ import DealCard from '../components/DealCard';
 import USMap from '../components/USMap';
 import PostDealModal from '../components/PostDealModal';
 import { deals, dealTypes } from '../data/deals';
+
+// Detect mobile viewport (matches Tailwind 'md' breakpoint)
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
+  }, []);
+  return isMobile;
+}
+
+// State name lookup for friendly labels in the dropdown
+const STATE_NAMES = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+};
 
 const CITIES = [
   'All Cities','Atlanta, GA','Phoenix, AZ','Dallas, TX','Houston, TX',
@@ -47,6 +74,7 @@ function FBAdCalculator() {
 }
 
 export default function Marketplace() {
+  const isMobile = useIsMobile();
   const [activeType,      setActiveType]      = useState('all');
   const [search,          setSearch]          = useState('');
   const [showFilters,     setShowFilters]     = useState(false);
@@ -59,6 +87,15 @@ export default function Marketplace() {
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [showPromote,     setShowPromote]     = useState(false);
   const [showPostDeal,    setShowPostDeal]    = useState(false);
+
+  // States that actually have deals (for the mobile dropdown), sorted by deal count desc
+  const statesWithDeals = useMemo(() => {
+    const counts = {};
+    for (const d of deals) counts[d.state] = (counts[d.state] || 0) + 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([abbr, count]) => ({ abbr, count, name: STATE_NAMES[abbr] || abbr }));
+  }, []);
 
   function handleStateToggle(abbr) {
     if (abbr === '__CLEAR__') { setSelectedStates([]); return; }
@@ -160,6 +197,20 @@ export default function Marketplace() {
             >
               {CITIES.map(c => <option key={c}>{c}</option>)}
             </select>
+            {/* Mobile-only: state filter dropdown (replaces the map on phones) */}
+            {isMobile && (
+              <select
+                value={selectedStates[0] || ''}
+                onChange={e => setSelectedStates(e.target.value ? [e.target.value] : [])}
+                className="input-dark"
+                style={{ padding: '10px 12px', borderRadius: '9px', fontSize: '13px', minWidth: '150px', cursor: 'pointer', flex: 1 }}
+              >
+                <option value="">All States</option>
+                {statesWithDeals.map(({ abbr, count, name }) => (
+                  <option key={abbr} value={abbr}>{name} ({count})</option>
+                ))}
+              </select>
+            )}
             <button onClick={() => setNewestOnly(n => !n)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px 14px', borderRadius: '9px', background: newestOnly ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.04)', border: newestOnly ? 'none' : '1px solid #1e1e2e', color: newestOnly ? '#fff' : '#94a3b8', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
               <TrendingUp size={13} /> Newest
             </button>
@@ -226,10 +277,10 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* ── Two-column body: MAP LEFT | DEALS RIGHT ── */}
+      {/* ── Body: map+deals on desktop, deals-only on mobile ── */}
       <div style={{ maxWidth: '1500px', margin: '0 auto', display: 'flex', gap: '0', minHeight: 'calc(100vh - 200px)' }}>
 
-        {/* ── LEFT: sticky map panel ── */}
+        {/* ── LEFT: sticky map panel (hidden on mobile) ── */}
         <div style={{
           width: '600px', flexShrink: 0,
           position: 'sticky', top: '0',
@@ -238,7 +289,8 @@ export default function Marketplace() {
           borderRight: '1px solid #1e1e2e',
           background: '#0d0d1a',
           padding: '16px 12px',
-          display: 'flex', flexDirection: 'column', gap: '14px',
+          display: isMobile ? 'none' : 'flex',
+          flexDirection: 'column', gap: '14px',
         }}>
           {/* Map header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -295,7 +347,7 @@ export default function Marketplace() {
         </div>
 
         {/* ── RIGHT: deal listings ── */}
-        <div style={{ flex: 1, padding: '20px 20px 40px', minWidth: 0 }}>
+        <div style={{ flex: 1, padding: isMobile ? '14px 12px 32px' : '20px 20px 40px', minWidth: 0 }}>
           {sorted.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 20px' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>🏚️</div>
@@ -315,7 +367,7 @@ export default function Marketplace() {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: isMobile ? '14px' : '18px' }}>
                 {sorted.map((deal, idx) => (
                   <div key={deal.id}>
                     {idx === sorted.filter(d => d.isSponsored).length && idx > 0 && (
