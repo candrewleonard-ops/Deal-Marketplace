@@ -60,25 +60,21 @@ export default function AddressAutocomplete({
       abortRef.current = ctrl;
 
       try {
-        const url = new URL('https://nominatim.openstreetmap.org/search');
-        url.searchParams.set('format', 'json');
-        url.searchParams.set('addressdetails', '1');
-        url.searchParams.set('countrycodes', 'us');
-        url.searchParams.set('limit', '6');
-        url.searchParams.set('q', value);
-
-        const res = await fetch(url.toString(), {
-          signal: ctrl.signal,
-          headers: { 'Accept-Language': 'en' },
-        });
-        if (!res.ok) throw new Error('Geocoder error');
-        const data = await res.json();
+        const data = await geocode(value, ctrl.signal);
         const parsed = (Array.isArray(data) ? data : [])
           .map(parseNominatimResult)
           .filter(Boolean);
-        setResults(parsed);
-        setOpen(parsed.length > 0);
-        setHighlight(parsed.length > 0 ? 0 : -1);
+        // De-dupe by display_name (structured + freeform fallback can overlap)
+        const seen = new Set();
+        const unique = parsed.filter(p => {
+          const key = `${p.street}|${p.city}|${p.state}|${p.zip}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setResults(unique);
+        setOpen(unique.length > 0);
+        setHighlight(unique.length > 0 ? 0 : -1);
       } catch (e) {
         if (e.name !== 'AbortError') {
           setResults([]);
@@ -86,7 +82,7 @@ export default function AddressAutocomplete({
       } finally {
         setLoading(false);
       }
-    }, 280);
+    }, 320);
 
     return () => clearTimeout(debounceRef.current);
   }, [value, picked]);
@@ -289,3 +285,150 @@ function parseNominatimResult(r) {
     displayName: r.display_name || '',
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Smart query parser + geocoder
+// Nominatim's freeform `q=` param ranks by global popularity, so "lima oh"
+// surfaces Lima, Peru before Lima, OH. Parsing the user's input into
+// {street, city, state, zip} and using Nominatim's STRUCTURED endpoint
+// (`street=`, `city=`, `state=`) is dramatically more accurate.
+// ─────────────────────────────────────────────────────────────────────────
+
+const US_STATE_ABBR_SET = new Set(Object.values(STATE_ABBR));
+
+// Common US street suffix tokens — used to find where the street ends and the city begins.
+const STREET_SUFFIX = /^(st|street|ave|avenue|rd|road|dr|drive|blvd|boulevard|ln|lane|way|ct|court|pl|place|cir|circle|pkwy|parkway|hwy|highway|ter|terrace|trail|trl|trce|sq|square|cv|cove|bend|bnd|crk|creek|run|loop|row|xing|aly|alley|hl|hill|grv|grove|expy|fwy|mews|walk|path)\.?$/i;
+
+/**
+ * Parse a freeform address string into {street, city, state, zip}.
+ * Handles:
+ *   - "1216 wayside dr lima oh"          → state=OH, city=lima, street="1216 wayside dr"
+ *   - "108 britt st franklin va 23851"   → +zip=23851
+ *   - "1216 wayside dr, lima, oh"        → comma-separated
+ *   - "100 main st new york ny"          → multi-word city
+ *   - state names (e.g. "ohio") and abbreviations
+ * Returns null if the input doesn't have enough hints (no recognizable state).
+ */
+function parseQueryToParts(input) {
+  if (!input) return null;
+  let cleaned = input.trim().replace(/\s+/g, ' ');
+  if (!cleaned) return null;
+
+  // Pull out trailing zip code (5-digit, optional +4) so it doesn't confuse state detection
+  let zip = '';
+  const zipMatch = cleaned.match(/\b(\d{5})(?:-\d{4})?\s*$/);
+  if (zipMatch) {
+    zip = zipMatch[1];
+    cleaned = cleaned.slice(0, zipMatch.index).trim().replace(/,\s*$/, '');
+  }
+
+  const findStateInTokens = (tokens) => {
+    if (tokens.length === 0) return { stateIdx: -1, state: '' };
+    // Try last token as 2-letter abbr
+    const last = tokens[tokens.length - 1].toUpperCase();
+    if (US_STATE_ABBR_SET.has(last)) return { stateIdx: tokens.length - 1, state: last };
+    // Try last 2 tokens as state name (e.g. "new york")
+    if (tokens.length >= 2) {
+      const last2 = tokens.slice(-2).join(' ').toLowerCase();
+      if (STATE_ABBR[last2]) return { stateIdx: tokens.length - 2, state: STATE_ABBR[last2] };
+    }
+    // Try last 1 token as state name
+    const last1 = tokens[tokens.length - 1].toLowerCase();
+    if (STATE_ABBR[last1]) return { stateIdx: tokens.length - 1, state: STATE_ABBR[last1] };
+    return { stateIdx: -1, state: '' };
+  };
+
+  // Comma path — most reliable when present
+  if (cleaned.includes(',')) {
+    const parts = cleaned.split(',').map(p => p.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      const street = parts[0];
+      // Walk parts[1..] looking for state. Common shapes:
+      //   "street, city, state"
+      //   "street, city state"
+      //   "street, city"
+      const restTokens = parts.slice(1).join(' ').split(/\s+/);
+      const { stateIdx, state } = findStateInTokens(restTokens);
+      const cityTokens = stateIdx >= 0 ? restTokens.slice(0, stateIdx) : restTokens;
+      const city = cityTokens.join(' ').replace(/,/g, '').trim();
+      return { street, city, state, zip };
+    }
+  }
+
+  // No-comma path
+  const tokens = cleaned.split(/\s+/);
+  if (tokens.length < 2) return null;
+
+  const { stateIdx, state } = findStateInTokens(tokens);
+  if (stateIdx <= 0) return null; // need at least street/city before state
+
+  const beforeState = tokens.slice(0, stateIdx);
+
+  // Find the LAST street-suffix token in beforeState — everything up to & including it
+  // is the street, everything after is the city.
+  let streetEndIdx = -1;
+  for (let i = beforeState.length - 1; i >= 0; i--) {
+    if (STREET_SUFFIX.test(beforeState[i])) { streetEndIdx = i; break; }
+  }
+
+  if (streetEndIdx >= 0 && streetEndIdx < beforeState.length - 1) {
+    return {
+      street: beforeState.slice(0, streetEndIdx + 1).join(' '),
+      city: beforeState.slice(streetEndIdx + 1).join(' '),
+      state,
+      zip,
+    };
+  }
+
+  // No street-suffix found. If there's exactly one token before state, treat the
+  // whole thing as a city query (e.g. "lima oh"). Otherwise assume the last token
+  // before state is the city.
+  if (beforeState.length === 1) {
+    return { street: '', city: beforeState[0], state, zip };
+  }
+  return {
+    street: beforeState.slice(0, -1).join(' '),
+    city: beforeState[beforeState.length - 1],
+    state,
+    zip,
+  };
+}
+
+async function geocode(query, signal) {
+  const parts = parseQueryToParts(query);
+  const baseParams = {
+    format: 'json',
+    addressdetails: '1',
+    countrycodes: 'us',
+    limit: '6',
+  };
+  const headers = { 'Accept-Language': 'en' };
+
+  // 1) Structured query (much more accurate when we can extract a state)
+  if (parts && parts.state && (parts.city || parts.street || parts.zip)) {
+    const url = new URL('https://nominatim.openstreetmap.org/search');
+    for (const [k, v] of Object.entries(baseParams)) url.searchParams.set(k, v);
+    if (parts.street) url.searchParams.set('street', parts.street);
+    if (parts.city)   url.searchParams.set('city',   parts.city);
+    if (parts.state)  url.searchParams.set('state',  parts.state);
+    if (parts.zip)    url.searchParams.set('postalcode', parts.zip);
+
+    const res = await fetch(url.toString(), { signal, headers });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  }
+
+  // 2) Freeform fallback
+  const url = new URL('https://nominatim.openstreetmap.org/search');
+  for (const [k, v] of Object.entries(baseParams)) url.searchParams.set(k, v);
+  url.searchParams.set('q', query);
+  const res = await fetch(url.toString(), { signal, headers });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+// Exported for tests / debugging
+export { parseQueryToParts };
