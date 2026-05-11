@@ -30,6 +30,9 @@ export default function AddressAutocomplete({
   const [highlight, setHighlight] = useState(-1);
   const [picked, setPicked] = useState(false); // shows green check briefly after a pick
   const [resolving, setResolving] = useState(false); // resolving Google Place Details
+  // Per-provider diagnostic — { google: { ok:n, err:'msg' }, census: ..., ... }
+  // Surfaced in the dropdown footer so misconfigured API keys are obvious.
+  const [diag, setDiag] = useState(null);
   const wrapRef = useRef(null);
   const abortRef = useRef(null);
   const debounceRef = useRef(null);
@@ -65,8 +68,9 @@ export default function AddressAutocomplete({
       abortRef.current = ctrl;
 
       try {
-        const merged = await geocode(value, ctrl.signal, sessionTokenRef.current);
+        const { merged, diagnostics } = await geocode(value, ctrl.signal, sessionTokenRef.current);
         setResults(merged);
+        setDiag(diagnostics);
         // Always open the dropdown when a query has finished, so the user
         // sees either the suggestions or a clear "no matches" message.
         setOpen(true);
@@ -231,6 +235,30 @@ export default function AddressAutocomplete({
                 Try adding the city &amp; state — e.g. <span style={{ color: '#a78bfa' }}>"1216 Wayside Dr Lima OH"</span>.
                 You can also type the address manually.
               </div>
+              {diag && (
+                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #1e1e2e' }}>
+                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>
+                    Provider status
+                  </div>
+                  {Object.entries(diag).map(([name, status]) => (
+                    <div key={name} style={{
+                      display: 'flex', justifyContent: 'space-between', gap: 8,
+                      fontSize: 11, padding: '2px 0',
+                      color: status.err ? '#ef4444' : (status.ok > 0 ? '#10b981' : '#64748b'),
+                    }}>
+                      <span style={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{name}</span>
+                      <span style={{
+                        fontFamily: 'monospace',
+                        textAlign: 'right',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        maxWidth: 280,
+                      }}>
+                        {status.err ? `error: ${status.err}` : `${status.ok} result${status.ok !== 1 ? 's' : ''}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {results.map((r, i) => {
@@ -476,36 +504,41 @@ function parseQueryToParts(input) {
 // All results are normalized to this shape:
 //   { street, city, state, zip, lat, lon, displayName, _src }
 
+// Wraps a provider call so we capture {ok:n, err:'msg'} per provider for
+// the visible diagnostic. Errors are still swallowed (returns []) so one
+// failure doesn't break the dropdown.
+async function runProvider(name, promise, diag) {
+  try {
+    const data = await promise;
+    diag[name] = { ok: data.length, err: null };
+    return data;
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      diag[name] = { ok: 0, err: 'aborted' };
+      return [];
+    }
+    const msg = (e?.message || String(e)).slice(0, 120);
+    diag[name] = { ok: 0, err: msg };
+    console.warn(`[geocoder] ${name} failed:`, e);
+    return [];
+  }
+}
+
 async function geocode(query, signal, sessionToken) {
   const parts = parseQueryToParts(query);
+  const diagnostics = {};
 
   // Run providers in parallel. Each catches its own errors so one slow/failed
   // source can't take down the dropdown.
-  const tasks = [
-    googlePlacesAutocomplete(query, sessionToken, signal).catch((e) => {
-      if (e.name !== 'AbortError') console.warn('[geocoder] google failed:', e);
-      return [];
-    }),
-    censusGeocode(query, signal).catch((e) => {
-      if (e.name !== 'AbortError') console.warn('[geocoder] census failed:', e);
-      return [];
-    }),
-    nominatimGeocode(query, parts, signal).catch((e) => {
-      if (e.name !== 'AbortError') console.warn('[geocoder] nominatim failed:', e);
-      return [];
-    }),
-    photonGeocode(query, signal).catch((e) => {
-      if (e.name !== 'AbortError') console.warn('[geocoder] photon failed:', e);
-      return [];
-    }),
-  ];
-
-  const [googleRes, censusRes, nomRes, photonRes] = await Promise.all(tasks);
+  const [googleRes, censusRes, nomRes, photonRes] = await Promise.all([
+    runProvider('google',   googlePlacesAutocomplete(query, sessionToken, signal), diagnostics),
+    runProvider('census',   censusGeocode(query, signal),                          diagnostics),
+    runProvider('osm',      nominatimGeocode(query, parts, signal),                diagnostics),
+    runProvider('photon',   photonGeocode(query, signal),                          diagnostics),
+  ]);
 
   // Merge order: Google first (best, always wins when available), then Census
   // (best US residential), then Photon (best OSM autocomplete), then Nominatim.
-  // Dedupe by display text for Google (no parsed address yet) and by
-  // street+city+state for the rest.
   const merged = [];
   const seen = new Set();
   for (const r of [...googleRes, ...censusRes, ...photonRes, ...nomRes]) {
@@ -517,7 +550,7 @@ async function geocode(query, signal, sessionToken) {
     merged.push(r);
     if (merged.length >= 6) break;
   }
-  return merged;
+  return { merged, diagnostics };
 }
 
 // ── Google Places (New) Autocomplete + Place Details ─────────────────────
@@ -537,7 +570,11 @@ function newSessionToken() {
 }
 
 async function googlePlacesAutocomplete(query, sessionToken, signal) {
-  if (!GOOGLE_API_KEY) return [];
+  if (!GOOGLE_API_KEY) {
+    // Make this a real error so the diagnostic surfaces it instead of
+    // silently looking like "Google returned 0 results".
+    throw new Error('VITE_GOOGLE_MAPS_API_KEY not set at build time');
+  }
 
   const res = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
     method: 'POST',
@@ -550,11 +587,23 @@ async function googlePlacesAutocomplete(query, sessionToken, signal) {
       input: query,
       includedRegionCodes: ['us'],
       sessionToken,
-      // Bias to addresses, drop strict POIs/businesses for a real-estate flow.
-      includedPrimaryTypes: ['street_address', 'subpremise', 'premise', 'route', 'locality', 'postal_code'],
+      // No includedPrimaryTypes — earlier filter was too strict and dropped
+      // valid street_address suggestions for partial inputs. Better to let
+      // Google return everything US-region and rank naturally.
     }),
   });
-  if (!res.ok) return [];
+  if (!res.ok) {
+    // Surface Google's exact error so the diagnostic shows what's wrong
+    // (REQUEST_DENIED, API not enabled, billing, etc.).
+    let detail = '';
+    try {
+      const body = await res.json();
+      detail = body?.error?.message || body?.error?.status || JSON.stringify(body).slice(0, 100);
+    } catch {
+      detail = await res.text().then(t => t.slice(0, 100)).catch(() => '');
+    }
+    throw new Error(`HTTP ${res.status} — ${detail}`);
+  }
   const data = await res.json();
   const suggestions = data?.suggestions || [];
   return suggestions.slice(0, 6).map(s => {
