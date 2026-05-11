@@ -60,24 +60,16 @@ export default function AddressAutocomplete({
       abortRef.current = ctrl;
 
       try {
-        const data = await geocode(value, ctrl.signal);
-        const parsed = (Array.isArray(data) ? data : [])
-          .map(parseNominatimResult)
-          .filter(Boolean);
-        // De-dupe by display_name (structured + freeform fallback can overlap)
-        const seen = new Set();
-        const unique = parsed.filter(p => {
-          const key = `${p.street}|${p.city}|${p.state}|${p.zip}`;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-        setResults(unique);
-        setOpen(unique.length > 0);
-        setHighlight(unique.length > 0 ? 0 : -1);
+        const merged = await geocode(value, ctrl.signal);
+        setResults(merged);
+        // Always open the dropdown when a query has finished, so the user
+        // sees either the suggestions or a clear "no matches" message.
+        setOpen(true);
+        setHighlight(merged.length > 0 ? 0 : -1);
       } catch (e) {
         if (e.name !== 'AbortError') {
           setResults([]);
+          setOpen(true);
         }
       } finally {
         setLoading(false);
@@ -160,7 +152,7 @@ export default function AddressAutocomplete({
         )}
       </div>
 
-      {open && results.length > 0 && (
+      {open && (
         <div
           role="listbox"
           style={{
@@ -174,6 +166,21 @@ export default function AddressAutocomplete({
             animation: 'addr-fade-in 0.15s ease-out',
           }}
         >
+          {loading && results.length === 0 && (
+            <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, color: '#94a3b8', fontSize: 13 }}>
+              <Loader2 size={14} style={{ color: '#8b5cf6', animation: 'addr-spin 0.8s linear infinite' }} />
+              Searching addresses…
+            </div>
+          )}
+          {!loading && results.length === 0 && (
+            <div style={{ padding: '14px', color: '#94a3b8', fontSize: 13, lineHeight: 1.5 }}>
+              <div style={{ color: '#f8fafc', fontWeight: 600, marginBottom: 4 }}>No matches found</div>
+              <div style={{ color: '#64748b', fontSize: 12 }}>
+                Try adding the city &amp; state — e.g. <span style={{ color: '#a78bfa' }}>"1216 Wayside Dr Lima OH"</span>.
+                You can also type the address manually.
+              </div>
+            </div>
+          )}
           {results.map((r, i) => (
             <button
               key={`${r.lat}-${r.lon}-${i}`}
@@ -216,17 +223,19 @@ export default function AddressAutocomplete({
               </div>
             </button>
           ))}
-          <div style={{
-            padding: '6px 12px',
-            background: '#0f0f18',
-            borderTop: '1px solid #1e1e2e',
-            fontSize: 10,
-            color: '#475569',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
-            <span>↑↓ to navigate · ↵ to select · esc to close</span>
-            <span>Powered by OSM</span>
-          </div>
+          {results.length > 0 && (
+            <div style={{
+              padding: '6px 12px',
+              background: '#0f0f18',
+              borderTop: '1px solid #1e1e2e',
+              fontSize: 10,
+              color: '#475569',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <span>↑↓ to navigate · ↵ to select · esc to close</span>
+              <span>US Census + OSM</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -394,8 +403,89 @@ function parseQueryToParts(input) {
   };
 }
 
+// All results are normalized to this shape:
+//   { street, city, state, zip, lat, lon, displayName, _src }
+
 async function geocode(query, signal) {
   const parts = parseQueryToParts(query);
+
+  // Run the providers in parallel — each one returns normalized records or
+  // an empty array on failure. We then merge & rank.
+  const tasks = [
+    censusGeocode(query, signal).catch((e) => {
+      if (e.name !== 'AbortError') console.warn('[geocoder] census failed:', e);
+      return [];
+    }),
+    nominatimGeocode(query, parts, signal).catch((e) => {
+      if (e.name !== 'AbortError') console.warn('[geocoder] nominatim failed:', e);
+      return [];
+    }),
+  ];
+
+  const [censusRes, nomRes] = await Promise.all(tasks);
+
+  // Merge: Census matches first (much higher US residential accuracy),
+  // then Nominatim, deduped by street+city+state.
+  const merged = [];
+  const seen = new Set();
+  for (const r of [...censusRes, ...nomRes]) {
+    const key = `${(r.street || '').toLowerCase()}|${(r.city || '').toLowerCase()}|${r.state}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(r);
+    if (merged.length >= 6) break;
+  }
+  return merged;
+}
+
+// ── US Census Geocoder ───────────────────────────────────────────────────
+// Free, no API key, comprehensive US residential coverage. The Census
+// Bureau geocodes literally every US address for the decennial count.
+async function censusGeocode(query, signal) {
+  const url = new URL('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress');
+  url.searchParams.set('address', query);
+  url.searchParams.set('benchmark', 'Public_AR_Current');
+  url.searchParams.set('format', 'json');
+
+  const res = await fetch(url.toString(), { signal });
+  if (!res.ok) return [];
+  const data = await res.json();
+  const matches = data?.result?.addressMatches || [];
+  return matches.slice(0, 6).map(censusToNormalized).filter(Boolean);
+}
+
+function censusToNormalized(m) {
+  if (!m) return null;
+  const c = m.addressComponents || {};
+  // Reconstruct street: "<from> <preDir> <streetName> <suffixType> <suffixDir>"
+  const street = [
+    c.fromAddress,
+    c.preDirection,
+    c.preType,
+    c.streetName,
+    c.suffixType,
+    c.suffixDirection,
+  ].filter(Boolean).map(s => titleCase(s)).join(' ').replace(/\s+/g, ' ').trim();
+
+  return {
+    street,
+    city: titleCase(c.city || ''),
+    state: (c.state || '').toUpperCase(),
+    zip: c.zip || '',
+    lat: m.coordinates?.y,
+    lon: m.coordinates?.x,
+    displayName: titleCase(m.matchedAddress || ''),
+    _src: 'census',
+  };
+}
+
+function titleCase(s) {
+  if (!s) return '';
+  return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// ── Nominatim (OSM) ──────────────────────────────────────────────────────
+async function nominatimGeocode(query, parts, signal) {
   const baseParams = {
     format: 'json',
     addressdetails: '1',
@@ -404,7 +494,7 @@ async function geocode(query, signal) {
   };
   const headers = { 'Accept-Language': 'en' };
 
-  // 1) Structured query (much more accurate when we can extract a state)
+  // 1) Structured query when we can extract a state
   if (parts && parts.state && (parts.city || parts.street || parts.zip)) {
     const url = new URL('https://nominatim.openstreetmap.org/search');
     for (const [k, v] of Object.entries(baseParams)) url.searchParams.set(k, v);
@@ -416,7 +506,8 @@ async function geocode(query, signal) {
     const res = await fetch(url.toString(), { signal, headers });
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      const parsed = (Array.isArray(data) ? data : []).map(parseNominatimResult).filter(Boolean);
+      if (parsed.length > 0) return parsed.map(p => ({ ...p, _src: 'nominatim-structured' }));
     }
   }
 
@@ -427,7 +518,10 @@ async function geocode(query, signal) {
   const res = await fetch(url.toString(), { signal, headers });
   if (!res.ok) return [];
   const data = await res.json();
-  return Array.isArray(data) ? data : [];
+  return (Array.isArray(data) ? data : [])
+    .map(parseNominatimResult)
+    .filter(Boolean)
+    .map(p => ({ ...p, _src: 'nominatim-freeform' }));
 }
 
 // Exported for tests / debugging
