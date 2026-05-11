@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, DollarSign, Home, MapPin, Camera, Video, Tag } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import AddressAutocomplete from './AddressAutocomplete';
 
 const DEAL_TYPES = [
   { value: 'fix-flip',  label: 'Fix & Flip',       color: '#ef4444' },
@@ -105,7 +106,21 @@ export default function PostDealModal({ onClose, onSubmit }) {
               </Field>
 
               <Field label="STREET ADDRESS (hidden until you approve requests)" icon={MapPin}>
-                <input value={form.address} onChange={e => update('address', e.target.value)} placeholder="2847 Peachtree Rd NE" className="input-dark" style={inputStyle} />
+                <AddressAutocomplete
+                  value={form.address}
+                  onChange={(v) => update('address', v)}
+                  onSelect={(picked) => {
+                    setForm(f => ({
+                      ...f,
+                      address: picked.street || f.address,
+                      city:    picked.city  || f.city,
+                      state:   picked.state || f.state,
+                      zip:     picked.zip   || f.zip,
+                    }));
+                  }}
+                  placeholder="Start typing — e.g. 2847 Peachtree Rd NE"
+                  inputStyle={inputStyle}
+                />
               </Field>
 
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '10px' }}>
