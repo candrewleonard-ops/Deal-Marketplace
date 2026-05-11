@@ -152,51 +152,78 @@ export default function Marketplace() {
     || priceValue < 1000000 || minBeds > 0 || selectedStates.length > 0 || newestOnly;
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh' }}>
 
       {/* ── Top header bar ── */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: isMobile ? '12px 14px' : '18px 20px' }}>
-        <div style={{ maxWidth: 1500, margin: '0 auto' }}>
+      <div style={{
+        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a0f 100%)',
+        borderBottom: '1px solid #1e1e2e',
+        padding: isMobile ? '12px 14px' : '18px 20px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* subtle gradient orb in header */}
+        <div style={{
+          position: 'absolute', top: '-40%', left: '-5%',
+          width: 300, height: 300, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%)',
+          filter: 'blur(30px)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{ maxWidth: 1500, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {/* Title row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', margin: 0 }}>Deal Marketplace</h1>
-              <p style={{ color: '#475569', margin: '2px 0 0', fontSize: '13px' }}>
-                {sorted.length} of {deals.length} deals
+              <h1 style={{
+                color: '#f8fafc', fontWeight: 800,
+                fontSize: isMobile ? 20 : 24, margin: 0,
+                letterSpacing: '-0.5px',
+              }}>
+                <span className="gradient-text">Deal</span> Marketplace
+              </h1>
+              <p style={{ color: '#94a3b8', margin: '2px 0 0', fontSize: '13px' }}>
+                <span style={{ color: '#8b5cf6', fontWeight: 700 }}>{sorted.length}</span>
+                {' '}of {deals.length} off-market deals
                 {selectedStates.length > 0 && ` · ${selectedStates.join(', ')}`}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               {hasActiveFilters && (
-                <button onClick={resetAll} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 14px', borderRadius: '8px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                <button onClick={resetAll} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px', borderRadius: 9, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
                   <RotateCcw size={13} /> Reset
                 </button>
               )}
-              <button onClick={() => setShowPromote(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
-                <TrendingUp size={14} /> Promote a Deal
-              </button>
-              <button onClick={() => setShowPostDeal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '9px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}>
-                + Post a Deal
-              </button>
+              {!isMobile && (
+                <button onClick={() => setShowPromote(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                  <TrendingUp size={14} /> Promote a Deal
+                </button>
+              )}
+              {!isMobile && (
+                <button onClick={() => setShowPostDeal(true)} className="gradient-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                  + Post a Deal
+                </button>
+              )}
             </div>
           </div>
 
           {/* Search + city + filters row */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ flex: 1, minWidth: '180px', position: 'relative' }}>
-              <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ flex: isMobile ? '1 1 100%' : 1, minWidth: 180, position: 'relative' }}>
+              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#8b5cf6', pointerEvents: 'none' }} />
               <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search city, market, or keyword…"
+                placeholder={isMobile ? 'Search deals…' : 'Search city, market, or keyword…'}
                 className="input-dark"
-                style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '9px', fontSize: '13px' }}
+                style={{ width: '100%', padding: isMobile ? '11px 12px 11px 38px' : '10px 12px 10px 36px', borderRadius: 10, fontSize: 13 }}
               />
             </div>
-            <select value={city} onChange={e => setCity(e.target.value)}
-              className="input-dark"
-              style={{ padding: '10px 12px', borderRadius: '9px', fontSize: '13px', minWidth: '150px', cursor: 'pointer' }}
-            >
-              {CITIES.map(c => <option key={c}>{c}</option>)}
-            </select>
+            {!isMobile && (
+              <select value={city} onChange={e => setCity(e.target.value)}
+                className="input-dark"
+                style={{ padding: '10px 12px', borderRadius: 9, fontSize: 13, minWidth: 150, cursor: 'pointer' }}
+              >
+                {CITIES.map(c => <option key={c}>{c}</option>)}
+              </select>
+            )}
             {/* Mobile-only: state filter dropdown (replaces the map on phones) */}
             {isMobile && (
               <select

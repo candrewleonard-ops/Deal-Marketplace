@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { ShoppingBag, Users, Plus, Heart, User } from 'lucide-react';
+import { ShoppingBag, UsersRound, Plus, Heart, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 
@@ -20,7 +20,7 @@ export default function MobileTabBar() {
 
   const tabs = [
     { to: '/marketplace', label: 'Browse', icon: ShoppingBag },
-    { to: '/social',      label: 'Social', icon: Users },
+    { to: '/groups',      label: 'Groups', icon: UsersRound },
     { type: 'fab' },
     { to: '/saved',       label: 'Saved',  icon: Heart },
     { to: currentUser ? `/profile/${currentUser.id}` : '/auth', label: 'Profile', icon: User },

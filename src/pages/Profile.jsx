@@ -3,13 +3,15 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, Calendar, Users, TrendingUp, MessageSquare, UserPlus,
   Edit3, Building2, Shield, Image, Video, FileText, Clock, Briefcase, X, Lock,
-  Share2, Check, Copy, ExternalLink
+  Share2, Check, Copy, ExternalLink, Star, Award
 } from 'lucide-react';
 import { getUserById, currentUser, users } from '../data/users';
 import { deals } from '../data/deals';
 import PostCard from '../components/PostCard';
 import DealCard from '../components/DealCard';
 import { posts } from '../data/posts';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { useAuth } from '../context/AuthContext';
 
 const tagColors = {
   'Wholesaler': '#8b5cf6',
@@ -36,6 +38,8 @@ const auditLog = [
 export default function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { requireAuth } = useAuth();
   const profile = getUserById(id) || getUserById(1);
   const isOwnProfile = profile.id === currentUser.id;
   const [activeTab, setActiveTab] = useState('posts');
@@ -72,12 +76,19 @@ export default function Profile() {
   ];
 
   function handleFollow() {
+    if (!requireAuth(`follow ${profile.name}`, 'follow', `/profile/${profile.id}`)) return;
     if (following) {
       setFollowerCount(c => c - 1);
     } else {
       setFollowerCount(c => c + 1);
     }
     setFollowing(!following);
+  }
+
+  function handleMessage(e) {
+    if (!requireAuth(`message ${profile.name}`, 'message', `/profile/${profile.id}`)) {
+      e.preventDefault();
+    }
   }
 
   function handleSaveProfile() {
@@ -94,60 +105,101 @@ export default function Profile() {
   const photoSeeds = Array.from({ length: 12 }, (_, i) => `deal${i + 1}`);
   const videoSeeds = Array.from({ length: 6 }, (_, i) => `video${i + 1}`);
 
+  const avatarSize = isMobile ? 104 : 128;
+  const coverHeight = isMobile ? 180 : 280;
+  const avatarOverlap = isMobile ? 56 : 64;
+
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: isMobile ? 32 : 60 }}>
       {/* Cover Photo */}
       <div style={{
-        height: '280px', position: 'relative',
+        height: coverHeight, position: 'relative',
         background: `linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.3)), url(${profileData.coverPhoto || profile.coverPhoto})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
         overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(10,10,15,0.8))' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10,10,15,0.85))' }} />
+        {/* subtle animated glow over cover */}
+        <div style={{
+          position: 'absolute', top: '-30%', right: '-10%',
+          width: 320, height: 320, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.25), transparent 70%)',
+          filter: 'blur(20px)',
+          animation: 'orb-float 8s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
         {isOwnProfile && (
-          <button style={{
-            position: 'absolute', top: '16px', right: '16px',
-            display: 'flex', alignItems: 'center', gap: '6px',
-            background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '8px', padding: '8px 14px',
-            color: '#f8fafc', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
-            backdropFilter: 'blur(8px)',
-          }}>
+          <button
+            onClick={() => { setEditForm({ ...profileData }); setShowEditModal(true); }}
+            style={{
+              position: 'absolute',
+              top: isMobile ? 12 : 16,
+              right: isMobile ? 12 : 16,
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 10, padding: isMobile ? '7px 12px' : '8px 14px',
+              color: '#f8fafc', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+            }}
+          >
             <Image size={14} />
-            Edit Cover
+            {!isMobile && 'Edit Cover'}
           </button>
         )}
       </div>
 
       {/* Profile Info */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 20px' }}>
-        <div style={{ position: 'relative', marginBottom: '24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 14px' : '0 20px' }}>
+        <div style={{ position: 'relative', marginBottom: 18 }}>
           {/* Avatar */}
           <div style={{
-            position: 'absolute', top: '-64px', left: 0,
-            width: '128px', height: '128px', borderRadius: '50%',
+            position: 'absolute',
+            top: -avatarOverlap,
+            left: isMobile ? '50%' : 0,
+            transform: isMobile ? 'translateX(-50%)' : 'none',
+            width: avatarSize, height: avatarSize, borderRadius: '50%',
             border: '4px solid #0a0a0f',
             overflow: 'hidden', background: '#12121e',
+            boxShadow: '0 14px 40px rgba(0,0,0,0.55), 0 0 0 2px rgba(139,92,246,0.25)',
           }}>
             <img
               src={profileData.avatar || profile.avatar}
               alt={profileData.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
+            {profile.isCommunityLeader && (
+              <div style={{
+                position: 'absolute', bottom: 4, right: 4,
+                width: 28, height: 28, borderRadius: '50%',
+                background: 'linear-gradient(135deg,#f59e0b,#fbbf24)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '2.5px solid #0a0a0f',
+              }} title="Community Leader">
+                <Star size={13} fill="#fff" color="#fff" />
+              </div>
+            )}
           </div>
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '16px', flexWrap: 'wrap' }}>
+          {/* Action buttons — placed under cover on mobile, beside avatar on desktop */}
+          <div style={{
+            display: 'flex',
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            gap: isMobile ? 8 : 10,
+            paddingTop: isMobile ? avatarSize - avatarOverlap + 16 : 16,
+            flexWrap: 'wrap',
+          }}>
             {isOwnProfile ? (
               <>
                 <button
                   onClick={() => { setEditForm({ ...profileData }); setShowEditModal(true); }}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 18px', borderRadius: '10px',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: isMobile ? '10px 14px' : '9px 18px', borderRadius: 10,
                     background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#f8fafc', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
-                    transition: 'all 0.2s',
+                    color: '#f8fafc', cursor: 'pointer', fontWeight: 600, fontSize: 14,
+                    transition: 'all 0.2s', flex: isMobile ? '1 1 auto' : '0 0 auto',
+                    justifyContent: 'center',
                   }}
                 >
                   <Edit3 size={15} />
@@ -156,14 +208,15 @@ export default function Profile() {
                 <button
                   onClick={() => setShowShareModal(true)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 18px', borderRadius: '10px',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: isMobile ? '10px 14px' : '9px 18px', borderRadius: 10,
                     background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: 14,
+                    justifyContent: 'center',
                   }}
                 >
                   <Share2 size={15} />
-                  Share
+                  {!isMobile && 'Share'}
                 </button>
               </>
             ) : (
@@ -172,13 +225,15 @@ export default function Profile() {
                   onClick={handleFollow}
                   className={following ? '' : 'gradient-btn'}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 18px', borderRadius: '10px',
+                    display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+                    padding: isMobile ? '11px 16px' : '9px 18px', borderRadius: 10,
                     background: following ? 'rgba(16,185,129,0.1)' : undefined,
                     border: following ? '1px solid rgba(16,185,129,0.3)' : 'none',
                     color: following ? '#10b981' : '#fff',
-                    cursor: 'pointer', fontWeight: 600, fontSize: '14px',
+                    cursor: 'pointer', fontWeight: 700, fontSize: 14,
                     transition: 'all 0.2s',
+                    flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto',
+                    minWidth: isMobile ? 0 : 110,
                   }}
                 >
                   {following ? <Check size={15} /> : <UserPlus size={15} />}
@@ -186,12 +241,14 @@ export default function Profile() {
                 </button>
                 <Link
                   to="/messages"
+                  onClick={handleMessage}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 18px', borderRadius: '10px',
+                    display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+                    padding: isMobile ? '11px 16px' : '9px 18px', borderRadius: 10,
                     background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#f8fafc', textDecoration: 'none', fontWeight: 600, fontSize: '14px',
+                    color: '#f8fafc', textDecoration: 'none', fontWeight: 600, fontSize: 14,
                     transition: 'all 0.2s',
+                    flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto',
                   }}
                 >
                   <MessageSquare size={15} />
@@ -200,58 +257,87 @@ export default function Profile() {
                 <Link
                   to={`/marketplace?seller=${profile.id}`}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 18px', borderRadius: '10px',
+                    display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+                    padding: isMobile ? '10px 14px' : '9px 18px', borderRadius: 10,
                     background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)',
-                    color: '#8b5cf6', textDecoration: 'none', fontWeight: 600, fontSize: '14px',
+                    color: '#8b5cf6', textDecoration: 'none', fontWeight: 600, fontSize: 14,
+                    flex: isMobile ? '1 1 100%' : '0 0 auto',
                   }}
                 >
                   <TrendingUp size={15} />
                   View Deals
                 </Link>
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '9px 14px', borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
-                  }}
-                >
-                  <Share2 size={15} />
-                </button>
+                {!isMobile && (
+                  <button
+                    onClick={() => setShowShareModal(true)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '9px 14px', borderRadius: 10,
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+                      color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: 14,
+                    }}
+                  >
+                    <Share2 size={15} />
+                  </button>
+                )}
               </>
             )}
           </div>
         </div>
 
         {/* Name / Info */}
-        <div style={{ paddingTop: '80px', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
-            <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', margin: 0 }}>{profileData.name}</h1>
+        <div style={{
+          paddingTop: isMobile ? 12 : 80,
+          marginBottom: 20,
+          textAlign: isMobile ? 'center' : 'left',
+        }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6,
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          }}>
+            <h1 style={{
+              color: '#f8fafc', fontWeight: 900,
+              fontSize: isMobile ? 22 : 28,
+              margin: 0, letterSpacing: '-0.5px',
+            }}>
+              {profileData.name}
+            </h1>
             {profile.isBusinessProfile && (
               <span style={{
-                display: 'flex', alignItems: 'center', gap: '4px',
+                display: 'flex', alignItems: 'center', gap: 4,
                 background: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4',
                 border: '1px solid rgba(6, 182, 212, 0.2)',
-                borderRadius: '20px', padding: '3px 12px', fontSize: '12px', fontWeight: 700,
+                borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700,
               }}>
                 <Building2 size={12} />
-                Business Account
+                Business
+              </span>
+            )}
+            {profile.accountTier === 'VIP Max' && (
+              <span style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                background: 'rgba(245,158,11,0.1)', color: '#f59e0b',
+                border: '1px solid rgba(245,158,11,0.25)',
+                borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700,
+              }}>
+                <Award size={12} /> VIP
               </span>
             )}
           </div>
-          <div style={{ color: '#475569', fontSize: '15px', marginBottom: '10px' }}>@{profile.username}</div>
+          <div style={{ color: '#475569', fontSize: 15, marginBottom: 10 }}>@{profile.username}</div>
 
           {/* Tags */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
+          <div style={{
+            display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14,
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          }}>
             {profileData.tags.map(tag => {
               const color = tagColors[tag] || '#8b5cf6';
               return (
                 <span key={tag} style={{
                   background: `${color}18`, color,
                   border: `1px solid ${color}30`,
-                  borderRadius: '20px', padding: '4px 14px', fontSize: '13px', fontWeight: 700,
+                  borderRadius: 20, padding: '4px 14px', fontSize: 13, fontWeight: 700,
                 }}>
                   {tag}
                 </span>
@@ -259,13 +345,16 @@ export default function Profile() {
             })}
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '14px' }}>
-              <MapPin size={14} />
+          <div style={{
+            display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16,
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94a3b8', fontSize: 14 }}>
+              <MapPin size={14} style={{ color: '#8b5cf6' }} />
               {profileData.location || profile.location}
             </div>
             {profile.isBusinessProfile && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94a3b8', fontSize: 14 }}>
                 <Briefcase size={14} />
                 {profile.companyName}
               </div>
@@ -273,33 +362,66 @@ export default function Profile() {
           </div>
 
           {(profileData.bio || profile.bio) && (
-            <p style={{ color: '#e2e8f0', fontSize: '15px', lineHeight: 1.7, marginBottom: '20px', maxWidth: '600px' }}>
+            <p style={{
+              color: '#e2e8f0', fontSize: 15, lineHeight: 1.7, marginBottom: 20,
+              maxWidth: 600, margin: isMobile ? '0 auto 20px' : '0 0 20px',
+            }}>
               {profileData.bio || profile.bio}
             </p>
           )}
 
-          {/* Stats */}
-          <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Stats — card-style on mobile */}
+          <div style={{
+            display: isMobile ? 'grid' : 'flex',
+            gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : undefined,
+            gap: isMobile ? 8 : 24,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: isMobile ? 'center' : 'flex-start',
+            background: isMobile ? '#12121e' : 'transparent',
+            border: isMobile ? '1px solid #1e1e2e' : 'none',
+            borderRadius: isMobile ? 14 : 0,
+            padding: isMobile ? '12px 8px' : 0,
+          }}>
             {[
               { value: followerCount?.toLocaleString(), label: 'Followers', clickable: 'followers' },
               { value: profile.following?.toLocaleString(), label: 'Following', clickable: 'following' },
-              { value: profile.dealsPosted, label: 'Deals Posted' },
+              { value: profile.dealsPosted, label: 'Deals' },
             ].map(({ value, label, clickable }) => (
               <button
                 key={label}
                 onClick={() => clickable && setShowFollowers(clickable)}
-                style={{ background: 'none', border: 'none', padding: 0, cursor: clickable ? 'pointer' : 'default', textAlign: 'center' }}
+                style={{
+                  background: 'none', border: 'none', padding: isMobile ? '6px' : 0,
+                  cursor: clickable ? 'pointer' : 'default', textAlign: 'center',
+                  transition: 'transform 0.15s',
+                }}
+                onTouchStart={(e) => { if (clickable) e.currentTarget.style.transform = 'scale(0.96)'; }}
+                onTouchEnd={(e) => { if (clickable) e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
-                <div style={{ color: '#475569', fontSize: '13px', marginTop: '2px' }}>{label}</div>
+                <div style={{
+                  color: '#f8fafc', fontWeight: 800,
+                  fontSize: isMobile ? 20 : 22, lineHeight: 1,
+                }}>{value}</div>
+                <div style={{
+                  color: '#475569', fontSize: isMobile ? 11 : 13, marginTop: 4,
+                  textTransform: isMobile ? 'uppercase' : 'none',
+                  letterSpacing: isMobile ? 0.5 : 0,
+                  fontWeight: isMobile ? 600 : 500,
+                }}>{label}</div>
               </button>
             ))}
-            {joinedDate && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569', fontSize: '13px', paddingLeft: '8px', borderLeft: '1px solid #1e1e2e' }}>
+            {joinedDate && !isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#475569', fontSize: 13, paddingLeft: 8, borderLeft: '1px solid #1e1e2e' }}>
                 <Calendar size={13} /> Joined {joinedDate}
               </div>
             )}
           </div>
+          {joinedDate && isMobile && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#475569', fontSize: 12, marginTop: 10 }}>
+              <Calendar size={12} /> Joined {joinedDate}
+            </div>
+          )}
         </div>
 
         {/* Business CTA for other profiles */}
@@ -353,19 +475,35 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #1e1e2e', marginBottom: '24px', overflowX: 'auto' }}>
+        {/* Tabs — horizontal scroll on mobile, sticky for fast nav */}
+        <div style={{
+          display: 'flex',
+          borderBottom: '1px solid #1e1e2e',
+          marginBottom: 20,
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          position: 'sticky',
+          top: isMobile ? 56 : 64,
+          background: '#0a0a0f',
+          zIndex: 10,
+          margin: isMobile ? '0 -14px 18px' : '0 0 24px',
+          padding: isMobile ? '0 14px' : 0,
+        }}>
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
               style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '12px 20px', background: 'none', border: 'none',
-                cursor: 'pointer', fontWeight: 600, fontSize: '14px', whiteSpace: 'nowrap',
-                color: activeTab === id ? '#8b5cf6' : '#475569',
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: isMobile ? '11px 14px' : '12px 20px',
+                background: 'none', border: 'none',
+                cursor: 'pointer', fontWeight: 600,
+                fontSize: isMobile ? 13 : 14, whiteSpace: 'nowrap',
+                color: activeTab === id ? '#8b5cf6' : '#64748b',
                 borderBottom: activeTab === id ? '2px solid #8b5cf6' : '2px solid transparent',
-                marginBottom: '-1px', transition: 'all 0.2s',
+                marginBottom: -1, transition: 'all 0.2s',
+                flexShrink: 0,
               }}
             >
               <Icon size={15} />
@@ -399,7 +537,11 @@ export default function Profile() {
         {activeTab === 'deals' && (
           <div>
             {userDeals.length > 0 ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: isMobile ? 14 : 20,
+              }}>
                 {userDeals.map(deal => <DealCard key={deal.id} deal={deal} />)}
               </div>
             ) : (
@@ -453,15 +595,23 @@ export default function Profile() {
 
         {activeTab === 'photos' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(180px, 1fr))',
+              gap: isMobile ? 4 : 8,
+            }}>
               {photoSeeds.map((seed, i) => (
-                <div key={i} style={{ aspectRatio: '1', borderRadius: '10px', overflow: 'hidden', cursor: 'pointer', transition: 'transform 0.2s' }}
+                <div key={i} style={{
+                  aspectRatio: '1', borderRadius: isMobile ? 6 : 10, overflow: 'hidden',
+                  cursor: 'pointer', transition: 'transform 0.2s',
+                }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <img
                     src={`https://picsum.photos/seed/${seed}/400/400`}
                     alt=""
+                    loading="lazy"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>

@@ -10,10 +10,11 @@ import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 
+// Primary nav (Social is intentionally tucked into the More section — it's still
+// accessible from the drawer / More menu, just no longer a top-level tab).
 const primaryNav = [
   { to: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
   { to: '/my-deals',    label: 'My Deals',    icon: TrendingUp },
-  { to: '/social',      label: 'Social',      icon: Users },
   { to: '/groups',      label: 'Groups',      icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
   { to: '/meetups',     label: 'Meetups',     icon: Calendar },
@@ -26,10 +27,14 @@ const drawerSecondary = [
   { to: '/premium',       label: 'Premium',      icon: Crown },
 ];
 
+const drawerMore = [
+  { to: '/social', label: 'Social Feed', icon: Users },
+];
+
 export default function Navbar() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { currentUser } = useAuth();
+  const { currentUser, isAuthenticated } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -137,7 +142,7 @@ export default function Navbar() {
             )}
 
             {/* Post Deal button — desktop only (mobile has FAB in tab bar) */}
-            {!isMobile && (
+            {!isMobile && isAuthenticated && (
               <button
                 onClick={() => setShowPostDeal(true)}
                 className="gradient-btn"
@@ -151,6 +156,37 @@ export default function Navbar() {
                 <Plus size={16} />
                 Post a Deal
               </button>
+            )}
+
+            {/* Guest CTA — desktop */}
+            {!isMobile && !isAuthenticated && (
+              <Link
+                to="/auth?tab=register"
+                className="gradient-btn"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 18px', borderRadius: 8,
+                  color: '#fff', textDecoration: 'none',
+                  fontSize: 14, fontWeight: 700,
+                }}
+              >
+                Sign Up Free
+              </Link>
+            )}
+            {!isMobile && !isAuthenticated && (
+              <Link
+                to="/auth?tab=login"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#e2e8f0', textDecoration: 'none',
+                  fontSize: 14, fontWeight: 600,
+                }}
+              >
+                Sign In
+              </Link>
             )}
 
             {/* Notifications */}
@@ -316,14 +352,28 @@ export default function Navbar() {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottom: '1px solid #1e1e2e' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <img
-                  src={currentUser?.avatar}
-                  alt="avatar"
-                  style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover' }}
-                />
+                {isAuthenticated ? (
+                  <img
+                    src={currentUser?.avatar}
+                    alt="avatar"
+                    style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 38, height: 38, borderRadius: '50%',
+                    background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <User size={18} color="#fff" />
+                  </div>
+                )}
                 <div>
-                  <p style={{ color: '#f8fafc', fontWeight: 700, margin: 0, fontSize: 14 }}>{currentUser?.name || 'Guest'}</p>
-                  <p style={{ color: '#475569', margin: '2px 0 0', fontSize: 12 }}>{currentUser?.username ? `@${currentUser.username}` : 'Sign in for full access'}</p>
+                  <p style={{ color: '#f8fafc', fontWeight: 700, margin: 0, fontSize: 14 }}>
+                    {isAuthenticated ? currentUser?.name : 'Welcome'}
+                  </p>
+                  <p style={{ color: '#475569', margin: '2px 0 0', fontSize: 12 }}>
+                    {isAuthenticated ? `@${currentUser?.username}` : 'Sign in for full access'}
+                  </p>
                 </div>
               </div>
               <button
@@ -337,6 +387,37 @@ export default function Navbar() {
                 <X size={20} />
               </button>
             </div>
+
+            {/* Guest CTA banner in the drawer */}
+            {!isAuthenticated && (
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #1e1e2e', display: 'flex', gap: 8 }}>
+                <Link
+                  to="/auth?tab=register"
+                  onClick={() => setDrawerOpen(false)}
+                  className="gradient-btn"
+                  style={{
+                    flex: 1, textAlign: 'center', padding: '11px',
+                    borderRadius: 10, color: '#fff', textDecoration: 'none',
+                    fontWeight: 700, fontSize: 14,
+                  }}
+                >
+                  Sign Up Free
+                </Link>
+                <Link
+                  to="/auth?tab=login"
+                  onClick={() => setDrawerOpen(false)}
+                  style={{
+                    flex: 1, textAlign: 'center', padding: '11px',
+                    borderRadius: 10, color: '#e2e8f0', textDecoration: 'none',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    fontWeight: 600, fontSize: 14,
+                  }}
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
 
             <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 8px' }}>
               <div style={{ padding: '0 8px', marginBottom: 8 }}>
@@ -376,6 +457,19 @@ export default function Navbar() {
                 ))}
                 <DrawerItem to={currentUser ? `/profile/${currentUser.id}` : '/auth'} icon={User} label="View Profile" onClick={() => setDrawerOpen(false)} />
                 {currentUser?.isAdmin && <DrawerItem to="/admin" icon={Shield} label="Admin" onClick={() => setDrawerOpen(false)} danger />}
+              </DrawerSection>
+
+              <DrawerSection title="More">
+                {drawerMore.map(({ to, label, icon }) => (
+                  <DrawerItem
+                    key={to}
+                    to={to}
+                    icon={icon}
+                    label={label}
+                    active={location.pathname.startsWith(to)}
+                    onClick={() => setDrawerOpen(false)}
+                  />
+                ))}
               </DrawerSection>
 
               <DrawerSection title="Account">

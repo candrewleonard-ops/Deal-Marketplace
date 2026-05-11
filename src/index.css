@@ -62,6 +62,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes rotate-gradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -72,6 +77,11 @@
   0% { opacity: 0.7; }
   50% { opacity: 1; }
   100% { opacity: 0.7; }
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
 }
 
 * {
@@ -98,6 +108,7 @@ body {
   overflow-x: hidden;
   /* iOS rubber-band only on Y */
   overscroll-behavior-y: contain;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
@@ -106,7 +117,7 @@ body {
   text-align: left;
 }
 
-/* Mobile-first defaults */
+/* ─── Mobile-first defaults ─── */
 @media (max-width: 767px) {
   /* Larger tap targets */
   button, [role="button"], a {
@@ -119,6 +130,20 @@ body {
   /* Tight body lines */
   body {
     font-size: 14px;
+  }
+  /* Smoother momentum + no awkward gaps */
+  main {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -138,8 +163,26 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #12121e; }
-::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #1e1e2e, #2a2a3e);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8b5cf6, #06b6d4);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(139, 92, 246, 0.35);
+  color: #f8fafc;
+}
+
+/* Focus rings (keyboard only) */
+:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
 
 /* Featured card animated gradient border */
 .featured-card {
@@ -187,23 +230,28 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 .gradient-btn {
   background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-  transition: all 0.2s ease;
+  transition: transform 0.18s cubic-bezier(.2,.9,.3,1), box-shadow 0.18s ease, filter 0.18s ease;
   border: none;
   cursor: pointer;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
 }
 .gradient-btn:hover {
   background: linear-gradient(135deg, #7c3aed, #0891b2);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.5);
   transform: translateY(-1px);
+}
+.gradient-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 /* Card hover */
 .card-hover {
-  transition: all 0.2s ease;
+  transition: transform 0.25s cubic-bezier(.2,.9,.3,1), box-shadow 0.25s ease, border-color 0.2s ease;
 }
 .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* Hero background */
@@ -218,12 +266,15 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
   background: #12121e;
   border: 1px solid #1e1e2e;
   color: #f8fafc;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.input-dark:hover {
+  border-color: #2a2a3e;
 }
 .input-dark:focus {
   outline: none;
   border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 .input-dark::placeholder { color: #475569; }
 
@@ -255,6 +306,12 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 }
 
 /* Line clamp */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -266,4 +323,36 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Skeleton shimmer placeholder */
+.skeleton {
+  background: linear-gradient(90deg, #12121e 0%, #1a1a2e 50%, #12121e 100%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+
+/* Page enter animation — applied to top-level pages for smoother transitions */
+.page-enter {
+  animation: fade-up 0.35s cubic-bezier(.2,.9,.3,1);
+}
+
+/* Mobile touch ripple feedback for cards */
+@media (hover: none) {
+  .card-hover:active {
+    transform: scale(0.985);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Avatar — consistent ring */
+.avatar-ring {
+  box-shadow: 0 0 0 2px #0a0a0f, 0 0 0 3.5px rgba(139, 92, 246, 0.45);
+}
+
+/* Buttery transitions for sticky elements */
+.sticky-smooth {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  will-change: transform;
 }

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileTabBar from './components/MobileTabBar';
+import AuthPromptModal from './components/AuthPromptModal';
 import { useIsMobile } from './hooks/useIsMobile';
 import Landing from './pages/Landing';
 import Marketplace from './pages/Marketplace';
@@ -49,6 +50,7 @@ function AppLayout({ children, hideFooter }) {
       </main>
       {!hideFooter && !isMobile && <Footer />}
       {isMobile && <MobileTabBar />}
+      <AuthPromptModal />
     </div>
   );
 }

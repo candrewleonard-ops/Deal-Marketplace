@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, Heart, Share2, MapPin, Calendar, Home, Maximize2,
@@ -41,7 +41,14 @@ function formatCurrency(n) {
 export default function DealDetail() {
   const { id } = useParams();
   const deal = getDealById(id);
-  const { currentUser, isLoggedIn } = useAuth();
+  const { currentUser, isLoggedIn, isAuthenticated, requireAuth } = useAuth();
+
+  // If a guest lands here directly (deep-link), surface the sign-up prompt.
+  useEffect(() => {
+    if (!isAuthenticated && deal) {
+      requireAuth(`view this property in ${deal.city || 'the marketplace'}`, 'open-deal', `/marketplace/${deal.id}`);
+    }
+  }, [isAuthenticated, deal, requireAuth]);
   const { toast } = useToast();
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const [showPromote, setShowPromote] = useState(false);
