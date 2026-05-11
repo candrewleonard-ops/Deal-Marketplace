@@ -107,11 +107,23 @@ export default function AddressAutocomplete({
 
   return (
     <div ref={wrapRef} style={{ position: 'relative' }}>
-      <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          position: 'relative',
+          // Subtle always-on highlight so users notice the field is "smart"
+          background: 'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(6,182,212,0.35))',
+          padding: 1.5,
+          borderRadius: 11,
+          boxShadow: picked
+            ? '0 0 0 3px rgba(16,185,129,0.15)'
+            : '0 0 16px rgba(139,92,246,0.18)',
+          transition: 'box-shadow 0.2s ease',
+        }}
+      >
         <input
           value={value}
           onChange={(e) => { setPicked(false); onChange?.(e.target.value); }}
-          onFocus={() => { if (results.length > 0) setOpen(true); }}
+          onFocus={() => { if (results.length > 0 || value.trim().length >= 3) setOpen(true); }}
           onKeyDown={onKeyDown}
           placeholder={placeholder}
           className={inputClassName}
@@ -119,36 +131,51 @@ export default function AddressAutocomplete({
           aria-autocomplete="list"
           aria-expanded={open}
           style={{
-            width: '100%', padding: '10px 12px 10px 34px',
-            borderRadius: 9, fontSize: 13,
+            width: '100%',
+            padding: '11px 38px 11px 14px',
+            borderRadius: 9.5,
+            fontSize: 14,
+            border: 'none',
+            display: 'block',
             ...inputStyle,
-          }}
-        />
-        <MapPin
-          size={14}
-          style={{
-            position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)',
-            color: picked ? '#10b981' : '#8b5cf6', pointerEvents: 'none',
           }}
         />
         {loading && (
           <Loader2
-            size={14}
+            size={15}
             style={{
               position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-              color: '#8b5cf6', pointerEvents: 'none',
+              color: '#a78bfa', pointerEvents: 'none',
               animation: 'addr-spin 0.8s linear infinite',
             }}
           />
         )}
         {!loading && picked && (
           <Check
-            size={14}
+            size={15}
             style={{
               position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
               color: '#10b981', pointerEvents: 'none',
             }}
           />
+        )}
+        {!loading && !picked && value.trim().length === 0 && (
+          // Tiny "autofill" hint chip when the field is empty — gives the
+          // user a visual cue that this field has typeahead.
+          <span
+            style={{
+              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+              fontSize: 9, fontWeight: 800, letterSpacing: 0.6,
+              padding: '2px 7px', borderRadius: 999,
+              background: 'rgba(139,92,246,0.15)',
+              border: '1px solid rgba(139,92,246,0.3)',
+              color: '#a78bfa',
+              pointerEvents: 'none',
+              textTransform: 'uppercase',
+            }}
+          >
+            Autofill
+          </span>
         )}
       </div>
 
@@ -233,7 +260,7 @@ export default function AddressAutocomplete({
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
               <span>↑↓ to navigate · ↵ to select · esc to close</span>
-              <span>US Census + OSM</span>
+              <span>US Census · OSM · Photon</span>
             </div>
           )}
         </div>
@@ -409,8 +436,8 @@ function parseQueryToParts(input) {
 async function geocode(query, signal) {
   const parts = parseQueryToParts(query);
 
-  // Run the providers in parallel — each one returns normalized records or
-  // an empty array on failure. We then merge & rank.
+  // Run all three providers in parallel — each one returns normalized
+  // records or an empty array on failure. We then merge & rank.
   const tasks = [
     censusGeocode(query, signal).catch((e) => {
       if (e.name !== 'AbortError') console.warn('[geocoder] census failed:', e);
@@ -420,16 +447,20 @@ async function geocode(query, signal) {
       if (e.name !== 'AbortError') console.warn('[geocoder] nominatim failed:', e);
       return [];
     }),
+    photonGeocode(query, signal).catch((e) => {
+      if (e.name !== 'AbortError') console.warn('[geocoder] photon failed:', e);
+      return [];
+    }),
   ];
 
-  const [censusRes, nomRes] = await Promise.all(tasks);
+  const [censusRes, nomRes, photonRes] = await Promise.all(tasks);
 
-  // Merge: Census matches first (much higher US residential accuracy),
-  // then Nominatim, deduped by street+city+state.
+  // Merge order: Census first (best US residential), Photon next (best
+  // autocomplete), Nominatim last. Dedupe by street+city+state.
   const merged = [];
   const seen = new Set();
-  for (const r of [...censusRes, ...nomRes]) {
-    const key = `${(r.street || '').toLowerCase()}|${(r.city || '').toLowerCase()}|${r.state}`;
+  for (const r of [...censusRes, ...photonRes, ...nomRes]) {
+    const key = `${(r.street || '').toLowerCase().replace(/\s+/g,' ')}|${(r.city || '').toLowerCase()}|${r.state}`;
     if (seen.has(key)) continue;
     seen.add(key);
     merged.push(r);
@@ -522,6 +553,48 @@ async function nominatimGeocode(query, parts, signal) {
     .map(parseNominatimResult)
     .filter(Boolean)
     .map(p => ({ ...p, _src: 'nominatim-freeform' }));
+}
+
+// ── Photon (Komoot, OSM-based) ───────────────────────────────────────────
+// Photon is built specifically for autocomplete: ranks results much better
+// than Nominatim freeform and handles partial inputs gracefully.
+async function photonGeocode(query, signal) {
+  const url = new URL('https://photon.komoot.io/api/');
+  url.searchParams.set('q', query);
+  url.searchParams.set('limit', '10');
+  url.searchParams.set('lang', 'en');
+  // Bias toward continental US bbox — improves ranking, doesn't hard-filter.
+  url.searchParams.set('bbox', '-125,24,-66,49');
+
+  const res = await fetch(url.toString(), { signal });
+  if (!res.ok) return [];
+  const data = await res.json();
+  const features = data?.features || [];
+  return features
+    .filter(f => (f?.properties?.countrycode || '').toUpperCase() === 'US')
+    .slice(0, 6)
+    .map(photonToNormalized)
+    .filter(Boolean);
+}
+
+function photonToNormalized(f) {
+  const p = f.properties || {};
+  const coords = f.geometry?.coordinates || [];
+  const street = [p.housenumber, p.street].filter(Boolean).join(' ').trim();
+  const city = p.city || p.town || p.village || p.county || p.locality || '';
+  const stateName = (p.state || '').toLowerCase();
+  const state = STATE_ABBR[stateName] || (p.state ? p.state.slice(0, 2).toUpperCase() : '');
+  if (!street && !city) return null;
+  return {
+    street,
+    city,
+    state,
+    zip: p.postcode || '',
+    lat: coords[1],
+    lon: coords[0],
+    displayName: [street, city, state, p.postcode].filter(Boolean).join(', '),
+    _src: 'photon',
+  };
 }
 
 // Exported for tests / debugging
