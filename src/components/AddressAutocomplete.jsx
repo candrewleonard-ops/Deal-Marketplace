@@ -29,9 +29,14 @@ export default function AddressAutocomplete({
   const [loading, setLoading] = useState(false);
   const [highlight, setHighlight] = useState(-1);
   const [picked, setPicked] = useState(false); // shows green check briefly after a pick
+  const [resolving, setResolving] = useState(false); // resolving Google Place Details
   const wrapRef = useRef(null);
   const abortRef = useRef(null);
   const debounceRef = useRef(null);
+  // Google Places session token — bundles all autocomplete keystrokes + the
+  // final Place Details call into ONE billable session ($2.83 + $5 per 1k
+  // total, instead of per-keystroke). Refreshed after each pick.
+  const sessionTokenRef = useRef(newSessionToken());
 
   // Close on outside click
   useEffect(() => {
@@ -60,7 +65,7 @@ export default function AddressAutocomplete({
       abortRef.current = ctrl;
 
       try {
-        const merged = await geocode(value, ctrl.signal);
+        const merged = await geocode(value, ctrl.signal, sessionTokenRef.current);
         setResults(merged);
         // Always open the dropdown when a query has finished, so the user
         // sees either the suggestions or a clear "no matches" message.
@@ -79,9 +84,29 @@ export default function AddressAutocomplete({
     return () => clearTimeout(debounceRef.current);
   }, [value, picked]);
 
-  function pick(item) {
+  async function pick(item) {
+    let resolved = item;
+
+    // Google's autocomplete returns a placeId, not the parsed address — we
+    // have to fetch Place Details to get house number, city, state, zip.
+    // This is also where the session token gets "consumed" and the cost
+    // collapses to one billable session.
+    if (item._googlePlaceId) {
+      setResolving(true);
+      try {
+        const details = await googlePlacesDetails(item._googlePlaceId, sessionTokenRef.current);
+        if (details) resolved = { ...item, ...details };
+      } catch (e) {
+        console.warn('[geocoder] google place details failed:', e);
+      } finally {
+        setResolving(false);
+        // Start a fresh session token for the next address the user types
+        sessionTokenRef.current = newSessionToken();
+      }
+    }
+
     setPicked(true);
-    onSelect?.(item);
+    onSelect?.(resolved);
     setOpen(false);
     setResults([]);
     setHighlight(-1);
@@ -140,7 +165,7 @@ export default function AddressAutocomplete({
             ...inputStyle,
           }}
         />
-        {loading && (
+        {(loading || resolving) && (
           <Loader2
             size={15}
             style={{
@@ -208,48 +233,66 @@ export default function AddressAutocomplete({
               </div>
             </div>
           )}
-          {results.map((r, i) => (
-            <button
-              key={`${r.lat}-${r.lon}-${i}`}
-              type="button"
-              role="option"
-              aria-selected={highlight === i}
-              onMouseEnter={() => setHighlight(i)}
-              onMouseDown={(e) => { e.preventDefault(); pick(r); }}
-              style={{
-                display: 'flex', alignItems: 'flex-start', gap: 10,
-                width: '100%', textAlign: 'left',
-                padding: '10px 12px',
-                background: highlight === i ? 'rgba(139,92,246,0.12)' : 'transparent',
-                border: 'none',
-                borderBottom: i < results.length - 1 ? '1px solid #1e1e2e' : 'none',
-                color: '#e2e8f0', cursor: 'pointer',
-                transition: 'background 0.1s ease',
-              }}
-            >
-              <MapPin
-                size={14}
+          {results.map((r, i) => {
+            const isGoogle = r._src === 'google';
+            const main = r._previewMain || r.street || (r.displayName || '').split(',')[0];
+            const secondary = r._previewSecondary || [r.city, r.state, r.zip].filter(Boolean).join(', ');
+            return (
+              <button
+                key={r._googlePlaceId || `${r.lat}-${r.lon}-${i}`}
+                type="button"
+                role="option"
+                aria-selected={highlight === i}
+                onMouseEnter={() => setHighlight(i)}
+                onMouseDown={(e) => { e.preventDefault(); pick(r); }}
                 style={{
-                  flexShrink: 0, marginTop: 2,
-                  color: highlight === i ? '#a78bfa' : '#475569',
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  width: '100%', textAlign: 'left',
+                  padding: '10px 12px',
+                  background: highlight === i ? 'rgba(139,92,246,0.12)' : 'transparent',
+                  border: 'none',
+                  borderBottom: i < results.length - 1 ? '1px solid #1e1e2e' : 'none',
+                  color: '#e2e8f0', cursor: 'pointer',
+                  transition: 'background 0.1s ease',
                 }}
-              />
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{
-                  color: '#f8fafc', fontSize: 13, fontWeight: 600,
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}>
-                  {r.street || r.displayName.split(',')[0]}
+              >
+                <MapPin
+                  size={14}
+                  style={{
+                    flexShrink: 0, marginTop: 2,
+                    color: highlight === i ? '#a78bfa' : '#475569',
+                  }}
+                />
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{
+                    color: '#f8fafc', fontSize: 13, fontWeight: 600,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {main}
+                  </div>
+                  <div style={{
+                    color: '#94a3b8', fontSize: 11, marginTop: 1,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {secondary}
+                  </div>
                 </div>
-                <div style={{
-                  color: '#94a3b8', fontSize: 11, marginTop: 1,
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}>
-                  {[r.city, r.state, r.zip].filter(Boolean).join(', ')}
-                </div>
-              </div>
-            </button>
-          ))}
+                {isGoogle && (
+                  <span style={{
+                    flexShrink: 0,
+                    fontSize: 9, fontWeight: 800, letterSpacing: 0.5,
+                    padding: '2px 6px', borderRadius: 999,
+                    background: 'rgba(66,133,244,0.15)',
+                    color: '#8ab4f8',
+                    textTransform: 'uppercase',
+                    alignSelf: 'center',
+                  }}>
+                    Google
+                  </span>
+                )}
+              </button>
+            );
+          })}
           {results.length > 0 && (
             <div style={{
               padding: '6px 12px',
@@ -260,7 +303,7 @@ export default function AddressAutocomplete({
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
               <span>↑↓ to navigate · ↵ to select · esc to close</span>
-              <span>US Census · OSM · Photon</span>
+              <span>{import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? 'Google · US Census · OSM' : 'US Census · OSM · Photon'}</span>
             </div>
           )}
         </div>
@@ -433,12 +476,16 @@ function parseQueryToParts(input) {
 // All results are normalized to this shape:
 //   { street, city, state, zip, lat, lon, displayName, _src }
 
-async function geocode(query, signal) {
+async function geocode(query, signal, sessionToken) {
   const parts = parseQueryToParts(query);
 
-  // Run all three providers in parallel — each one returns normalized
-  // records or an empty array on failure. We then merge & rank.
+  // Run providers in parallel. Each catches its own errors so one slow/failed
+  // source can't take down the dropdown.
   const tasks = [
+    googlePlacesAutocomplete(query, sessionToken, signal).catch((e) => {
+      if (e.name !== 'AbortError') console.warn('[geocoder] google failed:', e);
+      return [];
+    }),
     censusGeocode(query, signal).catch((e) => {
       if (e.name !== 'AbortError') console.warn('[geocoder] census failed:', e);
       return [];
@@ -453,20 +500,121 @@ async function geocode(query, signal) {
     }),
   ];
 
-  const [censusRes, nomRes, photonRes] = await Promise.all(tasks);
+  const [googleRes, censusRes, nomRes, photonRes] = await Promise.all(tasks);
 
-  // Merge order: Census first (best US residential), Photon next (best
-  // autocomplete), Nominatim last. Dedupe by street+city+state.
+  // Merge order: Google first (best, always wins when available), then Census
+  // (best US residential), then Photon (best OSM autocomplete), then Nominatim.
+  // Dedupe by display text for Google (no parsed address yet) and by
+  // street+city+state for the rest.
   const merged = [];
   const seen = new Set();
-  for (const r of [...censusRes, ...photonRes, ...nomRes]) {
-    const key = `${(r.street || '').toLowerCase().replace(/\s+/g,' ')}|${(r.city || '').toLowerCase()}|${r.state}`;
+  for (const r of [...googleRes, ...censusRes, ...photonRes, ...nomRes]) {
+    const key = r._googlePlaceId
+      ? `g:${r._googlePlaceId}`
+      : `${(r.street || '').toLowerCase().replace(/\s+/g,' ')}|${(r.city || '').toLowerCase()}|${r.state}`;
     if (seen.has(key)) continue;
     seen.add(key);
     merged.push(r);
     if (merged.length >= 6) break;
   }
   return merged;
+}
+
+// ── Google Places (New) Autocomplete + Place Details ─────────────────────
+// REST endpoints (no JS SDK to load). Uses a session token so all
+// keystrokes + the final Place Details lookup bill as ONE session
+// (~$0.78¢ total). Falls back silently to other providers if no key set.
+
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+function newSessionToken() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  // Fallback for older browsers (very rare these days).
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
+async function googlePlacesAutocomplete(query, sessionToken, signal) {
+  if (!GOOGLE_API_KEY) return [];
+
+  const res = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+    method: 'POST',
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': GOOGLE_API_KEY,
+    },
+    body: JSON.stringify({
+      input: query,
+      includedRegionCodes: ['us'],
+      sessionToken,
+      // Bias to addresses, drop strict POIs/businesses for a real-estate flow.
+      includedPrimaryTypes: ['street_address', 'subpremise', 'premise', 'route', 'locality', 'postal_code'],
+    }),
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  const suggestions = data?.suggestions || [];
+  return suggestions.slice(0, 6).map(s => {
+    const p = s.placePrediction;
+    if (!p?.placeId) return null;
+    return {
+      // Display fields shown in the dropdown — Google returns nicely-split
+      // mainText / secondaryText perfect for two-line rendering.
+      _previewMain: p.structuredFormat?.mainText?.text || p.text?.text || '',
+      _previewSecondary: p.structuredFormat?.secondaryText?.text || '',
+      _googlePlaceId: p.placeId,
+      // These get filled in by Place Details when the user picks this row.
+      street: '', city: '', state: '', zip: '',
+      lat: null, lon: null,
+      displayName: p.text?.text || '',
+      _src: 'google',
+    };
+  }).filter(Boolean);
+}
+
+async function googlePlacesDetails(placeId, sessionToken) {
+  if (!GOOGLE_API_KEY || !placeId) return null;
+
+  const url = new URL(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`);
+  url.searchParams.set('sessionToken', sessionToken);
+
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: {
+      'X-Goog-Api-Key': GOOGLE_API_KEY,
+      // Field mask drops unused fields and lowers the SKU charge to "Essentials".
+      'X-Goog-FieldMask': 'addressComponents,location,formattedAddress',
+    },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return parseGoogleDetails(data);
+}
+
+function parseGoogleDetails(d) {
+  const components = d?.addressComponents || [];
+  const get = (type) => {
+    const c = components.find(c => Array.isArray(c.types) && c.types.includes(type));
+    return c?.shortText || c?.longText || '';
+  };
+
+  const streetNumber = get('street_number');
+  const route = get('route');
+  const street = [streetNumber, route].filter(Boolean).join(' ').trim();
+
+  return {
+    street,
+    city: get('locality') || get('sublocality') || get('administrative_area_level_3') || get('administrative_area_level_2'),
+    state: get('administrative_area_level_1'), // shortText is 2-letter
+    zip: get('postal_code'),
+    lat: d?.location?.latitude,
+    lon: d?.location?.longitude,
+    displayName: d?.formattedAddress || street,
+    _src: 'google',
+  };
 }
 
 // ── US Census Geocoder ───────────────────────────────────────────────────
