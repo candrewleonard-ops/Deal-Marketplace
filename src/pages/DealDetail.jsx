@@ -10,6 +10,7 @@ import { getUserById } from '../data/users';
 import DealCard from '../components/DealCard';
 import ImageCarousel from '../components/ImageCarousel';
 import AddressRequestModal from '../components/AddressRequestModal';
+import StreetView from '../components/StreetView';
 import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -194,6 +195,16 @@ export default function DealDetail() {
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
               <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
             </div>
+
+            {/* ── Street View (only after address has been approved/granted, or for the owner) ── */}
+            {(isOwner || addressGranted) && (
+              <StreetView
+                address={deal.address}
+                city={deal.city}
+                state={deal.state}
+                zip={deal.zip}
+              />
+            )}
 
             {/* Promote Section — owner only */}
             {isOwner && (
