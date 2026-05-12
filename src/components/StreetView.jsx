@@ -27,6 +27,7 @@ export default function StreetView({ address, city, state, zip }) {
   const [phase, setPhase] = useState('placeholder');
   const [errorMsg, setErrorMsg] = useState('');
   const [open, setOpen] = useState(false);
+  const [location, setLocation] = useState(null); // { lat, lng } from metadata probe
 
   if (!API_KEY) return null;
 
@@ -47,6 +48,9 @@ export default function StreetView({ address, city, state, zip }) {
       }
       const data = await res.json();
       if (data?.status === 'OK') {
+        if (data.location?.lat != null && data.location?.lng != null) {
+          setLocation({ lat: data.location.lat, lng: data.location.lng });
+        }
         setPhase('ok');
       } else if (data?.status === 'ZERO_RESULTS' || data?.status === 'NOT_FOUND') {
         setPhase('none');
@@ -180,12 +184,19 @@ export default function StreetView({ address, city, state, zip }) {
             padding: '5px 9px', borderRadius: 999,
             display: 'flex', alignItems: 'center', gap: 4,
           }}>
-            <Camera size={10} /> TAP TO EXPAND
+            <Camera size={10} /> TAP TO EXPLORE
           </div>
         </button>
 
         {open && typeof document !== 'undefined' && createPortal(
-          <Fullscreen src={expandedSrc} address={fullAddress} mapsLink={mapsLink} onClose={() => setOpen(false)} />,
+          <Fullscreen
+            src={expandedSrc}
+            address={fullAddress}
+            mapsLink={mapsLink}
+            location={location}
+            apiKey={API_KEY}
+            onClose={() => setOpen(false)}
+          />,
           document.body
         )}
       </div>
@@ -274,7 +285,7 @@ export default function StreetView({ address, city, state, zip }) {
   );
 }
 
-function Fullscreen({ src, address, mapsLink, onClose }) {
+function Fullscreen({ src, address, mapsLink, location, apiKey, onClose }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -286,23 +297,30 @@ function Fullscreen({ src, address, mapsLink, onClose }) {
     };
   }, [onClose]);
 
+  // Build interactive Maps Embed URL when we have lat/lng (free, no per-load cost)
+  const embedUrl = location && apiKey
+    ? `https://www.google.com/maps/embed/v1/streetview?key=${apiKey}&location=${location.lat},${location.lng}&fov=90&pitch=0`
+    : null;
+
   return (
     <div
-      onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 600,
-        background: 'rgba(0,0,0,0.92)',
-        backdropFilter: 'blur(10px)',
+        background: '#000',
         display: 'flex', flexDirection: 'column',
         animation: 'sv-fade-in 0.18s ease-out',
       }}
     >
+      {/* Header bar — stop propagation so taps here don't bubble */}
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
           padding: '14px 16px', paddingTop: 'calc(14px + env(safe-area-inset-top))',
           display: 'flex', alignItems: 'center', gap: 10,
           color: '#fff',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 1,
+          flexShrink: 0,
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -319,6 +337,7 @@ function Fullscreen({ src, address, mapsLink, onClose }) {
             padding: '8px 12px', borderRadius: 8,
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
             color: '#fff', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+            flexShrink: 0,
           }}
         >
           Open in Maps <ExternalLink size={12} />
@@ -331,29 +350,35 @@ function Fullscreen({ src, address, mapsLink, onClose }) {
             background: 'rgba(255,255,255,0.08)', border: 'none',
             color: '#fff', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           <X size={18} />
         </button>
       </div>
 
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '0 16px 16px',
-        }}
-      >
-        <img
-          src={src}
-          alt={`Street view of ${address}`}
-          style={{
-            maxWidth: '100%', maxHeight: '100%',
-            borderRadius: 12,
-            boxShadow: '0 30px 80px rgba(0,0,0,0.7)',
-            objectFit: 'contain',
-          }}
-        />
+      {/* Interactive panorama (or static fallback) */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        {embedUrl ? (
+          <iframe
+            title="Street View"
+            src={embedUrl}
+            allow="fullscreen"
+            style={{
+              width: '100%', height: '100%',
+              border: 'none', display: 'block',
+            }}
+          />
+        ) : (
+          <img
+            src={src}
+            alt={`Street view of ${address}`}
+            style={{
+              width: '100%', height: '100%',
+              objectFit: 'contain',
+            }}
+          />
+        )}
       </div>
 
       <style>{`
