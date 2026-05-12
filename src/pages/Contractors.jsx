@@ -1,409 +1,453 @@
-import { useState } from 'react';
-import { Search, Wrench, CheckCircle, X, MapPin, Star, DollarSign } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import {
+  Search, Wrench, MapPin, Star, Phone, Shield, Filter, X,
+  ArrowRight, ChevronRight, DollarSign,
+} from 'lucide-react';
 import { contractorCities, tradeTypes, getContractorsByCity } from '../data/contractors';
-import ContractorCard from '../components/ContractorCard';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { getDealById } from '../data/deals';
+
+const tradeColors = {
+  'HVAC': '#06b6d4',
+  'Plumbing': '#3b82f6',
+  'Electrical': '#f59e0b',
+  'Painting/Cosmetic': '#ec4899',
+  'Flooring': '#8b5cf6',
+  'Roofing': '#ef4444',
+  'Foundation/Structural': '#10b981',
+};
 
 export default function Contractors() {
-  const [selectedCity, setSelectedCity] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [modalCity, setModalCity] = useState(null);
-  const [revealed, setRevealed] = useState({});
+  const isMobile = useIsMobile();
+  const [params] = useSearchParams();
+
+  // Deal context: if user came from a deal page we filter to that city
+  const dealId = params.get('dealId');
+  const cityParam = params.get('city');
+  const stateParam = params.get('state');
+  const deal = dealId ? getDealById(dealId) : null;
+  const contextCity = cityParam || deal?.city || '';
+  const contextState = stateParam || deal?.state || '';
+
   const [search, setSearch] = useState('');
-  const [purchased, setPurchased] = useState({});
   const [tradeFilter, setTradeFilter] = useState('All');
+  const [cityFilter, setCityFilter] = useState(contextCity);
 
-  const filteredCities = contractorCities.filter(c =>
-    search === '' ||
-    c.city.toLowerCase().includes(search.toLowerCase()) ||
-    c.state.toLowerCase().includes(search.toLowerCase())
-  );
+  // Build the flat searchable list of all contractors
+  const allContractors = useMemo(() => {
+    const out = [];
+    for (const c of contractorCities) {
+      for (const con of c.contractors) {
+        out.push({ ...con, city: c.city, state: c.state });
+      }
+    }
+    return out;
+  }, []);
 
-  function openModal(cityData) {
-    setModalCity(cityData);
-    setShowModal(true);
-  }
+  const filteredContractors = useMemo(() => {
+    return allContractors.filter(c => {
+      if (tradeFilter !== 'All' && c.trade !== tradeFilter) return false;
+      if (cityFilter && c.city.toLowerCase() !== cityFilter.toLowerCase()) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const hit =
+          c.name.toLowerCase().includes(q) ||
+          c.company.toLowerCase().includes(q) ||
+          c.trade.toLowerCase().includes(q) ||
+          c.city.toLowerCase().includes(q) ||
+          c.state.toLowerCase().includes(q);
+        if (!hit) return false;
+      }
+      return true;
+    });
+  }, [allContractors, tradeFilter, cityFilter, search]);
 
-  function handlePurchase(cityName) {
-    setPurchased(prev => ({ ...prev, [cityName]: true }));
-    setRevealed(prev => ({ ...prev, [cityName]: true }));
-  }
-
-  const tradeColors = {
-    'HVAC': '#06b6d4',
-    'Plumbing': '#3b82f6',
-    'Electrical': '#f59e0b',
-    'Painting/Cosmetic': '#ec4899',
-    'Flooring': '#8b5cf6',
-    'Roofing': '#ef4444',
-    'Foundation/Structural': '#10b981',
-  };
+  // Group contractors by city for cleaner display when no specific city is selected
+  const grouped = useMemo(() => {
+    if (cityFilter) return null;
+    const map = new Map();
+    for (const c of filteredContractors) {
+      const key = `${c.city}, ${c.state}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(c);
+    }
+    return [...map.entries()].sort((a, b) => b[1].length - a[1].length);
+  }, [filteredContractors, cityFilter]);
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
-      {/* Hero */}
+    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: isMobile ? 24 : 60 }}>
+      {/* ── Hero ── */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1)), #0d0d1a',
+        background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(6,182,212,0.10)), #0d0d1a',
         borderBottom: '1px solid #1e1e2e',
-        padding: '60px 20px 40px',
-        textAlign: 'center',
+        padding: isMobile ? '24px 16px 20px' : '48px 24px 32px',
+        position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '20px' }}>
-          <div style={{
-            width: '56px', height: '56px', borderRadius: '16px',
-            background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Wrench size={28} style={{ color: '#fff' }} />
-          </div>
-          <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: 'clamp(24px, 4vw, 40px)', margin: 0, letterSpacing: '-0.5px' }}>
-            Contractor Marketplace
-          </h1>
-        </div>
-        <p style={{ color: '#94a3b8', fontSize: '18px', marginBottom: '8px', fontWeight: 600 }}>
-          Find Trusted Contractors in Your Market
-        </p>
-        <p className="gradient-text" style={{ fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: 800, marginBottom: '32px' }}>
-          Full Stack Contractor Lists — Everything You Need in One Click
-        </p>
-
-        {/* What's in a Full Stack */}
+        {/* Decorative orb */}
         <div style={{
-          display: 'inline-grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-          gap: '12px',
-          background: '#12121e',
-          border: '1px solid #1e1e2e',
-          borderRadius: '16px',
-          padding: '20px 28px',
-          maxWidth: '900px',
-          margin: '0 auto 32px',
-        }}>
-          {tradeTypes.map((trade, i) => (
-            <div key={trade} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '8px', height: '8px', borderRadius: '50%',
-                background: Object.values(tradeColors)[i] || '#8b5cf6',
-                flexShrink: 0,
-              }} />
-              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 500 }}>{trade}</span>
-              <span style={{ color: '#475569', fontSize: '12px' }}>×2</span>
-            </div>
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', gridColumn: '1 / -1' }}>
-            <span style={{ color: '#f8fafc', fontSize: '14px', fontWeight: 700 }}>Total: 14 vetted contractors per city</span>
-            <span style={{ color: '#10b981', fontWeight: 800, fontSize: '18px', marginLeft: 'auto' }}>= $14</span>
-          </div>
-        </div>
+          position: 'absolute', top: '-30%', right: '-10%',
+          width: 360, height: 360, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%)',
+          filter: 'blur(40px)', pointerEvents: 'none',
+        }} />
 
-        {/* Stats */}
-        <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[
-            { value: '280+', label: 'Vetted Contractors' },
-            { value: '20', label: 'Cities Covered' },
-            { value: '$1/lead', label: 'Per Contractor' },
-            { value: '$14', label: 'Full Stack List' },
-          ].map(({ value, label }) => (
-            <div key={label} style={{ textAlign: 'center' }}>
-              <div className="gradient-text" style={{ fontWeight: 900, fontSize: '24px' }}>{value}</div>
-              <div style={{ color: '#475569', fontSize: '13px' }}>{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* City Search */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px' }}>
-        <div style={{ position: 'relative', maxWidth: '480px', margin: '0 auto 40px' }}>
-          <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by city or state..."
-            className="input-dark"
-            style={{ width: '100%', padding: '14px 14px 14px 44px', borderRadius: '12px', fontSize: '16px' }}
-          />
-        </div>
-
-        {/* Trade Filter */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '32px', justifyContent: 'center' }}>
-          <button
-            onClick={() => setTradeFilter('All')}
-            style={{ padding: '6px 16px', borderRadius: '20px', background: tradeFilter === 'All' ? 'linear-gradient(135deg, #8b5cf6, #06b6d4)' : 'rgba(255,255,255,0.04)', border: tradeFilter === 'All' ? 'none' : '1px solid #1e1e2e', color: tradeFilter === 'All' ? '#fff' : '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
-          >
-            All Trades
-          </button>
-          {tradeTypes.map((trade, i) => {
-            const color = Object.values(tradeColors)[i];
-            const isActive = tradeFilter === trade;
-            return (
-              <button
-                key={trade}
-                onClick={() => setTradeFilter(isActive ? 'All' : trade)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  background: isActive ? `${color}20` : `${color}0a`,
-                  border: `1px solid ${isActive ? color : color + '30'}`,
-                  borderRadius: '20px', padding: '5px 14px',
-                  cursor: 'pointer',
-                }}
-              >
-                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: color }} />
-                <span style={{ color: color, fontSize: '12px', fontWeight: 600 }}>{trade}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* City Cards Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-          {filteredCities.map(cityData => (
-            <div
-              key={`${cityData.city}-${cityData.state}`}
-              className="card-hover"
+        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative' }}>
+          {contextCity && (
+            <Link
+              to="/contractors"
               style={{
-                background: '#12121e', border: '1px solid #1e1e2e',
-                borderRadius: '16px', padding: '20px',
-                overflow: 'hidden', position: 'relative',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
+                borderRadius: 20, padding: '5px 12px 5px 8px',
+                color: '#94a3b8', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+                marginBottom: 14,
               }}
             >
-              {/* Purchased badge */}
-              {purchased[cityData.city] && (
-                <div style={{
-                  position: 'absolute', top: '14px', right: '14px',
-                  background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)',
-                  borderRadius: '20px', padding: '3px 10px',
-                  display: 'flex', alignItems: 'center', gap: '4px',
-                }}>
-                  <CheckCircle size={12} style={{ color: '#10b981' }} />
-                  <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 700 }}>PURCHASED</span>
-                </div>
-              )}
+              <X size={12} /> Showing contractors near {contextCity}{contextState ? `, ${contextState}` : ''}
+            </Link>
+          )}
 
-              {/* City Header */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
-                <div style={{
-                  width: '48px', height: '48px', borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <MapPin size={22} style={{ color: '#fff' }} />
-                </div>
-                <div>
-                  <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>{cityData.city}</h3>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', margin: '2px 0 0' }}>{cityData.state}</p>
-                </div>
-              </div>
-
-              {/* Trade breakdown */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
-                {tradeTypes.map((trade, i) => (
-                  <span
-                    key={trade}
-                    style={{
-                      background: `${Object.values(tradeColors)[i]}14`,
-                      border: `1px solid ${Object.values(tradeColors)[i]}30`,
-                      color: Object.values(tradeColors)[i],
-                      borderRadius: '20px', padding: '2px 8px', fontSize: '11px', fontWeight: 600,
-                    }}
-                  >
-                    {trade.split('/')[0]} ×2
-                  </span>
-                ))}
-              </div>
-
-              {/* Stats */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingTop: '14px', borderTop: '1px solid #1e1e2e' }}>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px' }}>{cityData.contractorCount}</div>
-                    <div style={{ color: '#475569', fontSize: '11px' }}>Contractors</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px' }}>$1</div>
-                    <div style={{ color: '#475569', fontSize: '11px' }}>Per Lead</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ color: '#10b981', fontWeight: 800, fontSize: '20px' }}>$14</div>
-                    <div style={{ color: '#475569', fontSize: '11px' }}>Full Stack</div>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  {[1,2,3,4,5].map(s => <Star key={s} size={12} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  onClick={() => openModal(cityData)}
-                  className="gradient-btn"
-                  style={{
-                    flex: 2, padding: '11px', borderRadius: '10px',
-                    color: '#fff', fontWeight: 700, fontSize: '14px',
-                  }}
-                >
-                  {purchased[cityData.city] ? 'View Full List' : 'Buy Full Stack — $14'}
-                </button>
-                <button
-                  style={{
-                    flex: 1, padding: '11px', borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  Custom
-                </button>
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <div style={{
+              width: isMobile ? 44 : 56, height: isMobile ? 44 : 56, borderRadius: 14,
+              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 12px 28px rgba(139,92,246,0.4)',
+            }}>
+              <Wrench size={isMobile ? 22 : 28} color="#fff" />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Business CTAs */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-          <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.07))', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '16px', padding: '24px' }}>
-            <div style={{ fontSize: '28px', marginBottom: '10px' }}>💼</div>
-            <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', margin: '0 0 8px' }}>Need a full renovation team?</h3>
-            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.6, margin: '0 0 16px' }}>
-              Our curated contractor lists save you 10+ hours of calling around. One purchase, 14 vetted pros ready to go.
-            </p>
-            <button onClick={() => { const first = filteredCities[0]; if (first) openModal(first); }} className="gradient-btn" style={{ padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer' }}>
-              Get My City's List →
-            </button>
+            <div>
+              <h1 style={{
+                color: '#f8fafc', fontWeight: 900,
+                fontSize: isMobile ? 22 : 32,
+                margin: 0, letterSpacing: '-0.5px',
+              }}>
+                <span className="gradient-text">Contractor</span> Marketplace
+              </h1>
+              <p style={{ color: '#94a3b8', margin: '2px 0 0', fontSize: isMobile ? 13 : 14 }}>
+                Vetted contractors. No markup. Their info is yours to keep.
+              </p>
+            </div>
           </div>
-          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px' }}>
-            <div style={{ fontSize: '28px', marginBottom: '10px' }}>🏗️</div>
-            <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', margin: '0 0 8px' }}>Are you a contractor?</h3>
-            <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.6, margin: '0 0 16px' }}>
-              Get in front of active real estate investors in your area. List your services free and get direct leads.
-            </p>
-            <button style={{ padding: '10px 20px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-              List Your Services Free →
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Modal */}
-      {showModal && modalCity && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 200,
-          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '20px',
-        }}>
+          {/* Bid request CTA banner */}
           <div style={{
-            background: '#12121e', border: '1px solid #1e1e2e',
-            borderRadius: '20px', width: '100%', maxWidth: '700px',
-            maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
+            marginTop: 16,
+            background: 'linear-gradient(135deg, rgba(245,158,11,0.10), rgba(16,185,129,0.05))',
+            border: '1px solid rgba(245,158,11,0.25)',
+            borderRadius: 14,
+            padding: isMobile ? 14 : 16,
+            display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
           }}>
-            {/* Header */}
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-              <div>
-                <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>
-                  Full Stack List — {modalCity.city}, {modalCity.state}
-                </h2>
-                <p style={{ color: '#94a3b8', margin: '4px 0 0', fontSize: '14px' }}>
-                  {modalCity.contractorCount} vetted contractors across 7 trades
-                </p>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10,
+              background: 'rgba(245,158,11,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <DollarSign size={20} style={{ color: '#f59e0b' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 14 }}>
+                Need bids on a property? <span style={{ color: '#f59e0b' }}>$300 flat</span>.
               </div>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
-                <X size={24} />
-              </button>
+              <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>
+                We'll connect you with local contractors and send their info directly.
+              </div>
             </div>
-
-            {/* Content */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-              {modalCity.contractors && modalCity.contractors.length > 0 ? (
-                <div>
-                  {/* Purchase CTA if not purchased */}
-                  {!purchased[modalCity.city] && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.08))',
-                      border: '1px solid rgba(139, 92, 246, 0.25)',
-                      borderRadius: '14px', padding: '20px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      marginBottom: '24px', flexWrap: 'wrap', gap: '16px',
-                    }}>
-                      <div>
-                        <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', marginBottom: '4px' }}>
-                          Unlock Full List — $14.00
-                        </div>
-                        <div style={{ color: '#94a3b8', fontSize: '14px' }}>
-                          14 contractors • All trades • Phone numbers revealed
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handlePurchase(modalCity.city)}
-                        className="gradient-btn"
-                        style={{
-                          padding: '12px 24px', borderRadius: '12px',
-                          color: '#fff', fontWeight: 800, fontSize: '16px',
-                          display: 'flex', alignItems: 'center', gap: '8px',
-                        }}
-                      >
-                        <DollarSign size={18} />
-                        Unlock Full List — $14
-                      </button>
-                    </div>
-                  )}
-
-                  {purchased[modalCity.city] && (
-                    <div style={{
-                      background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)',
-                      borderRadius: '12px', padding: '14px 18px',
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      marginBottom: '20px',
-                    }}>
-                      <CheckCircle size={20} style={{ color: '#10b981' }} />
-                      <div>
-                        <div style={{ color: '#10b981', fontWeight: 700 }}>Access Granted!</div>
-                        <div style={{ color: '#94a3b8', fontSize: '13px' }}>All phone numbers are now revealed for {modalCity.city}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Group by trade */}
-                  {tradeTypes.map((trade, tradeIdx) => {
-                    const tradeContractors = modalCity.contractors.filter(c => c.trade === trade);
-                    if (!tradeContractors.length) return null;
-                    return (
-                      <div key={trade} style={{ marginBottom: '24px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: Object.values({ 'HVAC': '#06b6d4', 'Plumbing': '#3b82f6', 'Electrical': '#f59e0b', 'Painting/Cosmetic': '#ec4899', 'Flooring': '#8b5cf6', 'Roofing': '#ef4444', 'Foundation/Structural': '#10b981' })[tradeIdx] }} />
-                          <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', margin: 0 }}>{trade}</h4>
-                          <span style={{ color: '#475569', fontSize: '13px' }}>({tradeContractors.length} contractors)</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                          {tradeContractors.map(c => (
-                            <ContractorCard key={c.id} contractor={c} revealed={revealed[modalCity.city] || false} />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <Wrench size={48} style={{ color: '#8b5cf6', marginBottom: '16px' }} />
-                  <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>
-                    Contractor List Coming Soon
-                  </h3>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '20px' }}>
-                    We're currently vetting contractors in {modalCity.city}. Join our waitlist to be notified when this market launches.
-                  </p>
-                  <button className="gradient-btn" style={{ padding: '12px 24px', borderRadius: '10px', color: '#fff', fontWeight: 700 }}>
-                    Join Waitlist — Notify Me
-                  </button>
-                </div>
-              )}
-            </div>
+            <Link
+              to={dealId ? `/bid-request/${dealId}` : '/bid-request'}
+              className="gradient-btn"
+              style={{
+                padding: '10px 16px', borderRadius: 10,
+                color: '#fff', fontWeight: 800, fontSize: 13,
+                textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              Request Bids <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* ── Search + filters ── */}
+      <div style={{
+        position: 'sticky',
+        top: isMobile ? 56 : 64,
+        zIndex: 20,
+        background: 'rgba(10,10,15,0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #1e1e2e',
+        padding: isMobile ? '12px 14px' : '16px 24px',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ position: 'relative', marginBottom: 10 }}>
+            <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#8b5cf6' }} />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search by trade, company, name, or city…"
+              className="input-dark"
+              style={{
+                width: '100%', padding: '11px 14px 11px 38px',
+                borderRadius: 12, fontSize: 14,
+              }}
+            />
+          </div>
+          {/* Trade filter chips — horizontal scroll on mobile */}
+          <div style={{
+            display: 'flex', gap: 6, overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            paddingBottom: 2,
+          }}>
+            <Chip
+              active={tradeFilter === 'All'}
+              onClick={() => setTradeFilter('All')}
+              color="#a78bfa"
+            >
+              All trades
+            </Chip>
+            {tradeTypes.map(trade => (
+              <Chip
+                key={trade}
+                active={tradeFilter === trade}
+                onClick={() => setTradeFilter(tradeFilter === trade ? 'All' : trade)}
+                color={tradeColors[trade] || '#8b5cf6'}
+              >
+                {trade}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '16px 14px 0' : '24px 24px 0' }}>
+        <div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 14 }}>
+          <span style={{ color: '#a78bfa', fontWeight: 700 }}>{filteredContractors.length}</span> contractor{filteredContractors.length !== 1 ? 's' : ''}
+          {cityFilter && <span> in {cityFilter}</span>}
+          {tradeFilter !== 'All' && <span> · {tradeFilter}</span>}
+        </div>
+
+        {filteredContractors.length === 0 ? (
+          <EmptyState />
+        ) : grouped ? (
+          // No specific city: show by city, biggest markets first
+          grouped.map(([cityKey, list]) => (
+            <CitySection
+              key={cityKey}
+              cityKey={cityKey}
+              contractors={list}
+              dealId={dealId}
+              isMobile={isMobile}
+              onShowCity={() => setCityFilter(cityKey.split(',')[0].trim())}
+            />
+          ))
+        ) : (
+          // Specific city selected: flat grid
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: isMobile ? 12 : 16,
+          }}>
+            {filteredContractors.map(c => (
+              <ContractorRow key={c.id} c={c} dealId={dealId} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Chip({ active, onClick, color, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '7px 14px',
+        borderRadius: 999,
+        background: active ? `${color}20` : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${active ? color : '#1e1e2e'}`,
+        color: active ? color : '#94a3b8',
+        cursor: 'pointer',
+        fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+        flexShrink: 0,
+        transition: 'all 0.15s',
+      }}
+    >
+      <div style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
+      {children}
+    </button>
+  );
+}
+
+function CitySection({ cityKey, contractors, dealId, isMobile, onShowCity }) {
+  return (
+    <section style={{ marginBottom: 28 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 12,
+      }}>
+        <h2 style={{
+          color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 18 : 20,
+          margin: 0, letterSpacing: '-0.3px',
+          display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <MapPin size={16} style={{ color: '#8b5cf6' }} />
+          {cityKey}
+          <span style={{
+            background: 'rgba(139,92,246,0.12)', color: '#a78bfa',
+            borderRadius: 999, padding: '2px 10px', fontSize: 11, fontWeight: 800,
+            letterSpacing: 0.3,
+          }}>
+            {contractors.length}
+          </span>
+        </h2>
+        <button
+          onClick={onShowCity}
+          style={{
+            background: 'none', border: 'none', color: '#a78bfa',
+            cursor: 'pointer', fontWeight: 700, fontSize: 13,
+            display: 'flex', alignItems: 'center', gap: 3,
+          }}
+        >
+          View all <ChevronRight size={14} />
+        </button>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: isMobile ? 12 : 16,
+      }}>
+        {contractors.slice(0, isMobile ? 4 : 6).map(c => (
+          <ContractorRow key={c.id} c={c} dealId={dealId} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ContractorRow({ c, dealId }) {
+  const color = tradeColors[c.trade] || '#8b5cf6';
+  const initials = c.company
+    ? c.company.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+    : c.name.split(' ').map(w => w[0]).slice(0, 2).join('');
+
+  return (
+    <div style={{
+      background: '#12121e', border: '1px solid #1e1e2e',
+      borderRadius: 14, padding: 14,
+      transition: 'border-color 0.15s, transform 0.15s',
+      WebkitTapHighlightColor: 'transparent',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        {/* Avatar/initials */}
+        <div style={{
+          width: 48, height: 48, borderRadius: 12,
+          background: `linear-gradient(135deg, ${color}, ${color}aa)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#fff', fontWeight: 900, fontSize: 16,
+          flexShrink: 0,
+          boxShadow: `0 6px 16px ${color}30`,
+        }}>
+          {initials}
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15, lineHeight: 1.2, marginBottom: 2 }}>
+            {c.company || c.name}
+          </div>
+          {c.company && c.name && (
+            <div style={{ color: '#94a3b8', fontSize: 12, marginBottom: 4 }}>{c.name}</div>
+          )}
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+            <span style={{
+              background: `${color}15`, color, border: `1px solid ${color}35`,
+              borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700,
+            }}>{c.trade}</span>
+            <span style={{
+              background: 'rgba(255,255,255,0.04)', color: '#94a3b8',
+              border: '1px solid #1e1e2e', borderRadius: 6,
+              padding: '2px 8px', fontSize: 11, fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: 3,
+            }}>
+              <MapPin size={10} />{c.city}, {c.state}
+            </span>
+          </div>
+
+          {/* Stats */}
+          <div style={{
+            display: 'flex', gap: 12, marginTop: 10, alignItems: 'center',
+            color: '#94a3b8', fontSize: 12,
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <Star size={11} fill="#f59e0b" style={{ color: '#f59e0b' }} />
+              <strong style={{ color: '#f8fafc' }}>{c.rating}</strong> ({c.reviewCount})
+            </span>
+            <span style={{ color: '#475569' }}>·</span>
+            <span>{c.yearsExp} yrs exp</span>
+            {(c.licensed || c.insured) && (
+              <>
+                <span style={{ color: '#475569' }}>·</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#10b981' }}>
+                  <Shield size={11} />
+                  {[c.licensed && 'Lic', c.insured && 'Ins'].filter(Boolean).join('/')}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+        <Link
+          to={dealId ? `/bid-request/${dealId}` : `/bid-request?city=${encodeURIComponent(c.city)}&state=${c.state}`}
+          className="gradient-btn"
+          style={{
+            flex: 1, padding: '9px', borderRadius: 9,
+            color: '#fff', fontWeight: 800, fontSize: 12,
+            textDecoration: 'none', textAlign: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+          }}
+        >
+          Request Bid
+        </Link>
+        <a
+          href={`tel:${c.phone.replace(/\D/g, '')}`}
+          style={{
+            flex: '0 0 auto',
+            padding: '9px 14px', borderRadius: 9,
+            background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+            color: '#94a3b8', fontWeight: 700, fontSize: 12,
+            textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5,
+          }}
+        >
+          <Phone size={12} /> Call
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div style={{
+      background: '#12121e', border: '1px solid #1e1e2e',
+      borderRadius: 16, padding: '40px 20px', textAlign: 'center',
+    }}>
+      <Wrench size={36} style={{ color: '#475569', opacity: 0.6, marginBottom: 14 }} />
+      <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 16, marginBottom: 6 }}>
+        No contractors match those filters
+      </div>
+      <div style={{ color: '#64748b', fontSize: 13, lineHeight: 1.6 }}>
+        Try clearing the trade filter or searching a different city.
+      </div>
     </div>
   );
 }

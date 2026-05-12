@@ -77,10 +77,10 @@ export default function DealDetail() {
   const isOwner = isLoggedIn && currentUser && String(currentUser.id) === String(deal.sellerId);
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh' }}>
       {/* Back nav */}
       <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '14px 20px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <Link
             to="/marketplace"
             style={{
@@ -101,8 +101,23 @@ export default function DealDetail() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'flex-start' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px 14px' }} className="deal-detail-wrap">
+        <style>{`
+          .deal-detail-wrap > .deal-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            align-items: flex-start;
+          }
+          @media (min-width: 900px) {
+            .deal-detail-wrap { padding: 32px 20px; }
+            .deal-detail-wrap > .deal-detail-grid {
+              grid-template-columns: 1fr 380px;
+              gap: 32px;
+            }
+          }
+        `}</style>
+        <div className="deal-detail-grid">
           {/* Left column */}
           <div>
             {/* Image Gallery with YouTube support */}
@@ -178,6 +193,86 @@ export default function DealDetail() {
             <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
               <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
+            </div>
+
+            {/* ── Contractor Bid Request CTA ── */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.10), rgba(6,182,212,0.06))',
+              border: '1px solid rgba(139,92,246,0.30)',
+              borderRadius: 18, padding: '22px', marginBottom: 24,
+              position: 'relative', overflow: 'hidden',
+            }}>
+              {/* decorative orb */}
+              <div style={{
+                position: 'absolute', top: '-50%', right: '-10%',
+                width: 240, height: 240, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(139,92,246,0.25), transparent 70%)',
+                filter: 'blur(40px)', pointerEvents: 'none',
+              }} />
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 8px 20px rgba(139,92,246,0.4)',
+                    flexShrink: 0,
+                  }}>
+                    <Shield size={22} color="#fff" />
+                  </div>
+                  <div>
+                    <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 18, margin: 0, letterSpacing: '-0.3px' }}>
+                      Need bids for this property?
+                    </h3>
+                    <p style={{ color: '#94a3b8', fontSize: 13, margin: '3px 0 0', lineHeight: 1.5 }}>
+                      Request bids from local contractors or browse contractors near this deal.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr', marginTop: 14 }}>
+                  <Link
+                    to={`/bid-request/${deal.id}`}
+                    className="gradient-btn"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                      padding: '14px 18px', borderRadius: 12,
+                      color: '#fff', textDecoration: 'none', fontWeight: 800, fontSize: 15,
+                      boxShadow: '0 8px 24px rgba(139,92,246,0.35)',
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      Request Bids From Local Contractors
+                    </span>
+                    <span style={{
+                      background: 'rgba(255,255,255,0.18)', padding: '3px 10px',
+                      borderRadius: 8, fontSize: 13, fontWeight: 800,
+                    }}>$300</span>
+                  </Link>
+                  <Link
+                    to={`/contractors?dealId=${deal.id}&city=${encodeURIComponent(deal.city)}&state=${deal.state}`}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                      padding: '13px 18px', borderRadius: 12,
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid #1e1e2e',
+                      color: '#e2e8f0', textDecoration: 'none', fontWeight: 700, fontSize: 14,
+                    }}
+                  >
+                    <span>View Contractors Near {deal.city}, {deal.state}</span>
+                    <ArrowLeft size={16} style={{ transform: 'rotate(180deg)', color: '#a78bfa' }} />
+                  </Link>
+                </div>
+
+                <div style={{
+                  marginTop: 14, padding: 12, borderRadius: 10,
+                  background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.18)',
+                  color: '#cbd5e1', fontSize: 12, lineHeight: 1.6,
+                }}>
+                  <strong style={{ color: '#10b981' }}>Flat $300 — no contractor markup.</strong>
+                  {' '}You receive contractor contact info directly and can keep it for future projects.
+                </div>
+              </div>
             </div>
 
             {/* Promote Section — owner only */}

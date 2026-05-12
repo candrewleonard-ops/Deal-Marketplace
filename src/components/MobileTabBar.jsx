@@ -1,12 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { ShoppingBag, UsersRound, Plus, Heart, User } from 'lucide-react';
+import { ShoppingBag, Wrench, Plus, MessageSquare, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 
 /**
- * Native-app-style bottom tab bar — visible only on mobile.
- * 5 slots: Browse / Social / Post (FAB) / Saved / Profile
+ * Mobile bottom nav — Deals · Contractors · POST · Messages · Profile.
+ * The POST tab is a raised gradient FAB that sits above the bar — the
+ * "do something" action of the whole app.
  */
 export default function MobileTabBar() {
   const location = useLocation();
@@ -19,10 +20,10 @@ export default function MobileTabBar() {
   };
 
   const tabs = [
-    { to: '/marketplace', label: 'Browse', icon: ShoppingBag },
-    { to: '/groups',      label: 'Groups', icon: UsersRound },
-    { type: 'fab' },
-    { to: '/saved',       label: 'Saved',  icon: Heart },
+    { to: '/marketplace', label: 'Deals',       icon: ShoppingBag },
+    { to: '/contractors', label: 'Contractors', icon: Wrench },
+    { type: 'fab',        label: 'Post' },
+    { to: '/messages',    label: 'Messages',    icon: MessageSquare },
     { to: currentUser ? `/profile/${currentUser.id}` : '/auth', label: 'Profile', icon: User },
   ];
 
@@ -34,9 +35,9 @@ export default function MobileTabBar() {
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'rgba(13,13,26,0.92)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          background: 'rgba(13,13,26,0.94)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           display: 'flex',
@@ -57,29 +58,36 @@ export default function MobileTabBar() {
                   border: 'none',
                   background: 'transparent',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'flex-end',
                   cursor: 'pointer',
                   position: 'relative',
-                  minWidth: 56,
-                  padding: '6px 0',
+                  minWidth: 64,
+                  padding: '4px 0 6px',
                 }}
               >
                 <div
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: 56,
+                    height: 56,
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 8px 24px rgba(139,92,246,0.5)',
-                    transform: 'translateY(-12px)',
+                    boxShadow: '0 10px 28px rgba(139,92,246,0.55), 0 0 0 4px rgba(10,10,15,0.95)',
+                    transform: 'translateY(-18px)',
                   }}
                 >
-                  <Plus size={26} strokeWidth={2.5} color="#fff" />
+                  <Plus size={28} strokeWidth={2.6} color="#fff" />
                 </div>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, letterSpacing: 0.2,
+                  color: '#a78bfa', marginTop: -8,
+                }}>
+                  {t.label}
+                </span>
               </button>
             );
           }
@@ -96,7 +104,7 @@ export default function MobileTabBar() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '8px 4px 4px',
+                padding: '8px 4px 6px',
                 color: active ? '#a78bfa' : '#64748b',
                 textDecoration: 'none',
                 gap: 3,
