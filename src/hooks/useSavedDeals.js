@@ -38,5 +38,12 @@ export function useSavedDeals() {
 
   const clear = useCallback(() => { setIds([]); write([]); }, []);
 
-  return { savedIds: ids, isSaved, toggle, clear };
+  const removeMany = useCallback((idsToRemove) => {
+    const set = new Set(idsToRemove.map(String));
+    const next = ids.filter(x => !set.has(x));
+    setIds(next);
+    write(next);
+  }, [ids]);
+
+  return { savedIds: ids, isSaved, toggle, clear, removeMany };
 }

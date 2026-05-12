@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Crown, Zap, X, CreditCard, Shield, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSEO } from '../hooks/useSEO';
 
 const features = [
   'Priority listing placement',
@@ -79,6 +80,10 @@ const faqs = [
 ];
 
 export default function Premium() {
+  useSEO({
+    title: 'VIP Premium Plans',
+    description: 'Upgrade to VIP or VIP Max for priority listings, unlimited address requests, advanced analytics, and 10x sponsored ad discounts.',
+  });
   const [showPayModal, setShowPayModal] = useState(false);
   const [selectedTier, setSelectedTier] = useState(null);
   const [paySuccess, setPaySuccess] = useState(false);

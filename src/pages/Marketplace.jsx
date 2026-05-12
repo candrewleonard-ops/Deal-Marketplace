@@ -7,6 +7,7 @@ import DealCard from '../components/DealCard';
 import USMap from '../components/USMap';
 import PostDealModal from '../components/PostDealModal';
 import { deals, dealTypes } from '../data/deals';
+import { useSEO } from '../hooks/useSEO';
 
 // Detect mobile viewport (matches Tailwind 'md' breakpoint)
 function useIsMobile() {
@@ -74,6 +75,10 @@ function FBAdCalculator() {
 }
 
 export default function Marketplace() {
+  useSEO({
+    title: 'Marketplace',
+    description: 'Browse off-market real estate deals nationwide. Wholesale, fix & flip, subject-to, and creative finance opportunities.',
+  });
   const isMobile = useIsMobile();
   const [activeType,      setActiveType]      = useState('all');
   const [search,          setSearch]          = useState('');

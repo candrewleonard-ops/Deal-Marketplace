@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileTabBar from './components/MobileTabBar';
 import AuthPromptModal from './components/AuthPromptModal';
+import OnboardingModal from './components/OnboardingModal';
 import { useIsMobile } from './hooks/useIsMobile';
 import Landing from './pages/Landing';
 import Marketplace from './pages/Marketplace';
@@ -52,6 +53,7 @@ function AppLayout({ children, hideFooter }) {
       {!hideFooter && !isMobile && <Footer />}
       {isMobile && <MobileTabBar />}
       <AuthPromptModal />
+      <OnboardingModal />
     </div>
   );
 }

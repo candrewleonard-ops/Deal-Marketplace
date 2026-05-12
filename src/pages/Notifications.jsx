@@ -1,9 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bell, Heart, MessageSquare, UserPlus, Home, Zap, CheckCircle,
   Calendar, Users, Settings, Trash2, Check
 } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
+
+function bucketForTime(time = '') {
+  const t = time.toLowerCase();
+  if (t.includes('min') || t.includes('hour') || t.includes('just now')) return 'Today';
+  if (t.includes('1 day')) return 'Yesterday';
+  return 'Earlier';
+}
+const BUCKET_ORDER = ['Today', 'Yesterday', 'Earlier'];
 
 const initialNotifications = [
   {
@@ -80,6 +89,7 @@ const FILTERS = [
 ];
 
 export default function Notifications() {
+  useSEO({ title: 'Notifications', description: 'Address requests, messages, follows, and deal updates.' });
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState('all');
 
@@ -91,6 +101,14 @@ export default function Notifications() {
     if (filter === 'social') return ['follow','like','group_invite','meetup'].includes(n.type);
     return true;
   });
+
+  const grouped = useMemo(() => {
+    const buckets = { Today: [], Yesterday: [], Earlier: [] };
+    for (const n of filtered) {
+      buckets[bucketForTime(n.time)].push(n);
+    }
+    return buckets;
+  }, [filtered]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -181,62 +199,72 @@ export default function Notifications() {
             <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>No notifications matching this filter.</p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {filtered.map(n => {
-              const Icon = n.icon;
-              return (
-                <div
-                  key={n.id}
-                  onClick={() => markRead(n.id)}
-                  style={{
-                    background: n.read ? '#12121e' : 'rgba(139,92,246,0.04)',
-                    border: `1px solid ${n.read ? '#1e1e2e' : 'rgba(139,92,246,0.2)'}`,
-                    borderRadius: '12px', padding: '14px 16px',
-                    display: 'flex', alignItems: 'flex-start', gap: '12px',
-                    cursor: 'pointer', transition: 'background 0.15s',
-                  }}
-                >
-                  {/* Icon */}
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '50%',
-                    background: `${n.color}15`, border: `1px solid ${n.color}30`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <Icon size={16} style={{ color: n.color }} />
-                  </div>
-
-                  {/* Content */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                      <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>{n.title}</span>
-                      {!n.read && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#8b5cf6', flexShrink: 0 }} />}
-                    </div>
-                    <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.5 }}>{n.body}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ color: '#475569', fontSize: '11px' }}>{n.time}</span>
-                      <Link
-                        to={n.actionTo}
-                        onClick={e => e.stopPropagation()}
-                        style={{ color: n.color, fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
-                      >
-                        {n.actionLabel} →
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Dismiss */}
-                  <button
-                    onClick={e => { e.stopPropagation(); dismiss(n.id); }}
-                    style={{
-                      background: 'none', border: 'none', color: '#475569',
-                      cursor: 'pointer', padding: '4px',
-                    }}
-                  >
-                    <Trash2 size={13} />
-                  </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {BUCKET_ORDER.filter(b => grouped[b].length > 0).map(bucket => (
+              <div key={bucket}>
+                <div style={{
+                  color: '#64748b', fontSize: 11, fontWeight: 800,
+                  letterSpacing: 1.2, textTransform: 'uppercase',
+                  marginBottom: 8, paddingLeft: 4,
+                }}>
+                  {bucket}
                 </div>
-              );
-            })}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {grouped[bucket].map(n => {
+                    const Icon = n.icon;
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => markRead(n.id)}
+                        style={{
+                          background: n.read ? '#12121e' : 'rgba(139,92,246,0.04)',
+                          border: `1px solid ${n.read ? '#1e1e2e' : 'rgba(139,92,246,0.2)'}`,
+                          borderRadius: '12px', padding: '14px 16px',
+                          display: 'flex', alignItems: 'flex-start', gap: '12px',
+                          cursor: 'pointer', transition: 'background 0.15s',
+                        }}
+                      >
+                        <div style={{
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          background: `${n.color}15`, border: `1px solid ${n.color}30`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <Icon size={16} style={{ color: n.color }} />
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                            <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>{n.title}</span>
+                            {!n.read && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#8b5cf6', flexShrink: 0 }} />}
+                          </div>
+                          <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.5 }}>{n.body}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ color: '#475569', fontSize: '11px' }}>{n.time}</span>
+                            <Link
+                              to={n.actionTo}
+                              onClick={e => e.stopPropagation()}
+                              style={{ color: n.color, fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}
+                            >
+                              {n.actionLabel} →
+                            </Link>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={e => { e.stopPropagation(); dismiss(n.id); }}
+                          style={{
+                            background: 'none', border: 'none', color: '#475569',
+                            cursor: 'pointer', padding: '4px',
+                          }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

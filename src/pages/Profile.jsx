@@ -12,6 +12,7 @@ import DealCard from '../components/DealCard';
 import { posts } from '../data/posts';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useAuth } from '../context/AuthContext';
+import { useSEO } from '../hooks/useSEO';
 
 const tagColors = {
   'Wholesaler': '#8b5cf6',
@@ -42,6 +43,12 @@ export default function Profile() {
   const { requireAuth } = useAuth();
   const profile = getUserById(id) || getUserById(1);
   const isOwnProfile = profile.id === currentUser.id;
+
+  useSEO({
+    title: profile.name,
+    description: profile.bio || `${profile.name} on AllStreetLive — real estate investor, ${profile.location || 'United States'}`,
+    image: profile.avatar,
+  });
   const [activeTab, setActiveTab] = useState('posts');
   const [following, setFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(profile.followers || 0);

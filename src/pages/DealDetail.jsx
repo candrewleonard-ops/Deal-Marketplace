@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSavedDeals } from '../hooks/useSavedDeals';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { useSEO } from '../hooks/useSEO';
 
 const dealTypeLabels = {
   'fix-flip': 'Fix & Flip',
@@ -60,6 +61,12 @@ export default function DealDetail() {
   const [addressGranted, setAddressGranted] = useState(false);
   const [budget, setBudget] = useState(20);
   const saved = deal ? isSaved(deal.id) : false;
+
+  useSEO({
+    title: deal ? `${deal.city || 'Off-market'} ${dealTypeLabels[deal.dealType] || 'deal'} — ${formatCurrency(deal.listingPrice || deal.price)}` : 'Deal',
+    description: deal ? `${deal.beds || 0} bed / ${deal.baths || 0} bath • ${deal.sqft ? deal.sqft.toLocaleString() + ' sqft' : ''} • ARV ${formatCurrency(deal.arv)} • ${deal.city}, ${deal.state}` : '',
+    image: deal?.images?.[0] || deal?.image,
+  });
 
   if (!deal) {
     return (
@@ -481,7 +488,18 @@ export default function DealDetail() {
                     {saved ? 'Saved' : 'Save'}
                   </button>
                   <button
-                    onClick={() => setShowShare(true)}
+                    onClick={async () => {
+                      const url = `${window.location.origin}/marketplace/${deal.id}`;
+                      const shareData = {
+                        title: deal.title || `${deal.city}, ${deal.state} deal`,
+                        text: `${deal.title} — ${formatCurrency(deal.listingPrice || deal.price)} in ${deal.city}, ${deal.state}`,
+                        url,
+                      };
+                      if (typeof navigator !== 'undefined' && navigator.share) {
+                        try { await navigator.share(shareData); return; } catch { /* user canceled */ }
+                      }
+                      setShowShare(true);
+                    }}
                     style={{
                       flex: 1, padding: '11px', borderRadius: '10px',
                       background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
@@ -491,7 +509,7 @@ export default function DealDetail() {
                     }}
                   >
                     <Share2 size={15} />
-                    Share to Feed
+                    Share
                   </button>
                 </div>
               </div>
