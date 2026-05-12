@@ -15,6 +15,7 @@ import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSavedDeals } from '../hooks/useSavedDeals';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const dealTypeLabels = {
   'fix-flip': 'Fix & Flip',
@@ -52,6 +53,7 @@ export default function DealDetail() {
   }, [isAuthenticated, deal, requireAuth]);
   const { toast } = useToast();
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
+  const isMobile = useIsMobile();
   const [showPromote, setShowPromote] = useState(false);
   const [showAddressReq, setShowAddressReq] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -122,13 +124,23 @@ export default function DealDetail() {
           {/* Left column */}
           <div>
             {/* Image Gallery with YouTube support */}
-            <div style={{ marginBottom: '24px' }}>
-              <ImageCarousel images={deal.images} youtubeId={deal.youtubeId} height={480} />
+            <div style={{ marginBottom: '16px' }}>
+              <ImageCarousel images={deal.images} youtubeId={deal.youtubeId} height={isMobile ? 320 : 480} />
             </div>
 
+            {/* Street View — directly under photos, lazy-loaded (no tokens used until tapped) */}
+            {(isOwner || addressGranted) && (
+              <StreetView
+                address={deal.address}
+                city={deal.city}
+                state={deal.state}
+                zip={deal.zip}
+              />
+            )}
+
             {/* Title & Address */}
-            <div style={{ marginBottom: '24px' }}>
-              <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', marginBottom: '8px', lineHeight: 1.2 }}>
+            <div style={{ marginBottom: '20px' }}>
+              <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', marginBottom: '8px', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
                 {deal.title}
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', flexWrap: 'wrap' }}>
@@ -151,27 +163,65 @@ export default function DealDetail() {
               </div>
             </div>
 
-            {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-              {[
-                { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
-                { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
-                { label: 'Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
-                { label: 'Potential Profit', value: formatCurrency(deal.potentialProfit), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)' },
-              ].map(({ label, value, color, bg, border }) => (
-                <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-                  <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
-                    {label.toUpperCase()}
+            {/* ── Deal Numbers Card (mobile: compact 2x2; desktop: 4 in a row) ── */}
+            {isMobile ? (
+              <div style={{
+                background: '#12121e',
+                border: '1px solid #1e1e2e',
+                borderRadius: 16,
+                overflow: 'hidden',
+                marginBottom: 20,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+              }}>
+                {[
+                  { label: 'Asking',  value: formatCurrency(deal.price),           color: '#f8fafc', accent: '#8b5cf6' },
+                  { label: 'ARV',     value: formatCurrency(deal.arv),             color: '#10b981', accent: '#10b981' },
+                  { label: 'Repairs', value: formatCurrency(deal.repairCost),      color: '#f59e0b', accent: '#ef4444' },
+                  { label: 'Profit',  value: `+${formatCurrency(deal.potentialProfit)}`, color: '#10b981', accent: '#10b981' },
+                ].map(({ label, value, color, accent }, i) => (
+                  <div key={label} style={{
+                    padding: '14px 14px',
+                    borderRight: i % 2 === 0 ? '1px solid #1e1e2e' : 'none',
+                    borderBottom: i < 2 ? '1px solid #1e1e2e' : 'none',
+                  }}>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
+                    }}>
+                      <div style={{ width: 4, height: 4, borderRadius: '50%', background: accent }} />
+                      <span style={{
+                        color: '#94a3b8', fontSize: 10, fontWeight: 700,
+                        letterSpacing: 0.5, textTransform: 'uppercase',
+                      }}>{label}</span>
+                    </div>
+                    <div style={{ color, fontWeight: 800, fontSize: 19, lineHeight: 1.1, letterSpacing: '-0.3px' }}>
+                      {value}
+                    </div>
                   </div>
-                  <div style={{ color, fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+                {[
+                  { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
+                  { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
+                  { label: 'Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
+                  { label: 'Potential Profit', value: formatCurrency(deal.potentialProfit), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)' },
+                ].map(({ label, value, color, bg, border }) => (
+                  <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                    <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
+                      {label.toUpperCase()}
+                    </div>
+                    <div style={{ color, fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Property Details */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '16px' }}>Property Details</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))', gap: isMobile ? '14px 12px' : '16px' }}>
                 {[
                   { label: 'Bedrooms', value: deal.beds || 'N/A', icon: '🛏' },
                   { label: 'Bathrooms', value: deal.baths || 'N/A', icon: '🛁' },
@@ -190,21 +240,65 @@ export default function DealDetail() {
               </div>
             </div>
 
+            {/* ── Contact the Wholesaler CTA (right under Property Details) ── */}
+            {!isOwner && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(139,92,246,0.10), rgba(6,182,212,0.06))',
+                border: '1px solid rgba(139,92,246,0.30)',
+                borderRadius: 16,
+                padding: isMobile ? '16px' : '20px',
+                marginBottom: 20,
+                display: 'flex', alignItems: 'center', gap: 14,
+                flexWrap: 'wrap',
+              }}>
+                <img
+                  src={seller.avatar || deal.sellerAvatar}
+                  alt={seller.name || deal.sellerName}
+                  style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    objectFit: 'cover', flexShrink: 0,
+                    border: '2px solid rgba(139,92,246,0.4)',
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 160 }}>
+                  <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
+                    Wholesaler
+                  </div>
+                  <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16, letterSpacing: '-0.2px' }}>
+                    {seller.name || deal.sellerName}
+                  </div>
+                  <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>
+                    Have questions? Reach out for details, access, or an offer.
+                  </div>
+                </div>
+                <Link
+                  to="/messages"
+                  onClick={(e) => {
+                    if (!isLoggedIn) {
+                      e.preventDefault();
+                      requireAuth(`message ${seller.name || deal.sellerName}`, 'message', `/marketplace/${deal.id}`);
+                    }
+                  }}
+                  className="gradient-btn"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '11px 18px', borderRadius: 11,
+                    color: '#fff', textDecoration: 'none', fontWeight: 800, fontSize: 14,
+                    boxShadow: '0 6px 18px rgba(139,92,246,0.35)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MessageSquare size={15} />
+                  Send Message
+                </Link>
+              </div>
+            )}
+
             {/* Description */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '24px' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
               <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
             </div>
-
-            {/* ── Street View (only after address has been approved/granted, or for the owner) ── */}
-            {(isOwner || addressGranted) && (
-              <StreetView
-                address={deal.address}
-                city={deal.city}
-                state={deal.state}
-                zip={deal.zip}
-              />
-            )}
 
             {/* Promote Section — owner only */}
             {isOwner && (

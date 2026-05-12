@@ -1,165 +1,160 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Camera, ExternalLink, Loader2, MapPin, X, ImageOff } from 'lucide-react';
+import { Camera, ExternalLink, Loader2, MapPin, X, ImageOff, ChevronRight } from 'lucide-react';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /**
- * Embedded Google Street View for a property address.
+ * Compact, tap-to-load Street View card for a property address.
  *
- *  - Inline 16:9 preview powered by the Street View Static API (accepts a
- *    plain address string, no geocoding needed).
- *  - First fires a metadata check (free) so we can show a graceful
- *    "no street view available" state for rural addresses instead of
- *    Google's gray placeholder image.
- *  - Tap the preview to open a fullscreen modal with a larger image and
- *    an "Open in Google Maps" deep-link for the full interactive pano.
+ *   Initial state  → small placeholder card, NO API calls (saves tokens).
+ *   User taps      → free metadata probe to see if Google has imagery.
+ *                    If yes → loads the static image inline (~$0.007).
+ *                    If no  → shows clean "no street view available" state.
+ *   Tap loaded img → fullscreen modal with high-res image.
  *
  * Requires:
- *  - VITE_GOOGLE_MAPS_API_KEY set at build time
- *  - "Street View Static API" enabled in the Google Cloud project
+ *   - VITE_GOOGLE_MAPS_API_KEY set at build time
+ *   - "Street View Static API" enabled in the Google Cloud project
+ *   - API key restrictions allow Street View Static API
  *
- * If the key is missing this component renders nothing — the rest of the
- * deal page is unaffected.
+ * Renders nothing if the key isn't configured.
  */
 export default function StreetView({ address, city, state, zip }) {
-  const fullAddress = useMemo(
-    () => [address, city, state, zip].filter(Boolean).join(', '),
-    [address, city, state, zip]
-  );
+  const fullAddress = [address, city, state, zip].filter(Boolean).join(', ');
 
-  const [metaStatus, setMetaStatus] = useState('loading'); // loading | ok | none | error
+  // 'placeholder' (default) → 'loading' → 'ok' | 'none' | 'error'
+  const [phase, setPhase] = useState('placeholder');
+  const [errorMsg, setErrorMsg] = useState('');
   const [open, setOpen] = useState(false);
 
-  // Cheap metadata probe so we can show "no street view" without burning a
-  // paid image request on rural addresses.
-  useEffect(() => {
-    if (!API_KEY || !fullAddress) return;
-    let cancelled = false;
+  if (!API_KEY) return null;
 
-    const url = new URL('https://maps.googleapis.com/maps/api/streetview/metadata');
-    url.searchParams.set('location', fullAddress);
-    url.searchParams.set('key', API_KEY);
-    url.searchParams.set('source', 'outdoor'); // prefer outdoor panos for properties
+  async function loadStreetView() {
+    setPhase('loading');
+    setErrorMsg('');
+    try {
+      const url = new URL('https://maps.googleapis.com/maps/api/streetview/metadata');
+      url.searchParams.set('location', fullAddress);
+      url.searchParams.set('key', API_KEY);
+      url.searchParams.set('source', 'outdoor');
 
-    fetch(url.toString())
-      .then(r => r.json())
-      .then(data => {
-        if (cancelled) return;
-        if (data?.status === 'OK') setMetaStatus('ok');
-        else if (data?.status === 'ZERO_RESULTS' || data?.status === 'NOT_FOUND') setMetaStatus('none');
-        else setMetaStatus('error');
-      })
-      .catch(() => { if (!cancelled) setMetaStatus('error'); });
-
-    return () => { cancelled = true; };
-  }, [fullAddress]);
-
-  if (!API_KEY) {
-    // No key configured — silently hide the component. The deal page still works.
-    return null;
+      const res = await fetch(url.toString());
+      if (!res.ok) {
+        // Network-level error or auth failure — surface the HTTP status
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status}${text ? ` — ${text.slice(0, 120)}` : ''}`);
+      }
+      const data = await res.json();
+      if (data?.status === 'OK') {
+        setPhase('ok');
+      } else if (data?.status === 'ZERO_RESULTS' || data?.status === 'NOT_FOUND') {
+        setPhase('none');
+      } else if (data?.status === 'REQUEST_DENIED') {
+        // Most common cause: Street View Static API not enabled, or API key
+        // restrictions don't include this API. Show the actual message.
+        setErrorMsg(data?.error_message || 'API key not authorized for Street View Static API. Enable the API in Google Cloud Console.');
+        setPhase('error');
+      } else if (data?.status === 'OVER_QUERY_LIMIT') {
+        setErrorMsg('Daily Street View quota exceeded.');
+        setPhase('error');
+      } else {
+        setErrorMsg(data?.error_message || `Unexpected status: ${data?.status || 'unknown'}`);
+        setPhase('error');
+      }
+    } catch (e) {
+      setErrorMsg(e.message || String(e));
+      setPhase('error');
+    }
   }
 
-  const previewSrc = buildStreetViewUrl(fullAddress, 800, 450);
-  const expandedSrc = buildStreetViewUrl(fullAddress, 1600, 900);
   const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+  const previewSrc  = buildStreetViewUrl(fullAddress, 800, 450);
+  const expandedSrc = buildStreetViewUrl(fullAddress, 1600, 900);
 
-  return (
-    <div style={{
-      background: '#12121e',
-      border: '1px solid #1e1e2e',
-      borderRadius: 16,
-      overflow: 'hidden',
-      marginBottom: 24,
-    }}>
-      {/* Header */}
-      <div style={{
-        padding: '14px 18px',
-        borderBottom: '1px solid #1e1e2e',
-        display: 'flex', alignItems: 'center', gap: 10,
-      }}>
+  // ── Placeholder (no API call yet) ──
+  if (phase === 'placeholder') {
+    return (
+      <button
+        onClick={loadStreetView}
+        aria-label="Load street view"
+        style={{
+          width: '100%',
+          background: '#12121e',
+          border: '1px solid #1e1e2e',
+          borderRadius: 14,
+          padding: '12px 14px',
+          marginBottom: 16,
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 12,
+          textAlign: 'left',
+          WebkitTapHighlightColor: 'transparent',
+          transition: 'border-color 0.15s, background 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.45)'; e.currentTarget.style.background = '#14142a'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e2e'; e.currentTarget.style.background = '#12121e'; }}
+      >
         <div style={{
-          width: 30, height: 30, borderRadius: 8,
-          background: 'rgba(139,92,246,0.12)',
+          width: 38, height: 38, borderRadius: 10,
+          background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 6px 16px rgba(139,92,246,0.35)',
         }}>
-          <Camera size={16} style={{ color: '#a78bfa' }} />
+          <Camera size={18} color="#fff" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 14 }}>Street View</div>
-          <div style={{ color: '#64748b', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {fullAddress}
-          </div>
+          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 1 }}>Tap to load — see the property from the street</div>
         </div>
-        <a
-          href={mapsLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            padding: '6px 10px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-            color: '#94a3b8', textDecoration: 'none', fontSize: 12, fontWeight: 700,
-            flexShrink: 0,
-          }}
-        >
-          Open in Maps <ExternalLink size={11} />
-        </a>
+        <ChevronRight size={18} style={{ color: '#475569' }} />
+      </button>
+    );
+  }
+
+  // ── Loading ──
+  if (phase === 'loading') {
+    return (
+      <div style={{
+        background: '#12121e', border: '1px solid #1e1e2e',
+        borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+        display: 'flex', alignItems: 'center', gap: 12,
+      }}>
+        <Loader2 size={16} style={{ color: '#a78bfa', animation: 'addr-spin 0.8s linear infinite' }} />
+        <span style={{ color: '#94a3b8', fontSize: 14 }}>Loading street view…</span>
       </div>
+    );
+  }
 
-      {/* Image / states */}
-      {metaStatus === 'loading' && (
+  // ── Loaded image (compact inline preview, tap to expand) ──
+  if (phase === 'ok') {
+    return (
+      <div style={{
+        background: '#12121e', border: '1px solid #1e1e2e',
+        borderRadius: 14, overflow: 'hidden', marginBottom: 16,
+      }}>
         <div style={{
-          aspectRatio: '16 / 9',
-          background: '#0f0f18',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 10, color: '#64748b', fontSize: 13,
+          padding: '10px 14px',
+          display: 'flex', alignItems: 'center', gap: 10,
+          borderBottom: '1px solid #1e1e2e',
         }}>
-          <Loader2 size={16} style={{ color: '#8b5cf6', animation: 'addr-spin 0.8s linear infinite' }} />
-          Loading street view…
-        </div>
-      )}
-
-      {metaStatus === 'none' && (
-        <div style={{
-          aspectRatio: '16 / 9',
-          background: 'linear-gradient(135deg, #0f0f18, #12121e)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          gap: 8, color: '#64748b', fontSize: 13, padding: 20, textAlign: 'center',
-        }}>
-          <ImageOff size={28} style={{ color: '#475569' }} />
-          <div style={{ color: '#94a3b8', fontWeight: 600 }}>No street view available</div>
-          <div style={{ fontSize: 12, maxWidth: 320 }}>
-            Google doesn't have street-level imagery for this address yet.
-          </div>
+          <Camera size={14} style={{ color: '#a78bfa' }} />
+          <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13, flex: 1 }}>Street View</span>
           <a
             href={mapsLink}
             target="_blank" rel="noopener noreferrer"
             style={{
-              marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 5,
-              color: '#a78bfa', fontSize: 12, fontWeight: 700, textDecoration: 'none',
+              display: 'flex', alignItems: 'center', gap: 4,
+              color: '#a78bfa', fontSize: 11, fontWeight: 700,
+              textDecoration: 'none',
             }}
           >
-            <MapPin size={12} /> View on map
+            Open in Maps <ExternalLink size={10} />
           </a>
         </div>
-      )}
-
-      {metaStatus === 'error' && (
-        <div style={{
-          aspectRatio: '16 / 9',
-          background: '#0f0f18',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#64748b', fontSize: 13, padding: 20, textAlign: 'center',
-        }}>
-          Couldn't load street view right now.
-        </div>
-      )}
-
-      {metaStatus === 'ok' && (
         <button
           onClick={() => setOpen(true)}
-          aria-label="Open street view fullscreen"
+          aria-label="Expand street view"
           style={{
             display: 'block', width: '100%', padding: 0,
             background: 'none', border: 'none', cursor: 'zoom-in',
@@ -171,38 +166,110 @@ export default function StreetView({ address, city, state, zip }) {
             src={previewSrc}
             alt={`Street view of ${fullAddress}`}
             loading="lazy"
+            onError={() => { setPhase('error'); setErrorMsg('Failed to fetch the street view image.'); }}
             style={{
               width: '100%', aspectRatio: '16 / 9', objectFit: 'cover',
               display: 'block',
-              transition: 'transform 0.4s cubic-bezier(.2,.9,.3,1)',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
           />
-          {/* "Tap to expand" pill */}
           <div style={{
-            position: 'absolute', bottom: 12, right: 12,
+            position: 'absolute', bottom: 10, right: 10,
             background: 'rgba(10,10,15,0.78)',
             backdropFilter: 'blur(8px)',
-            color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: 0.4,
-            padding: '6px 10px', borderRadius: 999,
-            display: 'flex', alignItems: 'center', gap: 5,
+            color: '#fff', fontSize: 10, fontWeight: 800, letterSpacing: 0.5,
+            padding: '5px 9px', borderRadius: 999,
+            display: 'flex', alignItems: 'center', gap: 4,
           }}>
-            <Camera size={11} /> TAP TO EXPAND
+            <Camera size={10} /> TAP TO EXPAND
           </div>
         </button>
-      )}
 
-      {/* Fullscreen modal */}
-      {open && typeof document !== 'undefined' && createPortal(
-        <Fullscreen
-          src={expandedSrc}
-          address={fullAddress}
-          mapsLink={mapsLink}
-          onClose={() => setOpen(false)}
-        />,
-        document.body
+        {open && typeof document !== 'undefined' && createPortal(
+          <Fullscreen src={expandedSrc} address={fullAddress} mapsLink={mapsLink} onClose={() => setOpen(false)} />,
+          document.body
+        )}
+      </div>
+    );
+  }
+
+  // ── No imagery available ──
+  if (phase === 'none') {
+    return (
+      <div style={{
+        background: '#12121e', border: '1px solid #1e1e2e',
+        borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+        display: 'flex', alignItems: 'center', gap: 12,
+      }}>
+        <div style={{
+          width: 38, height: 38, borderRadius: 10,
+          background: 'rgba(100,116,139,0.15)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <ImageOff size={18} style={{ color: '#94a3b8' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13 }}>No street view available</div>
+          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 1 }}>Google doesn't have street imagery for this address.</div>
+        </div>
+        <a
+          href={mapsLink}
+          target="_blank" rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '6px 10px', borderRadius: 8,
+            background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)',
+            color: '#a78bfa', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+            flexShrink: 0,
+          }}
+        >
+          <MapPin size={12} /> Map
+        </a>
+      </div>
+    );
+  }
+
+  // ── Error ──
+  return (
+    <div style={{
+      background: '#12121e', border: '1px solid rgba(239,68,68,0.3)',
+      borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8,
+          background: 'rgba(239,68,68,0.15)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <ImageOff size={16} style={{ color: '#ef4444' }} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13 }}>Street View unavailable</div>
+        </div>
+        <button
+          onClick={loadStreetView}
+          style={{
+            padding: '5px 10px', borderRadius: 8,
+            background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+            color: '#94a3b8', cursor: 'pointer', fontSize: 11, fontWeight: 700,
+          }}
+        >
+          Retry
+        </button>
+      </div>
+      {errorMsg && (
+        <div style={{
+          color: '#fca5a5', fontSize: 11, fontFamily: 'monospace',
+          background: 'rgba(239,68,68,0.06)', padding: '6px 10px', borderRadius: 6,
+          wordBreak: 'break-word',
+        }}>
+          {errorMsg}
+        </div>
       )}
+      <div style={{ color: '#64748b', fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
+        Most common cause: <strong style={{ color: '#94a3b8' }}>Street View Static API</strong> isn't enabled in Google Cloud Console, or the API key's allowed-APIs list doesn't include it.
+      </div>
     </div>
   );
 }
@@ -230,7 +297,6 @@ function Fullscreen({ src, address, mapsLink, onClose }) {
         animation: 'sv-fade-in 0.18s ease-out',
       }}
     >
-      {/* Top bar */}
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
