@@ -1,10 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Search, Wrench, MapPin, Star, Phone, Shield, Filter, X,
-  ArrowRight, ChevronRight, DollarSign,
+  Search, Wrench, MapPin, Star, Phone, Shield, X, ChevronRight,
 } from 'lucide-react';
-import { contractorCities, tradeTypes, getContractorsByCity } from '../data/contractors';
+import { contractorCities, tradeTypes } from '../data/contractors';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { getDealById } from '../data/deals';
 
@@ -126,46 +125,9 @@ export default function Contractors() {
                 <span className="gradient-text">Contractor</span> Marketplace
               </h1>
               <p style={{ color: '#94a3b8', margin: '2px 0 0', fontSize: isMobile ? 13 : 14 }}>
-                Vetted contractors. No markup. Their info is yours to keep.
+                Vetted local contractors — call or message directly.
               </p>
             </div>
-          </div>
-
-          {/* Bid request CTA banner */}
-          <div style={{
-            marginTop: 16,
-            background: 'linear-gradient(135deg, rgba(245,158,11,0.10), rgba(16,185,129,0.05))',
-            border: '1px solid rgba(245,158,11,0.25)',
-            borderRadius: 14,
-            padding: isMobile ? 14 : 16,
-            display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
-          }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: 'rgba(245,158,11,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <DollarSign size={20} style={{ color: '#f59e0b' }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 220 }}>
-              <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 14 }}>
-                Need bids on a property? <span style={{ color: '#f59e0b' }}>$300 flat</span>.
-              </div>
-              <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>
-                We'll connect you with local contractors and send their info directly.
-              </div>
-            </div>
-            <Link
-              to={dealId ? `/bid-request/${dealId}` : '/bid-request'}
-              className="gradient-btn"
-              style={{
-                padding: '10px 16px', borderRadius: 10,
-                color: '#fff', fontWeight: 800, fontSize: 13,
-                textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              Request Bids <ArrowRight size={14} />
-            </Link>
           </div>
         </div>
       </div>
@@ -240,7 +202,6 @@ export default function Contractors() {
               key={cityKey}
               cityKey={cityKey}
               contractors={list}
-              dealId={dealId}
               isMobile={isMobile}
               onShowCity={() => setCityFilter(cityKey.split(',')[0].trim())}
             />
@@ -253,7 +214,7 @@ export default function Contractors() {
             gap: isMobile ? 12 : 16,
           }}>
             {filteredContractors.map(c => (
-              <ContractorRow key={c.id} c={c} dealId={dealId} />
+              <ContractorRow key={c.id} c={c} />
             ))}
           </div>
         )}
@@ -285,7 +246,7 @@ function Chip({ active, onClick, color, children }) {
   );
 }
 
-function CitySection({ cityKey, contractors, dealId, isMobile, onShowCity }) {
+function CitySection({ cityKey, contractors, isMobile, onShowCity }) {
   return (
     <section style={{ marginBottom: 28 }}>
       <div style={{
@@ -324,14 +285,14 @@ function CitySection({ cityKey, contractors, dealId, isMobile, onShowCity }) {
         gap: isMobile ? 12 : 16,
       }}>
         {contractors.slice(0, isMobile ? 4 : 6).map(c => (
-          <ContractorRow key={c.id} c={c} dealId={dealId} />
+          <ContractorRow key={c.id} c={c} />
         ))}
       </div>
     </section>
   );
 }
 
-function ContractorRow({ c, dealId }) {
+function ContractorRow({ c }) {
   const color = tradeColors[c.trade] || '#8b5cf6';
   const initials = c.company
     ? c.company.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -406,29 +367,17 @@ function ContractorRow({ c, dealId }) {
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        <Link
-          to={dealId ? `/bid-request/${dealId}` : `/bid-request?city=${encodeURIComponent(c.city)}&state=${c.state}`}
-          className="gradient-btn"
-          style={{
-            flex: 1, padding: '9px', borderRadius: 9,
-            color: '#fff', fontWeight: 800, fontSize: 12,
-            textDecoration: 'none', textAlign: 'center',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-          }}
-        >
-          Request Bid
-        </Link>
         <a
           href={`tel:${c.phone.replace(/\D/g, '')}`}
+          className="gradient-btn"
           style={{
-            flex: '0 0 auto',
-            padding: '9px 14px', borderRadius: 9,
-            background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-            color: '#94a3b8', fontWeight: 700, fontSize: 12,
-            textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5,
+            flex: 1, padding: '10px', borderRadius: 9,
+            color: '#fff', fontWeight: 800, fontSize: 13,
+            textDecoration: 'none', textAlign: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           }}
         >
-          <Phone size={12} /> Call
+          <Phone size={14} /> Call {c.phone}
         </a>
       </div>
     </div>
