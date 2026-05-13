@@ -6,7 +6,7 @@ import {
   ArrowRight, Search, ChevronRight,
 } from 'lucide-react';
 import { sections, sectionOrder } from '../data/howToArticles';
-import { lenders } from '../data/lenders';
+import { lenders, lenderFilters } from '../data/lenders';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useSEO } from '../hooks/useSEO';
 import CyclingText from '../components/CyclingText';
@@ -99,22 +99,24 @@ function Hero({ isMobile }) {
           lineHeight: 1.05, letterSpacing: '-1.5px',
         }}>
           How to{' '}
-          <span style={{
-            background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          }}>
-            <CyclingText
-              phrases={[
-                'Buy Fix n Flips',
-                'Buy Rentals',
-                'With No Credit',
-                'Get More Deals',
-                'Wholesale',
-                'Find Wholesale Deals',
-              ]}
-              interval={3000}
-            />
-          </span>
+          <CyclingText
+            phrases={[
+              'Buy Fix n Flips',
+              'Buy Rentals',
+              'With No Credit',
+              'Get More Deals',
+              'Wholesale',
+              'Find Wholesale Deals',
+            ]}
+            interval={3000}
+            textStyle={{
+              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}
+          />
         </h1>
 
         <p style={{
@@ -420,17 +422,53 @@ function VideoSection({ videos = [], color, isMobile }) {
 // ───────────────────────────────────────────────────────────────────────
 // Lender directory
 // ───────────────────────────────────────────────────────────────────────
+function formatPhone(p) {
+  if (!p) return '';
+  const digits = p.replace(/[^0-9]/g, '');
+  // US 11-digit (with leading 1) → "+1 (xxx) xxx-xxxx"
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+1 (${digits.slice(1,4)}) ${digits.slice(4,7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+  }
+  return p;
+}
+
+function prettySite(url) {
+  return (url || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
 function LenderDirectory({ isMobile }) {
   const [q, setQ] = useState('');
+  const [activeFilters, setActiveFilters] = useState([]);
+
+  function toggleFilter(key) {
+    setActiveFilters(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  }
+
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
-    if (!t) return lenders;
-    return lenders.filter(l =>
-      l.name.toLowerCase().includes(t) ||
-      l.loanTypes.some(lt => lt.toLowerCase().includes(t)) ||
-      l.states.toLowerCase().includes(t)
-    );
-  }, [q]);
+    return lenders.filter(l => {
+      // Text search
+      if (t) {
+        const hit = l.name.toLowerCase().includes(t)
+          || l.loanTypes.some(lt => lt.toLowerCase().includes(t))
+          || l.states.toLowerCase().includes(t);
+        if (!hit) return false;
+      }
+      // Multi-select filters (OR within chips — show if any selected chip matches)
+      if (activeFilters.length > 0) {
+        const matches = lenderFilters
+          .filter(f => activeFilters.includes(f.key))
+          .some(f => f.match(l));
+        if (!matches) return false;
+      }
+      return true;
+    });
+  }, [q, activeFilters]);
 
   return (
     <div>
@@ -458,7 +496,8 @@ function LenderDirectory({ isMobile }) {
           </div>
         </div>
 
-        <div style={{ position: 'relative' }}>
+        {/* Search */}
+        <div style={{ position: 'relative', marginBottom: 12 }}>
           <Search size={15} style={{ position: 'absolute', left: 12, top: 11, color: '#475569' }} />
           <input
             value={q}
@@ -471,14 +510,102 @@ function LenderDirectory({ isMobile }) {
             }}
           />
         </div>
+
+        {/* Multi-select filter chips */}
+        <div>
+          <div style={{
+            color: '#64748b', fontSize: 11, fontWeight: 800,
+            letterSpacing: 0.8, textTransform: 'uppercase',
+            marginBottom: 8,
+          }}>
+            Filter by loan program
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+            {lenderFilters.map(f => {
+              const on = activeFilters.includes(f.key);
+              const count = lenders.filter(f.match).length;
+              return (
+                <button
+                  key={f.key}
+                  onClick={() => toggleFilter(f.key)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '7px 12px', borderRadius: 999,
+                    background: on ? 'rgba(245,158,11,0.18)' : '#0d0d1a',
+                    border: `1px solid ${on ? 'rgba(245,158,11,0.6)' : '#1e1e2e'}`,
+                    color: on ? '#fbbf24' : '#94a3b8',
+                    fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <span style={{
+                    width: 14, height: 14, borderRadius: 4,
+                    border: `1.5px solid ${on ? '#fbbf24' : '#475569'}`,
+                    background: on ? '#fbbf24' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {on && <CheckCircle2 size={10} style={{ color: '#1a1a2e' }} />}
+                  </span>
+                  {f.label}
+                  <span style={{
+                    color: on ? '#fbbf24' : '#475569',
+                    fontSize: 11, fontWeight: 700,
+                  }}>
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+            {activeFilters.length > 0 && (
+              <button
+                onClick={() => setActiveFilters([])}
+                style={{
+                  padding: '7px 12px', borderRadius: 999,
+                  background: 'transparent', border: '1px dashed #1e1e2e',
+                  color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
+      {/* Result count */}
       <div style={{
-        display: 'grid', gap: 12,
-        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 12, padding: '0 2px',
       }}>
-        {filtered.map(l => <LenderCard key={l.id} lender={l} />)}
+        <span style={{ color: '#94a3b8', fontSize: 13 }}>
+          Showing <strong style={{ color: '#f8fafc' }}>{filtered.length}</strong> of {lenders.length} lenders
+        </span>
+        {activeFilters.length > 0 && (
+          <span style={{ color: '#fbbf24', fontSize: 11, fontWeight: 700 }}>
+            {activeFilters.length} filter{activeFilters.length > 1 ? 's' : ''} active
+          </span>
+        )}
       </div>
+
+      {filtered.length === 0 ? (
+        <div style={{
+          background: '#12121e', border: '1px dashed #1e1e2e', borderRadius: 14,
+          padding: '40px 20px', textAlign: 'center', color: '#94a3b8',
+        }}>
+          <p style={{ margin: 0, fontSize: 14 }}>
+            No lenders match the selected filters. Try clearing or selecting fewer.
+          </p>
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid', gap: 18,
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        }}>
+          {filtered.map(l => <LenderCardWithFooter key={l.id} lender={l} />)}
+        </div>
+      )}
 
       <div style={{
         marginTop: 22, padding: '12px 14px', borderRadius: 10,
@@ -486,8 +613,32 @@ function LenderDirectory({ isMobile }) {
         color: '#fbbf24', fontSize: 12, lineHeight: 1.6,
       }}>
         <strong>Disclaimer.</strong> Verify rates, terms, and licensing in your state before applying.
-        Ratings and phone numbers are publicly listed at the time of writing and can change.
+        Phone numbers, ratings, and 100% financing programs change over time.
       </div>
+    </div>
+  );
+}
+
+/** Lender card + website link rendered underneath the card (for SEO). */
+function LenderCardWithFooter({ lender }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <LenderCard lender={lender} />
+      <a
+        href={lender.website}
+        target="_blank" rel="noopener noreferrer"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '2px 4px',
+          color: '#64748b', fontSize: 12,
+          textDecoration: 'none', wordBreak: 'break-all',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.color = '#a78bfa'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = '#64748b'; }}
+      >
+        <Globe2 size={11} />
+        {prettySite(lender.website)}
+      </a>
     </div>
   );
 }
@@ -552,6 +703,17 @@ function LenderCard({ lender }) {
             {lt}
           </span>
         ))}
+        {lender.financing100pct && (
+          <span style={{
+            padding: '3px 8px', borderRadius: 6,
+            background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15))',
+            border: '1px solid rgba(16,185,129,0.35)',
+            color: '#34d399',
+            fontSize: 10, fontWeight: 800, letterSpacing: 0.3,
+          }}>
+            100% FINANCING
+          </span>
+        )}
       </div>
 
       <div style={{
@@ -565,7 +727,37 @@ function LenderCard({ lender }) {
         <span>${(lender.minLoan / 1000).toFixed(0)}k–${(lender.maxLoan / 1000000).toFixed(1)}M</span>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 'auto', paddingTop: 6 }}>
+      {/* Phone number block — visible inside the card before the Call CTA */}
+      {lender.phone && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 12px', borderRadius: 10,
+          background: 'rgba(16,185,129,0.06)',
+          border: '1px solid rgba(16,185,129,0.18)',
+        }}>
+          <Phone size={14} style={{ color: '#34d399', flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              color: '#64748b', fontSize: 10, fontWeight: 800,
+              textTransform: 'uppercase', letterSpacing: 0.7,
+              marginBottom: 1,
+            }}>
+              Call direct
+            </div>
+            <a
+              href={`tel:${lender.phone}`}
+              style={{
+                color: '#f8fafc', fontWeight: 700, fontSize: 14,
+                textDecoration: 'none', letterSpacing: 0.2,
+              }}
+            >
+              {formatPhone(lender.phone)}
+            </a>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
         <a
           href={lender.website}
           target="_blank" rel="noopener noreferrer"

@@ -21,7 +21,7 @@ export default function MobileTabBar() {
 
   const tabs = [
     { to: '/marketplace', label: 'Deals',       icon: ShoppingBag },
-    { to: '/how-to',      label: 'How To',      icon: GraduationCap },
+    { to: '/how-to',      label: 'How Tos',     icon: GraduationCap },
     { to: '/contractors', label: 'Pros',        icon: Wrench },
     { type: 'fab',        label: 'Post' },
     { to: '/messages',    label: 'DMs',         icon: MessageSquare },

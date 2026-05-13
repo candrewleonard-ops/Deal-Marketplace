@@ -10,14 +10,23 @@ const DEFAULT_PHRASES = [
 ];
 
 /**
- * Renders a word that swaps every `interval` ms. The incoming word slides
- * down from above; the outgoing word slides further down and fades out.
+ * Cycles through `phrases`, swapping the visible word every `interval` ms.
+ * The new word slides in from above.
+ *
+ * Uses CSS grid (not position: absolute) so the cycling span inherits all
+ * font/gradient/color cleanly, and a hidden longest-phrase spacer locks the
+ * width so neighbours don't reflow on swap.
+ *
+ * Pass `textStyle` if the cycling word needs its own gradient — DO NOT wrap
+ * the component in a gradient parent (background-clip:text doesn't inherit
+ * to children).
  */
 export default function CyclingText({
   phrases = DEFAULT_PHRASES,
   interval = 3000,
   style,
   className,
+  textStyle,
 }) {
   const [idx, setIdx] = useState(0);
 
@@ -35,28 +44,36 @@ export default function CyclingText({
     <span
       className={className}
       style={{
-        position: 'relative',
-        display: 'inline-block',
+        display: 'inline-grid',
         overflow: 'hidden',
-        verticalAlign: 'baseline',
+        verticalAlign: 'bottom',
         ...style,
       }}
     >
-      {/* Invisible spacer locks the width so siblings don't reflow on each swap */}
-      <span style={{ visibility: 'hidden', whiteSpace: 'nowrap' }}>{longest}</span>
+      {/* Spacer locks the width to the longest phrase */}
+      <span
+        aria-hidden
+        style={{
+          gridArea: '1 / 1',
+          visibility: 'hidden',
+          whiteSpace: 'nowrap',
+          ...textStyle,
+        }}
+      >
+        {longest}
+      </span>
+      {/* Visible cycling phrase — keyed so a new mount triggers the animation */}
       <span
         key={idx}
         style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'inline-block',
+          gridArea: '1 / 1',
           whiteSpace: 'nowrap',
-          animation: 'asl-cycle-in 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+          animation: 'asl-cycle-in 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
+          ...textStyle,
         }}
       >
         {phrases[idx]}
       </span>
-
       <style>{`
         @keyframes asl-cycle-in {
           0%   { opacity: 0; transform: translateY(-110%); }

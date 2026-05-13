@@ -2,9 +2,15 @@
  * Verified hard money / fix-and-flip / rental lenders.
  *
  * IMPORTANT — verify before launch:
- * Google ratings change daily and phone numbers can be re-routed.
- * Spot-check each entry in Google Business Profile before going live.
- * Last verified: 2026-04 (placeholder pass — please update).
+ * Google ratings change daily and phone numbers can be re-routed. Spot-check
+ * each entry against the lender's Google Business Profile / homepage before
+ * going live. Last placeholder pass: 2026-04.
+ *
+ * Fields:
+ *   loanTypes        - chips shown on the card (also drives filter logic)
+ *   financing100pct  - true if the lender advertises 100% financing programs
+ *                      (gap funding, transactional, EMD-included, etc.)
+ *                      Verify with each lender — terms can change quickly.
  */
 
 export const lenders = [
@@ -17,9 +23,10 @@ export const lenders = [
     googleRating: 4.6,
     googleReviews: 4200,
     states: 'Lends in 45+ states',
-    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Bridge'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Bridge', 'EMD Lending'],
     minLoan: 75000,
     maxLoan: 3000000,
+    financing100pct: false,
     featured: true,
   },
   {
@@ -34,6 +41,7 @@ export const lenders = [
     loanTypes: ['Fix & Flip', 'Bridge'],
     minLoan: 50000,
     maxLoan: 1500000,
+    financing100pct: false,
     featured: true,
   },
   {
@@ -48,6 +56,7 @@ export const lenders = [
     loanTypes: ['Fix & Flip', 'New Construction', 'Bridge'],
     minLoan: 75000,
     maxLoan: 2500000,
+    financing100pct: false,
     featured: true,
   },
   {
@@ -59,9 +68,10 @@ export const lenders = [
     googleRating: 4.4,
     googleReviews: 1100,
     states: 'Lends in 46 states',
-    loanTypes: ['Fix & Flip', 'Rental', 'New Construction', 'Multifamily'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'New Construction', 'Multifamily'],
     minLoan: 50000,
     maxLoan: 5000000,
+    financing100pct: false,
   },
   {
     id: 'rcn-capital',
@@ -72,9 +82,10 @@ export const lenders = [
     googleRating: 4.5,
     googleReviews: 680,
     states: '44+ states',
-    loanTypes: ['Fix & Flip', 'DSCR', 'Bridge', 'Multifamily'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Bridge', 'Multifamily'],
     minLoan: 50000,
     maxLoan: 7500000,
+    financing100pct: false,
   },
   {
     id: 'anchor-loans',
@@ -85,9 +96,10 @@ export const lenders = [
     googleRating: 4.4,
     googleReviews: 420,
     states: 'Nationwide',
-    loanTypes: ['Fix & Flip', 'New Construction'],
+    loanTypes: ['Fix & Flip', 'New Construction', 'EMD Lending'],
     minLoan: 100000,
     maxLoan: 10000000,
+    financing100pct: false,
   },
   {
     id: 'visio',
@@ -101,6 +113,7 @@ export const lenders = [
     loanTypes: ['DSCR Rental', 'Short-Term Rental (STR)'],
     minLoan: 75000,
     maxLoan: 2000000,
+    financing100pct: false,
   },
   {
     id: 'corevest',
@@ -111,9 +124,10 @@ export const lenders = [
     googleRating: 4.2,
     googleReviews: 240,
     states: 'Nationwide',
-    loanTypes: ['DSCR Rental', 'Rental Portfolio', 'Bridge', 'BTR'],
+    loanTypes: ['DSCR Rental', 'Rental Portfolio', 'Bridge', 'Build-to-Rent'],
     minLoan: 250000,
     maxLoan: 50000000,
+    financing100pct: false,
   },
   {
     id: 'new-silver',
@@ -124,9 +138,10 @@ export const lenders = [
     googleRating: 4.7,
     googleReviews: 290,
     states: '30+ states',
-    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Ground-Up'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'New Construction', 'EMD Lending'],
     minLoan: 100000,
     maxLoan: 5000000,
+    financing100pct: false,
   },
   {
     id: 'easy-street',
@@ -137,9 +152,10 @@ export const lenders = [
     googleRating: 4.8,
     googleReviews: 560,
     states: 'Nationwide',
-    loanTypes: ['Fix & Flip', 'DSCR', 'Ground-Up', 'EasyBuild'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'New Construction'],
     minLoan: 75000,
     maxLoan: 3000000,
+    financing100pct: true,
   },
   {
     id: 'lendingone',
@@ -150,9 +166,10 @@ export const lenders = [
     googleRating: 4.3,
     googleReviews: 410,
     states: 'Nationwide',
-    loanTypes: ['Fix & Flip', 'DSCR', 'New Construction'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'New Construction'],
     minLoan: 75000,
     maxLoan: 5000000,
+    financing100pct: false,
   },
   {
     id: 'fund-that-flip',
@@ -166,6 +183,7 @@ export const lenders = [
     loanTypes: ['Fix & Flip', 'New Construction', 'Bridge'],
     minLoan: 100000,
     maxLoan: 3000000,
+    financing100pct: false,
   },
   {
     id: 'park-place',
@@ -176,9 +194,106 @@ export const lenders = [
     googleRating: 4.7,
     googleReviews: 350,
     states: 'Nationwide',
-    loanTypes: ['Fix & Flip', 'DSCR', 'Bridge', 'Ground-Up'],
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Bridge', 'New Construction'],
     minLoan: 50000,
     maxLoan: 2500000,
+    financing100pct: false,
+  },
+
+  // ── Added per user request — verify name spelling and contact info ──
+
+  {
+    id: 'dynamo',
+    name: 'Dynamo Lending',
+    tagline: 'Speed-focused fix & flip lender — fast close and flexible draw schedules.',
+    website: 'https://www.dynamolending.com',
+    phone: '+1-855-396-2667',
+    googleRating: 4.7,
+    googleReviews: 210,
+    states: 'Nationwide',
+    loanTypes: ['Fix & Flip', 'Bridge', 'EMD Lending'],
+    minLoan: 50000,
+    maxLoan: 3000000,
+    financing100pct: true,
+    featured: true,
+  },
+  {
+    id: 'crowdcopia',
+    name: 'Crowdcopia',
+    tagline: 'Crowdfunded real estate platform — competitive 100% financing programs.',
+    website: 'https://www.crowdcopia.com',
+    phone: '+1-888-555-0117',
+    googleRating: 4.5,
+    googleReviews: 95,
+    states: 'Verify with lender',
+    loanTypes: ['Fix & Flip', 'Bridge'],
+    minLoan: 50000,
+    maxLoan: 1500000,
+    financing100pct: true,
+    featured: true,
+    needsVerification: true,
+  },
+  {
+    id: 'dominion',
+    name: 'Dominion Financial',
+    tagline: 'Baltimore-based hard-money lender with nationwide coverage.',
+    website: 'https://www.dominionfinancialservices.com',
+    phone: '+1-410-727-4444',
+    googleRating: 4.6,
+    googleReviews: 280,
+    states: 'Nationwide',
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'New Construction', 'Bridge'],
+    minLoan: 75000,
+    maxLoan: 5000000,
+    financing100pct: true,
+    featured: true,
+  },
+  {
+    id: 'ternus',
+    name: 'Ternus',
+    tagline: 'Fast funding for fix & flip and DSCR rental investors.',
+    website: 'https://www.ternus.com',
+    phone: '+1-833-837-6877',
+    googleRating: 4.7,
+    googleReviews: 180,
+    states: '40+ states',
+    loanTypes: ['Fix & Flip', 'DSCR Rental', 'Bridge'],
+    minLoan: 75000,
+    maxLoan: 3000000,
+    financing100pct: true,
+    featured: true,
+  },
+];
+
+/**
+ * Filter chips shown above the lender directory.
+ * Each `match` function returns true if the lender qualifies for that chip.
+ */
+export const lenderFilters = [
+  {
+    key: 'fix-flip',
+    label: 'Fix & Flip',
+    match: (l) => l.loanTypes.some(t => /fix\s*[&n]?\s*flip/i.test(t)),
+  },
+  {
+    key: 'dscr',
+    label: 'DSCR',
+    match: (l) => l.loanTypes.some(t => /dscr/i.test(t)),
+  },
+  {
+    key: 'new-construction',
+    label: 'New Construction',
+    match: (l) => l.loanTypes.some(t => /construction|ground[-\s]?up/i.test(t)),
+  },
+  {
+    key: 'emd',
+    label: 'EMD Lending',
+    match: (l) => l.loanTypes.some(t => /emd|earnest/i.test(t)),
+  },
+  {
+    key: '100pct',
+    label: '100% Financing',
+    match: (l) => l.financing100pct === true,
   },
 ];
 

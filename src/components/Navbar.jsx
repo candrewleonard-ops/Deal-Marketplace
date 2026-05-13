@@ -28,7 +28,7 @@ const primaryNav = [
   { to: '/groups',      label: 'Groups',      icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
   { to: '/meetups',     label: 'Meetups',     icon: Calendar },
-  { to: '/how-to',      label: 'How To',      icon: GraduationCap },
+  { to: '/how-to',      label: 'How Tos - All Industries', icon: GraduationCap },
 ];
 
 const drawerSecondary = [
@@ -119,7 +119,7 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              {/* How to (with cycling text) */}
+              {/* How Tos (with cycling text) */}
               {(() => {
                 const active = location.pathname === '/how-to';
                 return (
@@ -138,14 +138,19 @@ export default function Navbar() {
                     }}
                   >
                     <GraduationCap size={16} />
-                    <span>How to</span>{' '}
-                    <span style={{
-                      background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
-                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                      fontWeight: 800,
-                    }}>
-                      <CyclingText phrases={HOWTO_PHRASES} interval={3000} style={{ height: '1.2em' }} />
-                    </span>
+                    <span>How Tos &mdash; All Industries</span>{' '}
+                    <CyclingText
+                      phrases={HOWTO_PHRASES}
+                      interval={3000}
+                      textStyle={{
+                        background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        color: 'transparent',
+                        fontWeight: 800,
+                      }}
+                    />
                   </Link>
                 );
               })()}
