@@ -24,6 +24,7 @@ import SavedDeals from './pages/SavedDeals';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 import BidRequest from './pages/BidRequest';
+import HowTo from './pages/HowTo';
 import './index.css';
 
 function AppLayout({ children, hideFooter }) {
@@ -82,6 +83,7 @@ export default function App() {
         <Route path="/notifications" element={<AppLayout><Notifications /></AppLayout>} />
         <Route path="/bid-request" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
         <Route path="/bid-request/:dealId" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
+        <Route path="/how-to" element={<AppLayout><HowTo /></AppLayout>} />
         <Route path="*" element={<AppLayout hideFooter><NotFound /></AppLayout>} />
       </Routes>
     </Router>

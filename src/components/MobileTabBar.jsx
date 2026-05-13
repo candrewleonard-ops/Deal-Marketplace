@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { ShoppingBag, Wrench, Plus, MessageSquare, User } from 'lucide-react';
+import { ShoppingBag, Wrench, Plus, MessageSquare, User, GraduationCap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 
@@ -21,9 +21,10 @@ export default function MobileTabBar() {
 
   const tabs = [
     { to: '/marketplace', label: 'Deals',       icon: ShoppingBag },
-    { to: '/contractors', label: 'Contractors', icon: Wrench },
+    { to: '/how-to',      label: 'How To',      icon: GraduationCap },
+    { to: '/contractors', label: 'Pros',        icon: Wrench },
     { type: 'fab',        label: 'Post' },
-    { to: '/messages',    label: 'Messages',    icon: MessageSquare },
+    { to: '/messages',    label: 'DMs',         icon: MessageSquare },
     { to: currentUser ? `/profile/${currentUser.id}` : '/auth', label: 'Profile', icon: User },
   ];
 

@@ -4,11 +4,21 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
-  Crown, Shield, UsersRound, Heart
+  Crown, Shield, UsersRound, Heart, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 import { useIsMobile } from '../hooks/useIsMobile';
+import CyclingText from './CyclingText';
+
+const HOWTO_PHRASES = [
+  'Buy Fix n Flips',
+  'Buy Rentals',
+  'With No Credit',
+  'Get More Deals',
+  'Wholesale',
+  'Find Wholesale Deals',
+];
 
 // Primary nav (Social is intentionally tucked into the More section — it's still
 // accessible from the drawer / More menu, just no longer a top-level tab).
@@ -18,6 +28,7 @@ const primaryNav = [
   { to: '/groups',      label: 'Groups',      icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
   { to: '/meetups',     label: 'Meetups',     icon: Calendar },
+  { to: '/how-to',      label: 'How To',      icon: GraduationCap },
 ];
 
 const drawerSecondary = [
@@ -86,7 +97,7 @@ export default function Navbar() {
           {/* DESKTOP: inline nav links */}
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
-              {primaryNav.map(({ to, label, icon: Icon }) => {
+              {primaryNav.filter(n => n.to !== '/how-to').map(({ to, label, icon: Icon }) => {
                 const active = location.pathname === to || (to === '/marketplace' && location.pathname === '/');
                 return (
                   <Link
@@ -108,6 +119,36 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              {/* How to (with cycling text) */}
+              {(() => {
+                const active = location.pathname === '/how-to';
+                return (
+                  <Link
+                    to="/how-to"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '6px 12px', borderRadius: 8, textDecoration: 'none',
+                      fontSize: 14, fontWeight: 600,
+                      color: active ? '#a78bfa' : '#94a3b8',
+                      background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
+                      borderBottom: active ? '2px solid #8b5cf6' : '2px solid transparent',
+                      transition: 'all 0.2s',
+                      paddingBottom: 4,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <GraduationCap size={16} />
+                    <span>How to</span>{' '}
+                    <span style={{
+                      background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                      fontWeight: 800,
+                    }}>
+                      <CyclingText phrases={HOWTO_PHRASES} interval={3000} style={{ height: '1.2em' }} />
+                    </span>
+                  </Link>
+                );
+              })()}
             </div>
           )}
 
