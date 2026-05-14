@@ -22,6 +22,7 @@ import GroupDetail from './pages/GroupDetail';
 import SavedDeals from './pages/SavedDeals';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
+import MarketplacePreview from './preview/MarketplacePreview';
 import './index.css';
 
 function AppLayout({ children, hideFooter }) {
@@ -62,6 +63,8 @@ export default function App() {
         <Route path="/" element={<AppLayout hideFooter><Marketplace /></AppLayout>} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
+        {/* Preview-only marketplace redesign — does not affect live /marketplace */}
+        <Route path="/marketplace-preview" element={<MarketplacePreview />} />
         <Route path="/marketplace" element={<AppLayout hideFooter><Marketplace /></AppLayout>} />
         <Route path="/marketplace/:id" element={<AppLayout><DealDetail /></AppLayout>} />
         <Route path="/my-deals" element={<AppLayout><MyDeals /></AppLayout>} />
