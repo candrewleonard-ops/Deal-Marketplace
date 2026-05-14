@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Eye, MessageSquare, MapPin, ChevronDown, ChevronUp, Check, X as XIcon, TrendingUp, Zap, Rocket } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { deals } from '../data/deals';
 import { users } from '../data/users';
+import MyDealsTutorial from '../components/MyDealsTutorial';
 
 function fmt(n) {
   if (!n) return '$0';
@@ -37,6 +38,7 @@ const promoTiers = [
 
 export default function MyDeals() {
   const { currentUser } = useAuth();
+  const [params, setParams] = useSearchParams();
   const [myDealsList, setMyDealsList] = useState(deals.filter(d => d.sellerId === currentUser.id));
   const [activeTab, setActiveTab] = useState('active');
   const [expanded, setExpanded] = useState(null);
@@ -45,6 +47,33 @@ export default function MyDeals() {
   const [showNewDeal, setShowNewDeal] = useState(false);
   const [showPromo, setShowPromo] = useState(null);
   const [toast, setToast] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // If we navigated here with ?post=1, open the New Deal modal automatically.
+  useEffect(() => {
+    if (params.get('post') === '1') {
+      setShowNewDeal(true);
+      const next = new URLSearchParams(params);
+      next.delete('post');
+      setParams(next, { replace: true });
+    }
+  }, [params, setParams]);
+
+  // First-time visit: show the interactive tutorial.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (!localStorage.getItem('asl-mydeals-tutorial-v1')) {
+        const t = setTimeout(() => setShowTutorial(true), 500);
+        return () => clearTimeout(t);
+      }
+    } catch { /* private mode — skip */ }
+  }, []);
+
+  function dismissTutorial() {
+    try { localStorage.setItem('asl-mydeals-tutorial-v1', '1'); } catch { /* ignore */ }
+    setShowTutorial(false);
+  }
   const [newDeal, setNewDeal] = useState({
     title: '', type: 'Wholesale', contractedPrice: '', listingPrice: '',
     beds: '', baths: '', sqft: '', yearBuilt: '', city: '', state: '',
@@ -437,6 +466,13 @@ export default function MyDeals() {
           <Check size={16} style={{ color: '#10b981', flexShrink: 0 }} />
           <span style={{ color: '#f8fafc', fontSize: '14px', fontWeight: 500 }}>{toast}</span>
         </div>
+      )}
+
+      {showTutorial && (
+        <MyDealsTutorial
+          onClose={dismissTutorial}
+          onPostDeal={() => { dismissTutorial(); setShowNewDeal(true); }}
+        />
       )}
     </div>
   );

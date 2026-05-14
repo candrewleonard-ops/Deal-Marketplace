@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Home, Eye, EyeOff, Check, User, Building2, ArrowRight, AlertCircle } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Home, Eye, EyeOff, Check, User, Building2, ArrowRight, AlertCircle, Phone, Mail } from 'lucide-react';
 import { validateUsername } from '../utils/username';
 import { users } from '../data/users';
+import { useAuth } from '../context/AuthContext';
+import RoleSelectionModal from '../components/RoleSelectionModal';
 
 const userTags = [
   'Fix N Flipper', 'Wholesaler', 'Marketer', 'Realtor', 'Cash Buyer',
@@ -23,7 +25,9 @@ const tagColors = {
 };
 
 export default function Auth() {
-  const [tab, setTab] = useState('login');
+  const [params] = useSearchParams();
+  const initialTab = params.get('tab') === 'register' ? 'register' : 'login';
+  const [tab, setTab] = useState(initialTab);
   const [showPw, setShowPw] = useState(false);
   const [profileType, setProfileType] = useState('personal');
   const [selectedTags, setSelectedTags] = useState([]);
@@ -31,7 +35,15 @@ export default function Auth() {
   const [teamEmails, setTeamEmails] = useState(['']);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [verifyCode, setVerifyCode] = useState(['', '', '', '', '', '']);
+  const [verifyError, setVerifyError] = useState('');
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Password strength: 0 (empty) - 4 (strong)
   const pwStrength = (() => {
@@ -56,14 +68,58 @@ export default function Auth() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    login('me');
     navigate('/marketplace');
   };
 
+  // Step 1 (form) → Step 2 (verify code) → success → role modal → final landing
   const handleRegister = (e) => {
     e.preventDefault();
-    if (step === 1) { setStep(2); return; }
-    navigate('/marketplace');
+    if (step === 1) {
+      // In a real backend this is where we'd POST and trigger an email/SMS code
+      setStep(2);
+      setVerifyError('');
+      return;
+    }
+    // Step 2 — submit happens via Verify button below; this catch is safety
   };
+
+  function handleVerify() {
+    const code = verifyCode.join('');
+    if (code.length !== 6) {
+      setVerifyError('Enter the 6-digit code we sent to your email.');
+      return;
+    }
+    // Mock: accept any 6 digits. Real backend would call /verify-email.
+    login('me', {
+      profile: {
+        email, phone,
+        name: [firstName, lastName].filter(Boolean).join(' ') || username,
+        username,
+        roles: [],
+      },
+    });
+    setShowRoleModal(true);
+  }
+
+  function setCodeDigit(idx, v) {
+    const cleaned = v.replace(/[^0-9]/g, '').slice(0, 1);
+    const next = [...verifyCode];
+    next[idx] = cleaned;
+    setVerifyCode(next);
+    if (cleaned && idx < 5) {
+      const el = document.getElementById(`vc-${idx + 1}`);
+      el?.focus();
+    }
+  }
+
+  function handleCodePaste(e) {
+    const pasted = (e.clipboardData?.getData('text') || '').replace(/[^0-9]/g, '').slice(0, 6);
+    if (pasted.length === 6) {
+      e.preventDefault();
+      setVerifyCode(pasted.split(''));
+    }
+  }
 
   return (
     <div style={{
@@ -284,7 +340,10 @@ export default function Auth() {
                           <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>First Name</label>
                           <input
                             type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                             placeholder="Marcus"
+                            required
                             className="input-dark"
                             style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }}
                           />
@@ -293,7 +352,10 @@ export default function Auth() {
                           <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Last Name</label>
                           <input
                             type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                             placeholder="Johnson"
+                            required
                             className="input-dark"
                             style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }}
                           />
@@ -302,12 +364,37 @@ export default function Auth() {
 
                       <div>
                         <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Email Address</label>
-                        <input
-                          type="email"
-                          placeholder="you@example.com"
-                          className="input-dark"
-                          style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px' }}
-                        />
+                        <div style={{ position: 'relative' }}>
+                          <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            required
+                            className="input-dark"
+                            style={{ width: '100%', padding: '11px 14px 11px 36px', borderRadius: '10px', fontSize: '14px' }}
+                          />
+                        </div>
+                        <div style={{ color: '#475569', fontSize: 11, marginTop: 5 }}>
+                          We'll send a 6-digit verification code here.
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Phone Number</label>
+                        <div style={{ position: 'relative' }}>
+                          <Phone size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
+                          <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="(555) 123-4567"
+                            required
+                            className="input-dark"
+                            style={{ width: '100%', padding: '11px 14px 11px 36px', borderRadius: '10px', fontSize: '14px' }}
+                          />
+                        </div>
                       </div>
 
                       <div>
@@ -422,67 +509,117 @@ export default function Auth() {
                 ) : (
                   <>
                     <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', marginBottom: '8px', textAlign: 'center' }}>
-                      Select Your Investor Tags
+                      Verify your email
                     </h2>
-                    <p style={{ color: '#475569', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
-                      Select all that apply. This helps others find and connect with you.
+                    <p style={{ color: '#94a3b8', textAlign: 'center', marginBottom: '24px', fontSize: '13px', lineHeight: 1.55 }}>
+                      We sent a 6-digit code to <strong style={{ color: '#f8fafc' }}>{email || 'your email'}</strong>. Enter it below to finish creating your account.
                     </p>
 
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '24px' }}>
-                      {userTags.map(tag => {
-                        const active = selectedTags.includes(tag);
-                        const color = tagColors[tag] || '#8b5cf6';
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => toggleTag(tag)}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: '6px',
-                              padding: '8px 16px', borderRadius: '20px',
-                              background: active ? `${color}20` : 'rgba(255,255,255,0.04)',
-                              border: `2px solid ${active ? color : '#1e1e2e'}`,
-                              color: active ? color : '#94a3b8',
-                              cursor: 'pointer', fontWeight: 600, fontSize: '13px',
-                              transition: 'all 0.2s',
-                            }}
-                          >
-                            {active && <Check size={14} />}
-                            {tag}
-                          </button>
-                        );
-                      })}
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 16 }}>
+                      {verifyCode.map((digit, i) => (
+                        <input
+                          key={i}
+                          id={`vc-${i}`}
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => setCodeDigit(i, e.target.value)}
+                          onPaste={i === 0 ? handleCodePaste : undefined}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Backspace' && !digit && i > 0) {
+                              document.getElementById(`vc-${i - 1}`)?.focus();
+                            }
+                          }}
+                          style={{
+                            width: 46, height: 56,
+                            textAlign: 'center',
+                            background: '#0d0d1a',
+                            border: `1.5px solid ${digit ? '#8b5cf6' : '#1e1e2e'}`,
+                            borderRadius: 10,
+                            color: '#f8fafc',
+                            fontSize: 22, fontWeight: 800,
+                            outline: 'none',
+                            transition: 'border-color 0.15s',
+                          }}
+                        />
+                      ))}
                     </div>
 
-                    {selectedTags.length > 0 && (
+                    {verifyError && (
                       <div style={{
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
-                        borderRadius: '10px', padding: '12px 16px',
-                        marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px',
+                        display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+                        color: '#ef4444', fontSize: 12, fontWeight: 600, marginBottom: 12,
                       }}>
-                        <Check size={16} style={{ color: '#10b981' }} />
-                        <span style={{ color: '#10b981', fontSize: '13px', fontWeight: 600 }}>
-                          {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected: {selectedTags.join(', ')}
-                        </span>
+                        <AlertCircle size={12} /> {verifyError}
                       </div>
                     )}
+
+                    <div style={{ textAlign: 'center', marginBottom: 18 }}>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        style={{
+                          background: 'none', border: 'none',
+                          color: '#64748b', fontSize: 12, fontWeight: 600,
+                          cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
+                        }}
+                      >
+                        Use a different email
+                      </button>
+                      <span style={{ color: '#1e1e2e', margin: '0 8px' }}>·</span>
+                      <button
+                        type="button"
+                        onClick={() => { setVerifyCode(['','','','','','']); setVerifyError(''); }}
+                        style={{
+                          background: 'none', border: 'none',
+                          color: '#a78bfa', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                        }}
+                      >
+                        Resend code
+                      </button>
+                    </div>
+
+                    <div style={{
+                      padding: '10px 14px', borderRadius: 8,
+                      background: 'rgba(139,92,246,0.06)', border: '1px dashed rgba(139,92,246,0.2)',
+                      color: '#a78bfa', fontSize: 11, lineHeight: 1.5,
+                      textAlign: 'center',
+                    }}>
+                      <strong style={{ color: '#cbd5e1' }}>Mock mode:</strong> any 6 digits will work for now.
+                    </div>
                   </>
                 )}
 
-                <button
-                  type="submit"
-                  className="gradient-btn"
-                  style={{
-                    width: '100%', marginTop: step === 1 ? '24px' : '0',
-                    padding: '14px', borderRadius: '12px',
-                    color: '#fff', fontWeight: 700, fontSize: '15px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                  }}
-                >
-                  {step === 1 ? 'Continue' : 'Complete Registration'}
-                  <ArrowRight size={18} />
-                </button>
+                {step === 1 ? (
+                  <button
+                    type="submit"
+                    className="gradient-btn"
+                    style={{
+                      width: '100%', marginTop: '24px',
+                      padding: '14px', borderRadius: '12px',
+                      color: '#fff', fontWeight: 700, fontSize: '15px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    }}
+                  >
+                    Send verification code
+                    <ArrowRight size={18} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleVerify}
+                    className="gradient-btn"
+                    style={{
+                      width: '100%', marginTop: '4px',
+                      padding: '14px', borderRadius: '12px',
+                      color: '#fff', fontWeight: 700, fontSize: '15px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    }}
+                  >
+                    Verify &amp; create account
+                    <ArrowRight size={18} />
+                  </button>
+                )}
 
                 {step === 1 && (
                   <p style={{ textAlign: 'center', color: '#475569', fontSize: '12px', marginTop: '16px' }}>
@@ -497,6 +634,16 @@ export default function Auth() {
           </div>
         </div>
       </div>
+
+      <RoleSelectionModal
+        open={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        contactInfo={{
+          email, phone,
+          name: [firstName, lastName].filter(Boolean).join(' ') || username,
+          username,
+        }}
+      />
     </div>
   );
 }

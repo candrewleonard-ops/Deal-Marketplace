@@ -40,7 +40,7 @@ export default function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { requireAuth } = useAuth();
+  const { requireAuth, requireAuthForDM, isAuthenticated } = useAuth();
   const profile = getUserById(id) || getUserById(1);
   const isOwnProfile = profile.id === currentUser.id;
 
@@ -93,8 +93,9 @@ export default function Profile() {
   }
 
   function handleMessage(e) {
-    if (!requireAuth(`message ${profile.name}`, 'message', `/profile/${profile.id}`)) {
+    if (!isAuthenticated) {
       e.preventDefault();
+      requireAuthForDM('profile-message-button');
     }
   }
 

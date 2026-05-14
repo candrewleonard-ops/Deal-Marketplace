@@ -1,8 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Wrench, Plus, MessageSquare, User, GraduationCap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import PostDealModal from './PostDealModal';
 
 /**
  * Mobile bottom nav — Deals · Contractors · POST · Messages · Profile.
@@ -11,8 +9,18 @@ import PostDealModal from './PostDealModal';
  */
 export default function MobileTabBar() {
   const location = useLocation();
-  const { currentUser } = useAuth();
-  const [showPostDeal, setShowPostDeal] = useState(false);
+  const navigate = useNavigate();
+  const { currentUser, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
+
+  function goPostDeal() {
+    // Guests get the sign-up prompt; signed-in users land on /my-deals
+    // where they can hit "Post a Deal" — no instant modal pop.
+    if (!isAuthenticated) {
+      requireAuth('post a deal', 'post-deal', '/my-deals');
+      return;
+    }
+    navigate('/my-deals?post=1');
+  }
 
   const isActive = (path) => {
     if (path === '/marketplace') return location.pathname === '/' || location.pathname.startsWith('/marketplace');
@@ -53,7 +61,7 @@ export default function MobileTabBar() {
             return (
               <button
                 key={idx}
-                onClick={() => setShowPostDeal(true)}
+                onClick={goPostDeal}
                 aria-label="Post a Deal"
                 style={{
                   border: 'none',
@@ -94,11 +102,18 @@ export default function MobileTabBar() {
           }
           const active = isActive(t.to);
           const Icon = t.icon;
+          const gateDM = !isAuthenticated && t.to === '/messages';
           return (
             <Link
               key={t.to}
               to={t.to}
               aria-label={t.label}
+              onClick={(e) => {
+                if (gateDM) {
+                  e.preventDefault();
+                  requireAuthForDM('mobile-tab-bar');
+                }
+              }}
               style={{
                 flex: 1,
                 display: 'flex',
@@ -120,8 +135,6 @@ export default function MobileTabBar() {
           );
         })}
       </nav>
-
-      {showPostDeal && <PostDealModal onClose={() => setShowPostDeal(false)} />}
     </>
   );
 }

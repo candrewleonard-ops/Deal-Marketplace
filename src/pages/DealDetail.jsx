@@ -10,6 +10,7 @@ import { getUserById } from '../data/users';
 import DealCard from '../components/DealCard';
 import ImageCarousel from '../components/ImageCarousel';
 import AddressRequestModal from '../components/AddressRequestModal';
+import CarsonFirstAddressModal, { hasSeenCarsonNote, markCarsonNoteSeen } from '../components/CarsonFirstAddressModal';
 import StreetView from '../components/StreetView';
 import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
@@ -44,7 +45,7 @@ function formatCurrency(n) {
 export default function DealDetail() {
   const { id } = useParams();
   const deal = getDealById(id);
-  const { currentUser, isLoggedIn, isAuthenticated, requireAuth } = useAuth();
+  const { currentUser, isLoggedIn, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
 
   // If a guest lands here directly (deep-link), surface the sign-up prompt.
   useEffect(() => {
@@ -57,6 +58,17 @@ export default function DealDetail() {
   const isMobile = useIsMobile();
   const [showPromote, setShowPromote] = useState(false);
   const [showAddressReq, setShowAddressReq] = useState(false);
+  const [showCarsonNote, setShowCarsonNote] = useState(false);
+
+  // First-time guard: when the user clicks any "Request Address" button,
+  // show Carson's message first. After they acknowledge it, open the real form.
+  function startAddressRequest() {
+    if (!hasSeenCarsonNote()) {
+      setShowCarsonNote(true);
+    } else {
+      setShowAddressReq(true);
+    }
+  }
   const [showShare, setShowShare] = useState(false);
   const [addressGranted, setAddressGranted] = useState(false);
   const [budget, setBudget] = useState(20);
@@ -157,7 +169,7 @@ export default function DealDetail() {
                 </span>
                 {!addressGranted && (
                   <button
-                    onClick={() => setShowAddressReq(true)}
+                    onClick={startAddressRequest}
                     style={{
                       marginLeft: '8px', padding: '4px 12px', borderRadius: '16px',
                       background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.4)',
@@ -283,7 +295,7 @@ export default function DealDetail() {
                   onClick={(e) => {
                     if (!isLoggedIn) {
                       e.preventDefault();
-                      requireAuth(`message ${seller.name || deal.sellerName}`, 'message', `/marketplace/${deal.id}`);
+                      requireAuthForDM('deal-detail-seller-card');
                     }
                   }}
                   className="gradient-btn"
@@ -445,7 +457,7 @@ export default function DealDetail() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => setShowAddressReq(true)}
+                    onClick={startAddressRequest}
                     className="gradient-btn"
                     style={{
                       width: '100%', padding: '14px', borderRadius: '12px',
@@ -460,6 +472,12 @@ export default function DealDetail() {
 
                 <Link
                   to="/messages"
+                  onClick={(e) => {
+                    if (!isLoggedIn) {
+                      e.preventDefault();
+                      requireAuthForDM('deal-detail-message-seller');
+                    }
+                  }}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     padding: '13px', borderRadius: '12px',
@@ -597,6 +615,17 @@ export default function DealDetail() {
           </div>
         </div>
       </div>
+
+      {/* First-time Carson note (localStorage-gated). Opens AddressRequestModal once acknowledged. */}
+      <CarsonFirstAddressModal
+        open={showCarsonNote}
+        onClose={() => setShowCarsonNote(false)}
+        onContinue={() => {
+          markCarsonNoteSeen();
+          setShowCarsonNote(false);
+          setShowAddressReq(true);
+        }}
+      />
 
       {/* Address Request Modal */}
       {showAddressReq && (

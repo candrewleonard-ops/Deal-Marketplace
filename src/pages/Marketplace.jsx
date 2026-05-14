@@ -1,13 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search, SlidersHorizontal, X, TrendingUp, ChevronDown, ChevronUp,
   RotateCcw, MapPin
 } from 'lucide-react';
 import DealCard from '../components/DealCard';
 import USMap from '../components/USMap';
-import PostDealModal from '../components/PostDealModal';
 import { deals, dealTypes } from '../data/deals';
 import { useSEO } from '../hooks/useSEO';
+import { useAuth } from '../context/AuthContext';
 
 // Detect mobile viewport (matches Tailwind 'md' breakpoint)
 function useIsMobile() {
@@ -91,7 +92,16 @@ export default function Marketplace() {
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [showPromote,     setShowPromote]     = useState(false);
-  const [showPostDeal,    setShowPostDeal]    = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, requireAuth } = useAuth();
+
+  function goPostDeal() {
+    if (!isAuthenticated) {
+      requireAuth('post a deal', 'post-deal', '/my-deals');
+      return;
+    }
+    navigate('/my-deals?post=1');
+  }
 
   // States that actually have deals (for the mobile dropdown), sorted by deal count desc
   const statesWithDeals = useMemo(() => {
@@ -204,7 +214,7 @@ export default function Marketplace() {
                 </button>
               )}
               {!isMobile && (
-                <button onClick={() => setShowPostDeal(true)} className="gradient-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                <button onClick={goPostDeal} className="gradient-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                   + Post a Deal
                 </button>
               )}
@@ -464,8 +474,6 @@ export default function Marketplace() {
         </div>
       )}
 
-      {/* Post Deal Modal */}
-      {showPostDeal && <PostDealModal onClose={() => setShowPostDeal(false)} />}
     </div>
   );
 }
