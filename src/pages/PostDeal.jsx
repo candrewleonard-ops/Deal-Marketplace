@@ -151,12 +151,6 @@ export default function PostDeal() {
       return;
     }
 
-    if (!isSupabaseConfigured) {
-      toast('Preview mode — connect the database to save deals for real.', 'info', 4500);
-      navigate('/my-deals');
-      return;
-    }
-
     setSubmitting(true);
     try {
       // 1. Upload photos to Storage (in display order)
@@ -176,14 +170,17 @@ export default function PostDeal() {
         { id: currentUser?.id, name: currentUser?.name },
       );
       if (!res.ok) {
-        toast(`Couldn't save the deal: ${res.reason}`, 'error', 6000);
+        const msg = res.reason === 'not-configured'
+          ? "Database not connected on this build. The Supabase keys aren't baked in — add VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY in Cloudflare and Retry the deployment."
+          : `Couldn't save the deal: ${res.reason}`;
+        toast(msg, 'error', 8000);
         setSubmitting(false);
         return;
       }
       toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
       navigate('/marketplace');
     } catch (err) {
-      toast(`Upload failed: ${err?.message || err}`, 'error', 6000);
+      toast(`Upload failed: ${err?.message || err}`, 'error', 7000);
       setSubmitting(false);
     }
   }
@@ -207,7 +204,7 @@ export default function PostDeal() {
           >
             <ArrowLeft size={15} /> Back
           </button>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '4px 10px', borderRadius: 999,
@@ -215,6 +212,22 @@ export default function PostDeal() {
               color: '#a78bfa', fontSize: 11, fontWeight: 800, letterSpacing: 0.5,
             }}>
               <Sparkles size={11} /> FREE TO LIST
+            </div>
+            {/* DB connection indicator — instantly shows if the Supabase keys
+                are in this build. Green = deals save. Amber = they don't. */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '4px 10px', borderRadius: 999,
+              background: isSupabaseConfigured ? 'rgba(16,185,129,0.14)' : 'rgba(245,158,11,0.14)',
+              border: `1px solid ${isSupabaseConfigured ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'}`,
+              color: isSupabaseConfigured ? '#34d399' : '#fbbf24',
+              fontSize: 11, fontWeight: 800, letterSpacing: 0.3,
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: isSupabaseConfigured ? '#10b981' : '#f59e0b',
+              }} />
+              {isSupabaseConfigured ? 'DATABASE CONNECTED' : 'DB NOT CONNECTED — DEALS WON’T SAVE'}
             </div>
           </div>
         </div>
