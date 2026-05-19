@@ -39,6 +39,9 @@ export function rowToDeal(r) {
     images: photos.length ? photos : ['https://picsum.photos/seed/asl-new/800/600'],
     sellerId: r.seller_id || 'me',
     sellerName: r.seller_name || 'AllStreet member',
+    sellerAvatar: null,        // falls back to the seller profile avatar in the UI
+    tags: [],                  // live deals carry no seller tag badges yet
+    lotSize: null,
     status: r.status || 'available',
     daysListed: 0,
     createdAt: r.created_at,

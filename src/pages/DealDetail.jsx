@@ -493,7 +493,7 @@ export default function DealDetail() {
 
               <Link to={`/profile/${deal.sellerId}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
                 <img
-                  src={deal.sellerAvatar}
+                  src={deal.sellerAvatar || seller.avatar}
                   alt={deal.sellerName}
                   style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #1e1e2e' }}
                 />
@@ -501,7 +501,7 @@ export default function DealDetail() {
                   <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px' }}>{deal.sellerName}</div>
                   <div style={{ color: '#475569', fontSize: '13px' }}>{seller.location || `${deal.city}, ${deal.state}`}</div>
                   <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
-                    {deal.tags.map(tag => (
+                    {(deal.tags || seller.tags || []).map(tag => (
                       <span key={tag} style={{
                         background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6',
                         border: '1px solid rgba(139, 92, 246, 0.2)',
