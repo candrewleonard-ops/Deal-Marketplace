@@ -42,8 +42,8 @@ const features = [
   },
   {
     icon: Star,
-    title: 'Deal Promotion Tools',
-    desc: 'Boost your deals to the top with our sponsored placement system. From $2/day to #1 Featured.',
+    title: 'Verified Lender Directory',
+    desc: 'A vetted list of hard-money, fix & flip, and DSCR lenders ready to fund your next deal.',
     color: '#f59e0b',
   },
 ];

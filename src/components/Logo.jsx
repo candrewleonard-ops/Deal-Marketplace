@@ -67,10 +67,10 @@ export function LogoGlyph({ size = 34, radius }) {
 
 export default function Logo({ size = 'sm', tagline = false, iconOnly = false, style }) {
   const dims = {
-    sm: { glyph: 30, word: 18, live: 9,  gap: 9 },
-    md: { glyph: 40, word: 24, live: 11, gap: 11 },
-    lg: { glyph: 64, word: 40, live: 14, gap: 16 },
-  }[size] || { glyph: 30, word: 18, live: 9, gap: 9 };
+    sm: { glyph: 40, word: 23, live: 10, gap: 11 },
+    md: { glyph: 54, word: 31, live: 12, gap: 14 },
+    lg: { glyph: 80, word: 46, live: 15, gap: 18 },
+  }[size] || { glyph: 40, word: 23, live: 10, gap: 11 };
 
   if (iconOnly) return <LogoGlyph size={dims.glyph} />;
 

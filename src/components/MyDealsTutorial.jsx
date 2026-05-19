@@ -209,7 +209,7 @@ const SLIDES = [
   {
     color: '#8b5cf6', colorAlt: '#06b6d4',
     title: 'Welcome to My Deals',
-    body: "This is your command center — every deal you post lives here. Track views, address requests, messages, and promotions in one place.",
+    body: "This is your command center — every deal you post lives here. Track views, address requests, and messages in one place.",
     render: () => <DashboardMock />,
   },
   {
@@ -286,7 +286,7 @@ function DashboardMock() {
       </div>
       <div style={{ padding: '0 12px 12px' }}>
         <DealRow city="Atlanta, GA" price="$25k" status="ACTIVE" color="#10b981" />
-        <DealRow city="Phoenix, AZ" price="$18k" status="PROMOTED" color="#f59e0b" />
+        <DealRow city="Phoenix, AZ" price="$18k" status="ACTIVE" color="#10b981" />
         <DealRow city="Memphis, TN" price="$42k" status="ACTIVE" color="#10b981" />
       </div>
     </MockCard>

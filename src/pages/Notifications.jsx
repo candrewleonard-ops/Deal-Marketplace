@@ -51,13 +51,6 @@ const initialNotifications = [
     actionLabel: 'View Post', actionTo: '/social',
   },
   {
-    id: 6, type: 'promoted', read: true, time: '5 hours ago',
-    icon: Zap, color: '#f59e0b',
-    title: 'Your deal is now promoted',
-    body: 'Your Pro-tier promotion for Atlanta Brick Ranch is now live. Top 5 placement active.',
-    actionLabel: 'View Stats', actionTo: '/my-deals',
-  },
-  {
     id: 7, type: 'meetup', read: true, time: '1 day ago',
     icon: Calendar, color: '#06b6d4',
     title: 'Upcoming meetup reminder',
@@ -96,7 +89,7 @@ export default function Notifications() {
   const filtered = notifications.filter(n => {
     if (filter === 'all') return true;
     if (filter === 'unread') return !n.read;
-    if (filter === 'deals') return ['address_request','deal','promoted','address_approved'].includes(n.type);
+    if (filter === 'deals') return ['address_request','deal','address_approved'].includes(n.type);
     if (filter === 'messages') return n.type === 'message';
     if (filter === 'social') return ['follow','like','group_invite','meetup'].includes(n.type);
     return true;

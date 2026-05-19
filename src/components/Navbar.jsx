@@ -7,7 +7,6 @@ import {
   Crown, Shield, UsersRound, Heart, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import PostDealModal from './PostDealModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import CyclingText from './CyclingText';
 import Logo from './Logo';
@@ -51,7 +50,6 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchVal, setSearchVal] = useState('');
-  const [showPostDeal, setShowPostDeal] = useState(false);
 
   const notifications = [
     { id: 1, text: 'Marcus Johnson liked your post', time: '2m ago', unread: true },
@@ -177,19 +175,19 @@ export default function Navbar() {
 
             {/* Post Deal button — desktop only (mobile has FAB in tab bar) */}
             {!isMobile && isAuthenticated && (
-              <button
-                onClick={() => setShowPostDeal(true)}
+              <Link
+                to="/post-deal"
                 className="gradient-btn"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '8px 16px', borderRadius: 8,
                   color: '#fff', border: 'none', cursor: 'pointer',
-                  fontSize: 14, fontWeight: 600,
+                  fontSize: 14, fontWeight: 600, textDecoration: 'none',
                 }}
               >
                 <Plus size={16} />
                 Post a Deal
-              </button>
+              </Link>
             )}
 
             {/* Guest CTA — desktop */}
@@ -523,7 +521,6 @@ export default function Navbar() {
         />
       )}
 
-      {showPostDeal && <PostDealModal onClose={() => setShowPostDeal(false)} />}
     </nav>
   );
 }

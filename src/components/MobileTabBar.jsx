@@ -16,10 +16,10 @@ export default function MobileTabBar() {
     // Guests get the sign-up prompt; signed-in users land on /my-deals
     // where they can hit "Post a Deal" — no instant modal pop.
     if (!isAuthenticated) {
-      requireAuth('post a deal', 'post-deal', '/my-deals');
+      requireAuth('post a deal', 'post-deal', '/post-deal');
       return;
     }
-    navigate('/my-deals?post=1');
+    navigate('/post-deal');
   }
 
   const isActive = (path) => {

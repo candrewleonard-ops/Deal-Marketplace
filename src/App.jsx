@@ -26,11 +26,13 @@ import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 import BidRequest from './pages/BidRequest';
 import HowTo from './pages/HowTo';
+import PostDeal from './pages/PostDeal';
 import { DMGuard, AuthGuard } from './components/RouteGuards';
 import './index.css';
 
-function AppLayout({ children, hideFooter }) {
+function AppLayout({ children, hideFooter, hideTabBar }) {
   const isMobile = useIsMobile();
+  const showTabBar = isMobile && !hideTabBar;
   return (
     <div
       style={{
@@ -46,7 +48,7 @@ function AppLayout({ children, hideFooter }) {
         style={{
           flex: 1,
           /* Reserve space for the bottom tab bar on mobile so content isn't hidden */
-          paddingBottom: isMobile
+          paddingBottom: showTabBar
             ? 'calc(72px + env(safe-area-inset-bottom))'
             : 0,
         }}
@@ -54,7 +56,7 @@ function AppLayout({ children, hideFooter }) {
         {children}
       </main>
       {!hideFooter && !isMobile && <Footer />}
-      {isMobile && <MobileTabBar />}
+      {showTabBar && <MobileTabBar />}
       <AuthPromptModal />
       <DMShowcaseModal />
       <OnboardingModal />
@@ -87,6 +89,7 @@ export default function App() {
         <Route path="/bid-request" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
         <Route path="/bid-request/:dealId" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
         <Route path="/how-to" element={<AppLayout><HowTo /></AppLayout>} />
+        <Route path="/post-deal" element={<AuthGuard reason="post a deal"><AppLayout hideFooter hideTabBar><PostDeal /></AppLayout></AuthGuard>} />
         <Route path="*" element={<AppLayout hideFooter><NotFound /></AppLayout>} />
       </Routes>
     </Router>

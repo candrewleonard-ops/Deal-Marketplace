@@ -56,7 +56,6 @@ export default function DealDetail() {
   const { toast } = useToast();
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const isMobile = useIsMobile();
-  const [showPromote, setShowPromote] = useState(false);
   const [showAddressReq, setShowAddressReq] = useState(false);
   const [showCarsonNote, setShowCarsonNote] = useState(false);
 
@@ -71,7 +70,6 @@ export default function DealDetail() {
   }
   const [showShare, setShowShare] = useState(false);
   const [addressGranted, setAddressGranted] = useState(false);
-  const [budget, setBudget] = useState(20);
   const saved = deal ? isSaved(deal.id) : false;
 
   useSEO({
@@ -93,9 +91,7 @@ export default function DealDetail() {
 
   const seller = getUserById(deal.sellerId) || {};
   const similar = getSimilarDeals(deal, 3);
-  const fee = (budget * 0.15).toFixed(2);
-  const total = (budget + parseFloat(fee)).toFixed(2);
-  // Only the deal owner sees promote/edit tools
+  // Only the deal owner sees edit tools
   const isOwner = isLoggedIn && currentUser && String(currentUser.id) === String(deal.sellerId);
 
   return (
@@ -318,82 +314,6 @@ export default function DealDetail() {
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
               <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
             </div>
-
-            {/* Promote Section — owner only */}
-            {isOwner && (
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(139, 92, 246, 0.08))',
-              border: '1px solid rgba(245, 158, 11, 0.2)',
-              borderRadius: '16px', padding: '24px', marginBottom: '32px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-                <div>
-                  <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', margin: 0 }}>Promote This Deal</h3>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', margin: '4px 0 0' }}>Get more buyers to see this listing</p>
-                </div>
-                <Zap size={24} style={{ color: '#f59e0b' }} />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
-                {[
-                  { tier: 'Starter', price: '$2/day', desc: 'Top 20 placement', color: '#94a3b8' },
-                  { tier: 'Growth', price: '$5/day', desc: 'Top 10 placement', color: '#06b6d4' },
-                  { tier: 'Pro', price: '$10/day', desc: 'Top 5 + Sponsored', color: '#8b5cf6' },
-                  { tier: 'Featured', price: '$20/day', desc: '#1 + Glow Effect', color: '#f59e0b' },
-                ].map(({ tier, price, desc, color }) => (
-                  <button
-                    key={tier}
-                    onClick={() => setShowPromote(true)}
-                    style={{
-                      background: '#12121e', border: `1px solid ${color}40`,
-                      borderRadius: '10px', padding: '14px', cursor: 'pointer',
-                      textAlign: 'left', transition: 'all 0.2s',
-                    }}
-                  >
-                    <div style={{ color, fontWeight: 800, fontSize: '14px' }}>{tier}</div>
-                    <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px' }}>{price}</div>
-                    <div style={{ color: '#475569', fontSize: '12px' }}>{desc}</div>
-                  </button>
-                ))}
-              </div>
-
-              {/* FB Ads */}
-              <div style={{ background: '#12121e', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '12px', padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '20px' }}>📘</span>
-                  <span style={{ color: '#06b6d4', fontWeight: 700, fontSize: '15px' }}>Facebook Ads Integration</span>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-                  <div style={{ flex: 1, minWidth: '120px' }}>
-                    <label style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Daily Budget</label>
-                    <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#f8fafc', fontWeight: 700 }}>$</span>
-                      <input
-                        type="number"
-                        value={budget}
-                        onChange={e => setBudget(Math.max(5, parseInt(e.target.value) || 5))}
-                        className="input-dark"
-                        style={{ width: '100%', padding: '10px 14px 10px 28px', borderRadius: '8px', fontSize: '14px' }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ flex: 1, minWidth: '120px' }}>
-                    <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>Your Cost</div>
-                    <div style={{ background: '#1a1a2e', border: '1px solid #1e1e2e', borderRadius: '8px', padding: '10px 14px' }}>
-                      <span style={{ color: '#f8fafc' }}>${budget}</span>
-                      <span style={{ color: '#475569' }}> + </span>
-                      <span style={{ color: '#f59e0b' }}>${fee}</span>
-                      <span style={{ color: '#475569' }}> = </span>
-                      <span style={{ color: '#10b981', fontWeight: 800 }}>${total}/day</span>
-                    </div>
-                  </div>
-                  <button className="gradient-btn" style={{ padding: '10px 18px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '13px', whiteSpace: 'nowrap' }}>
-                    Launch Ads
-                  </button>
-                </div>
-              </div>
-            </div>
-            )} {/* end isOwner promote block */}
 
             {/* Similar Deals */}
             {similar.length > 0 && (

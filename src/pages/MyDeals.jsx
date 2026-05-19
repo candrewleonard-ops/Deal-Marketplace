@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Plus, Eye, MessageSquare, MapPin, ChevronDown, ChevronUp, Check, X as XIcon, TrendingUp, Zap, Rocket } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, MapPin, ChevronDown, ChevronUp, Check, X as XIcon, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { deals } from '../data/deals';
 import { users } from '../data/users';
@@ -28,36 +28,16 @@ const mockAddressRequests = {
   ],
 };
 
-const dealTypes = ['Wholesale', 'Fix & Flip', 'Subject-To', 'Creative Finance', 'BRRRR', 'Land', 'Commercial', 'Multi-Family'];
-
-const promoTiers = [
-  { name: 'Basic Boost', price: '$2/day', desc: '2x more visibility in search results', color: '#8b5cf6' },
-  { name: 'Featured', price: '$5/day', desc: '5x views, badge on listing, top placement', color: '#06b6d4' },
-  { name: 'Premium Spotlight', price: '$10/day', desc: 'Homepage feature, email blast to 1k+ buyers', color: '#f59e0b' },
-];
-
 export default function MyDeals() {
   const { currentUser } = useAuth();
-  const [params, setParams] = useSearchParams();
-  const [myDealsList, setMyDealsList] = useState(deals.filter(d => d.sellerId === currentUser.id));
+  const navigate = useNavigate();
+  const [myDealsList] = useState(deals.filter(d => d.sellerId === currentUser.id));
   const [activeTab, setActiveTab] = useState('active');
   const [expanded, setExpanded] = useState(null);
   const [autoApprove, setAutoApprove] = useState(false);
   const [requestActions, setRequestActions] = useState({});
-  const [showNewDeal, setShowNewDeal] = useState(false);
-  const [showPromo, setShowPromo] = useState(null);
   const [toast, setToast] = useState(null);
   const [showTutorial, setShowTutorial] = useState(false);
-
-  // If we navigated here with ?post=1, open the New Deal modal automatically.
-  useEffect(() => {
-    if (params.get('post') === '1') {
-      setShowNewDeal(true);
-      const next = new URLSearchParams(params);
-      next.delete('post');
-      setParams(next, { replace: true });
-    }
-  }, [params, setParams]);
 
   // First-time visit: show the interactive tutorial.
   useEffect(() => {
@@ -74,11 +54,6 @@ export default function MyDeals() {
     try { localStorage.setItem('asl-mydeals-tutorial-v1', '1'); } catch { /* ignore */ }
     setShowTutorial(false);
   }
-  const [newDeal, setNewDeal] = useState({
-    title: '', type: 'Wholesale', contractedPrice: '', listingPrice: '',
-    beds: '', baths: '', sqft: '', yearBuilt: '', city: '', state: '',
-    description: '', youtubeUrl: '',
-  });
 
   function showToastMsg(msg) {
     setToast(msg);
@@ -105,34 +80,6 @@ export default function MyDeals() {
     showToastMsg(action === 'approved' ? 'Address granted! They\'ll be notified.' : 'Request denied.');
   };
 
-  function handlePostDeal(e) {
-    e.preventDefault();
-    if (!newDeal.title.trim() || !newDeal.city.trim()) return;
-    const deal = {
-      id: Date.now(),
-      sellerId: currentUser.id,
-      title: newDeal.title,
-      city: newDeal.city,
-      state: newDeal.state,
-      price: parseInt(newDeal.contractedPrice) || 0,
-      listingPrice: parseInt(newDeal.listingPrice) || 0,
-      beds: parseInt(newDeal.beds) || 0,
-      baths: parseFloat(newDeal.baths) || 0,
-      sqft: parseInt(newDeal.sqft) || 0,
-      yearBuilt: parseInt(newDeal.yearBuilt) || 0,
-      description: newDeal.description,
-      type: newDeal.type,
-      status: 'available',
-      views: 0,
-      inquiries: 0,
-      images: [`https://picsum.photos/seed/newdeal${Date.now()}/800/600`],
-    };
-    setMyDealsList(prev => [deal, ...prev]);
-    setShowNewDeal(false);
-    setNewDeal({ title: '', type: 'Wholesale', contractedPrice: '', listingPrice: '', beds: '', baths: '', sqft: '', yearBuilt: '', city: '', state: '', description: '', youtubeUrl: '' });
-    showToastMsg('Deal posted! You should start receiving address requests soon.');
-    setActiveTab('active');
-  }
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
@@ -143,13 +90,13 @@ export default function MyDeals() {
               <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '28px', margin: 0 }}>My Deals</h1>
               <p style={{ color: '#475569', margin: '4px 0 0', fontSize: '14px' }}>Manage your listings and address requests</p>
             </div>
-            <button
-              onClick={() => setShowNewDeal(true)}
+            <Link
+              to="/post-deal"
               className="gradient-btn"
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '11px 18px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '11px 18px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer', textDecoration: 'none' }}
             >
               <Plus size={16} /> Post New Deal
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -169,24 +116,6 @@ export default function MyDeals() {
               <div style={{ color: s.color, fontWeight: 800, fontSize: '28px', marginTop: '4px' }}>{s.value}</div>
             </div>
           ))}
-        </div>
-
-        {/* Promo CTA tip */}
-        <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px', padding: '14px 18px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Rocket size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '14px' }}>
-              Promoted deals get 3x more address requests.
-            </span>
-            <span style={{ color: '#94a3b8', fontSize: '13px' }}> Upgrade your listing for $2/day and reach more buyers today.</span>
-          </div>
-          <button
-            onClick={() => filtered[0] && setShowPromo(filtered[0].id)}
-            className="gradient-btn"
-            style={{ padding: '7px 14px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '12px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
-          >
-            Promote a Deal
-          </button>
         </div>
 
         {/* Auto-approve toggle */}
@@ -269,13 +198,6 @@ export default function MyDeals() {
                       <div style={{ color: '#8b5cf6', fontWeight: 700, fontSize: '15px' }}>{requests.length}</div>
                       <div style={{ color: '#475569', fontSize: '11px' }}>Requests</div>
                     </div>
-                    <button
-                      onClick={e => { e.stopPropagation(); setShowPromo(deal.id); }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', borderRadius: '8px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', color: '#f59e0b', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}
-                    >
-                      <Zap size={12} />
-                      Promote
-                    </button>
                     {isExpanded ? <ChevronUp size={18} style={{ color: '#94a3b8' }} /> : <ChevronDown size={18} style={{ color: '#94a3b8' }} />}
                   </div>
                 </div>
@@ -347,112 +269,14 @@ export default function MyDeals() {
                 {activeTab === 'active' ? 'Post your first deal and start collecting address requests from buyers.' : `No deals in ${activeTab} status.`}
               </p>
               {activeTab === 'active' && (
-                <button onClick={() => setShowNewDeal(true)} className="gradient-btn" style={{ padding: '11px 24px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
+                <Link to="/post-deal" className="gradient-btn" style={{ display: 'inline-block', padding: '11px 24px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
                   Post Your First Deal
-                </button>
+                </Link>
               )}
             </div>
           )}
         </div>
       </div>
-
-      {/* Post New Deal Modal */}
-      {showNewDeal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowNewDeal(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#12121e', zIndex: 1 }}>
-              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '19px', margin: 0 }}>Post New Deal</h2>
-              <button onClick={() => setShowNewDeal(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><XIcon size={20} /></button>
-            </div>
-            <form onSubmit={handlePostDeal} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Deal Title *</label>
-                <input value={newDeal.title} onChange={e => setNewDeal({ ...newDeal, title: e.target.value })} placeholder="e.g. 3/2 Brick Ranch - Atlanta, GA — Assignment" className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} required />
-              </div>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Deal Type</label>
-                <select value={newDeal.type} onChange={e => setNewDeal({ ...newDeal, type: e.target.value })} className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }}>
-                  {dealTypes.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Contracted Price ($)</label>
-                  <input value={newDeal.contractedPrice} onChange={e => setNewDeal({ ...newDeal, contractedPrice: e.target.value })} placeholder="125000" type="number" className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} />
-                </div>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Listing / Asking Price ($)</label>
-                  <input value={newDeal.listingPrice} onChange={e => setNewDeal({ ...newDeal, listingPrice: e.target.value })} placeholder="150000" type="number" className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} />
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-                {[
-                  { label: 'Beds', key: 'beds', placeholder: '3' },
-                  { label: 'Baths', key: 'baths', placeholder: '2' },
-                  { label: 'Sq Ft', key: 'sqft', placeholder: '1400' },
-                  { label: 'Year Built', key: 'yearBuilt', placeholder: '1985' },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{f.label}</label>
-                    <input value={newDeal[f.key]} onChange={e => setNewDeal({ ...newDeal, [f.key]: e.target.value })} placeholder={f.placeholder} type="number" className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} />
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px' }}>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>City *</label>
-                  <input value={newDeal.city} onChange={e => setNewDeal({ ...newDeal, city: e.target.value })} placeholder="Atlanta" className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} required />
-                </div>
-                <div>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>State</label>
-                  <input value={newDeal.state} onChange={e => setNewDeal({ ...newDeal, state: e.target.value })} placeholder="GA" maxLength={2} className="input-dark" style={{ width: '70px', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} />
-                </div>
-              </div>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
-                <textarea value={newDeal.description} onChange={e => setNewDeal({ ...newDeal, description: e.target.value })} placeholder="ARV, repairs needed, deal highlights, timeline..." className="input-dark" rows={4} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px', resize: 'vertical' }} />
-              </div>
-              <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>YouTube Walkthrough URL (optional)</label>
-                <input value={newDeal.youtubeUrl} onChange={e => setNewDeal({ ...newDeal, youtubeUrl: e.target.value })} placeholder="https://youtube.com/watch?v=..." className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', paddingTop: '4px' }}>
-                <button type="button" onClick={() => setShowNewDeal(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
-                <button type="submit" className="gradient-btn" style={{ flex: 2, padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}>Post Deal</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Promo Modal */}
-      {showPromo && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowPromo(null)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '480px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '19px', margin: 0 }}>Promote This Deal</h2>
-              <button onClick={() => setShowPromo(null)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><XIcon size={20} /></button>
-            </div>
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Boost your deal's visibility and reach more active buyers on All Street Live.</p>
-              {promoTiers.map(tier => (
-                <div key={tier.name} style={{ background: '#1a1a2e', border: `1px solid ${tier.color}30`, borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer', transition: 'border-color 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = tier.color}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = `${tier.color}30`}
-                  onClick={() => { setShowPromo(null); showToastMsg(`"${tier.name}" promotion activated! Your deal is now boosted.`); }}
-                >
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: tier.color, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{tier.name}</div>
-                    <div style={{ color: '#94a3b8', fontSize: '13px' }}>{tier.desc}</div>
-                  </div>
-                  <div style={{ color: tier.color, fontWeight: 800, fontSize: '15px', flexShrink: 0 }}>{tier.price}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Toast */}
       {toast && (
@@ -471,7 +295,7 @@ export default function MyDeals() {
       {showTutorial && (
         <MyDealsTutorial
           onClose={dismissTutorial}
-          onPostDeal={() => { dismissTutorial(); setShowNewDeal(true); }}
+          onPostDeal={() => { dismissTutorial(); navigate('/post-deal'); }}
         />
       )}
     </div>

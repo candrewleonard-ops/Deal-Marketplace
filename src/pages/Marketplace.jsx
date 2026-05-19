@@ -45,35 +45,6 @@ const CITIES = [
   'Baltimore, MD','Philadelphia, PA','Las Vegas, NV','Columbus, OH',
 ];
 
-function FBAdCalculator() {
-  const [budget, setBudget] = useState(20);
-  const fee = (budget * 0.15).toFixed(2);
-  const total = (budget + parseFloat(fee)).toFixed(2);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ color: '#f8fafc', fontWeight: 700 }}>$</span>
-        <input type="number" min={5} max={1000} value={budget}
-          onChange={e => setBudget(Math.max(5, parseInt(e.target.value) || 5))}
-          className="input-dark"
-          style={{ flex: 1, padding: '9px 12px', borderRadius: '8px', fontSize: '14px' }}
-        />
-        <span style={{ color: '#94a3b8', fontSize: '13px', whiteSpace: 'nowrap' }}>/day</span>
-      </div>
-      <div style={{ background: '#12121e', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '7px' }}>
-        {[['Ad spend', `$${budget}/day`, '#f8fafc'],['Platform fee (15%)', `+$${fee}/day`, '#f59e0b'],['Total', `$${total}/day`, '#10b981']].map(([l, v, c], i) => (
-          <div key={l} style={{ display: 'flex', justifyContent: 'space-between', ...(i === 2 ? { paddingTop: '7px', borderTop: '1px solid #1e1e2e' } : {}) }}>
-            <span style={{ color: '#94a3b8', fontSize: '13px' }}>{l}</span>
-            <span style={{ color: c, fontWeight: i === 2 ? 800 : 600, fontSize: i === 2 ? '15px' : '13px' }}>{v}</span>
-          </div>
-        ))}
-      </div>
-      <button className="gradient-btn" style={{ padding: '10px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer' }}>
-        Launch Facebook Ads · ${total}/day
-      </button>
-    </div>
-  );
-}
 
 export default function Marketplace() {
   useSEO({
@@ -91,16 +62,15 @@ export default function Marketplace() {
   const [sortBy,          setSortBy]          = useState('newest');
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
-  const [showPromote,     setShowPromote]     = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, requireAuth } = useAuth();
 
   function goPostDeal() {
     if (!isAuthenticated) {
-      requireAuth('post a deal', 'post-deal', '/my-deals');
+      requireAuth('post a deal', 'post-deal', '/post-deal');
       return;
     }
-    navigate('/my-deals?post=1');
+    navigate('/post-deal');
   }
 
   // States that actually have deals (for the mobile dropdown), sorted by deal count desc
@@ -206,11 +176,6 @@ export default function Marketplace() {
               {hasActiveFilters && (
                 <button onClick={resetAll} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px', borderRadius: 9, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
                   <RotateCcw size={13} /> Reset
-                </button>
-              )}
-              {!isMobile && (
-                <button onClick={() => setShowPromote(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 9, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#f59e0b', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-                  <TrendingUp size={14} /> Promote a Deal
                 </button>
               )}
               {!isMobile && (
@@ -426,53 +391,6 @@ export default function Marketplace() {
           )}
         </div>
       </div>
-
-      {/* ── Promote modal ── */}
-      {showPromote && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>Promote Your Deal</h2>
-                <p style={{ color: '#475569', margin: '3px 0 0', fontSize: '13px' }}>Get more buyers with sponsored placement</p>
-              </div>
-              <button onClick={() => setShowPromote(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={20} /></button>
-            </div>
-            <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { tier: 'Starter',  price: '$2/day',  perks: 'Top 20 placement',              color: '#94a3b8', icon: '🔹' },
-                { tier: 'Growth',   price: '$5/day',  perks: 'Top 10 placement',              color: '#06b6d4', icon: '🔷' },
-                { tier: 'Pro',      price: '$10/day', perks: 'Top 5 · Sponsored badge',       color: '#8b5cf6', icon: '💎' },
-                { tier: 'Featured', price: '$20/day', perks: '#1 · Animated glow · Crown',   color: '#f59e0b', icon: '👑' },
-              ].map(({ tier, price, perks, color, icon }) => (
-                <div key={tier} style={{ background: '#1a1a2e', border: `1px solid ${color}35`, borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '24px' }}>{icon}</span>
-                    <div>
-                      <div style={{ color, fontWeight: 800, fontSize: '14px' }}>{tier}</div>
-                      <div style={{ color: '#94a3b8', fontSize: '12px' }}>{perks}</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px' }}>{price}</div>
-                    <button style={{ marginTop: '4px', padding: '4px 12px', borderRadius: '20px', background: `${color}20`, border: `1px solid ${color}35`, color, cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}>Select</button>
-                  </div>
-                </div>
-              ))}
-              <div style={{ background: '#1a1a2e', border: '1px solid rgba(6,182,212,0.3)', borderRadius: '12px', padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '20px' }}>📘</span>
-                  <div>
-                    <div style={{ color: '#06b6d4', fontWeight: 800, fontSize: '14px' }}>Run Facebook Ads</div>
-                    <div style={{ color: '#94a3b8', fontSize: '12px' }}>Retarget motivated sellers & buyers</div>
-                  </div>
-                </div>
-                <FBAdCalculator />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
