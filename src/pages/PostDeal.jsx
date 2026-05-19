@@ -27,6 +27,7 @@ export default function PostDeal() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const fileInputRef = useRef(null);
+  const addressBoxRef = useRef(null); // wraps the address input so we can read its live DOM value (autofill-safe)
 
   const [form, setForm] = useState({
     dealType: 'fix-flip',
@@ -101,20 +102,41 @@ export default function PostDeal() {
     });
   }
 
+  // Reads the address from React state OR, as a fallback, the live DOM value
+  // of the input. Browser autofill can populate the field visually without
+  // firing React's onChange, which would otherwise leave state empty.
+  function resolveAddress() {
+    const fromState = (form.address || '').trim();
+    if (fromState) return fromState;
+    const el = addressBoxRef.current?.querySelector('input');
+    return (el?.value || '').trim();
+  }
+
   // Minimum to post: a name, a street address, and at least one photo.
   const canPost = !!form.title.trim() && !!form.address.trim() && photos.length >= 1;
 
   function handleSubmit(e) {
-    e.preventDefault();
-    if (!canPost) {
-      toast('Add a deal name, the street address, and at least one photo to post.', 'info');
+    e?.preventDefault?.();
+    const title = form.title.trim();
+    const address = resolveAddress();
+    // Keep state in sync if autofill bypassed onChange.
+    if (address && address !== form.address) update('address', address);
+
+    const missing = [];
+    if (!title) missing.push('a deal name');
+    if (!address) missing.push('the street address');
+    if (photos.length < 1) missing.push('at least one photo');
+
+    if (missing.length) {
+      const list = missing.length === 1
+        ? missing[0]
+        : missing.slice(0, -1).join(', ') + ' and ' + missing[missing.length - 1];
+      toast(`Add ${list} to post your deal.`, 'info', 4000);
       return;
     }
     toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
     navigate('/my-deals');
   }
-
-  const fullAddress = [form.address, form.city, form.state, form.zip].filter(Boolean).join(', ');
 
   return (
     <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: 150 }}>
@@ -149,7 +171,7 @@ export default function PostDeal() {
       </div>
 
       <form onSubmit={handleSubmit} style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
-        {/* Hero: deal name + address */}
+        {/* Hero: deal name */}
         <div style={{ marginBottom: 20 }}>
           <input
             value={form.title}
@@ -158,70 +180,19 @@ export default function PostDeal() {
             style={{
               width: '100%', background: 'transparent', border: 'none', outline: 'none',
               color: '#f8fafc', fontWeight: 900,
-              fontSize: 'clamp(22px, 4vw, 34px)', letterSpacing: '-0.5px',
+              fontSize: 'clamp(20px, 4vw, 34px)', letterSpacing: '-0.5px',
               padding: '4px 0',
             }}
           />
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            borderBottom: '1px solid #1e1e2e', paddingBottom: 12, marginTop: 4,
+            borderBottom: '1px solid #1e1e2e', paddingBottom: 12, marginTop: 2,
+            color: '#64748b', fontSize: 13,
           }}>
-            <MapPin size={16} style={{ color: '#a78bfa', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <AddressAutocomplete
-                value={form.address}
-                onChange={(v) => update('address', v)}
-                onSelect={(picked) => setForm(f => ({
-                  ...f,
-                  address: picked.street || f.address,
-                  city: picked.city || f.city,
-                  state: picked.state || f.state,
-                  zip: picked.zip || f.zip,
-                }))}
-                placeholder="Start typing the property address…"
-                inputStyle={{
-                  width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                  color: '#cbd5e1', fontSize: 15, padding: '4px 0',
-                }}
-              />
-            </div>
+            Give your deal a clear, catchy title — this is the first thing buyers see.
           </div>
-          {fullAddress && (
-            <div style={{ color: '#64748b', fontSize: 12, marginTop: 6 }}>
-              🔒 Exact address stays hidden until you approve a buyer's request.
-            </div>
-          )}
-
-          {/* Subtle YouTube nudge — sits right under the address */}
-          {showVideoNudge && !form.youtubeUrl && (
-            <div style={{
-              marginTop: 12,
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 14px', borderRadius: 10,
-              background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(139,92,246,0.06))',
-              border: '1px solid rgba(239,68,68,0.18)',
-            }}>
-              <Video size={15} style={{ color: '#f87171', flexShrink: 0 }} />
-              <span style={{ color: '#cbd5e1', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
-                Deals with a <strong style={{ color: '#f8fafc' }}>video walkthrough</strong> get far more
-                serious buyers. Add a YouTube link below — it embeds right on your listing.
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowVideoNudge(false)}
-                aria-label="Dismiss"
-                style={{
-                  background: 'none', border: 'none', color: '#64748b',
-                  cursor: 'pointer', flexShrink: 0, padding: 2, lineHeight: 0,
-                }}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Photo gallery — directly under name + address */}
+        {/* Photo gallery — directly under the deal name */}
         <PhotoGallery
           photos={photos}
           dragOver={dragOver}
@@ -245,6 +216,69 @@ export default function PostDeal() {
         }}>
           {/* Property details */}
           <Card title="Property details" icon={Home}>
+            {/* Property address — first field, full width, mobile-friendly */}
+            <Label>Property address *</Label>
+            <div
+              ref={addressBoxRef}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: '#0d0d1a', border: '1px solid #1e1e2e',
+                borderRadius: 10, padding: '4px 12px', marginBottom: 8,
+              }}
+            >
+              <MapPin size={16} style={{ color: '#a78bfa', flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <AddressAutocomplete
+                  value={form.address}
+                  onChange={(v) => update('address', v)}
+                  onSelect={(picked) => setForm(f => ({
+                    ...f,
+                    address: picked.street || f.address,
+                    city: picked.city || f.city,
+                    state: picked.state || f.state,
+                    zip: picked.zip || f.zip,
+                  }))}
+                  placeholder="Start typing the property address…"
+                  inputStyle={{
+                    width: '100%', background: 'transparent', border: 'none', outline: 'none',
+                    color: '#f8fafc', fontSize: 15, fontWeight: 600,
+                    padding: '11px 0',
+                  }}
+                />
+              </div>
+            </div>
+            <div style={{ color: '#64748b', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>
+              🔒 The exact address stays hidden from buyers until you approve their request.
+            </div>
+
+            {/* Subtle, dismissible video nudge — right under the address */}
+            {showVideoNudge && !form.youtubeUrl && (
+              <div style={{
+                marginBottom: 16,
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+                padding: '10px 14px', borderRadius: 10,
+                background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(139,92,246,0.06))',
+                border: '1px solid rgba(239,68,68,0.18)',
+              }}>
+                <Video size={15} style={{ color: '#f87171', flexShrink: 0, marginTop: 2 }} />
+                <span style={{ color: '#cbd5e1', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
+                  Deals with a <strong style={{ color: '#f8fafc' }}>video walkthrough</strong> get far
+                  more serious buyers. Add a YouTube link below — it embeds right on your listing.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowVideoNudge(false)}
+                  aria-label="Dismiss"
+                  style={{
+                    background: 'none', border: 'none', color: '#64748b',
+                    cursor: 'pointer', flexShrink: 0, padding: 2, lineHeight: 0,
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
             <Label>Deal type</Label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
               {DEAL_TYPES.map(t => (
@@ -406,24 +440,26 @@ export default function PostDeal() {
               {canPost ? '✓ Ready to post' : 'Need: name, street address & 1 photo'}
             </div>
           </div>
+          {/* Always pressable — clicking it tells you exactly what's missing
+              (and is autofill-safe via resolveAddress). */}
           <button
             type="submit"
             onClick={handleSubmit}
-            disabled={!canPost}
             style={{
               padding: isMobile ? '16px 28px' : '18px 44px',
               borderRadius: 14,
-              background: canPost ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.05)',
-              border: canPost ? 'none' : '1px solid #1e1e2e',
-              color: canPost ? '#fff' : '#475569',
+              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              border: 'none',
+              color: '#fff',
               fontWeight: 900, fontSize: isMobile ? 17 : 20, letterSpacing: 0.2,
-              cursor: canPost ? 'pointer' : 'not-allowed',
+              cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 10,
-              boxShadow: canPost ? '0 14px 38px rgba(139,92,246,0.5)' : 'none',
+              boxShadow: '0 14px 38px rgba(139,92,246,0.5)',
+              opacity: canPost ? 1 : 0.92,
               flexShrink: 0,
               transition: 'transform 0.12s',
             }}
-            onMouseDown={(e) => { if (canPost) e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
             onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
             <CheckCircle2 size={isMobile ? 20 : 24} /> Post Deal
