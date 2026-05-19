@@ -12,7 +12,11 @@ import DealCard from '../components/DealCard';
 import ImageCarousel from '../components/ImageCarousel';
 import AddressRequestModal from '../components/AddressRequestModal';
 import CarsonFirstAddressModal, { hasSeenCarsonNote, markCarsonNoteSeen } from '../components/CarsonFirstAddressModal';
+import AddressSignupSlider from '../components/AddressSignupSlider';
+import AddressRequestOwnerModal from '../components/AddressRequestOwnerModal';
 import StreetView from '../components/StreetView';
+import { hasDMd } from '../lib/dmHistory';
+import { logActivity } from '../lib/activityLog';
 import ProfitCalculator from '../components/ProfitCalculator';
 import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
@@ -65,12 +69,8 @@ export default function DealDetail() {
   const deal = mockDeal || liveDeal;
   const { currentUser, isLoggedIn, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
 
-  // If a guest lands here directly (deep-link), surface the sign-up prompt.
-  useEffect(() => {
-    if (!isAuthenticated && deal) {
-      requireAuth(`view this property in ${deal.city || 'the marketplace'}`, 'open-deal', `/marketplace/${deal.id}`);
-    }
-  }, [isAuthenticated, deal, requireAuth]);
+  // Guests CAN browse the masked listing — they're only gated (with the
+  // animated signup slider) when they try to request the exact address.
   const { toast } = useToast();
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const isMobile = useIsMobile();
@@ -78,16 +78,47 @@ export default function DealDetail() {
   const [showCarsonNote, setShowCarsonNote] = useState(false);
 
   // First-time guard: when the user clicks any "Request Address" button,
-  // show Carson's message first. After they acknowledge it, open the real form.
+  const [showShare, setShowShare] = useState(false);
+  const [addressGranted, setAddressGranted] = useState(false);
+  const [showSignupSlider, setShowSignupSlider] = useState(false);
+  const [showOwnerModal, setShowOwnerModal] = useState(false);
+
+  // Address visibility policy set by the seller on the post page.
+  const addressPolicy = deal?.addressVisibility || 'request';
+
+  // Kicks off the address flow with the right behaviour for the policy.
   function startAddressRequest() {
+    // Guests can't request — sell them on signing up.
+    if (!isAuthenticated) {
+      setShowSignupSlider(true);
+      return;
+    }
+    if (addressPolicy === 'public') return; // already visible
+
+    const sellerId = deal?.sellerId;
+    // "Buyers I've DM'd before" → instant unlock if the seller messaged them.
+    if (addressPolicy === 'dmd' && sellerId && hasDMd(sellerId, currentUser?.id)) {
+      grantAddress('Auto-shared — you and the seller have messaged before.');
+      return;
+    }
+    // Otherwise require the request form (Carson note first time).
     if (!hasSeenCarsonNote()) {
       setShowCarsonNote(true);
     } else {
       setShowAddressReq(true);
     }
   }
-  const [showShare, setShowShare] = useState(false);
-  const [addressGranted, setAddressGranted] = useState(false);
+
+  function grantAddress(msg) {
+    setAddressGranted(true);
+    logActivity({
+      actorId: currentUser?.id, actorName: currentUser?.name,
+      type: 'address_approved',
+      detail: `${deal?.title} — ${deal?.city}, ${deal?.state}`,
+      targetId: deal?.sellerId,
+    });
+    toast(msg || 'Address unlocked.', 'success', 4000);
+  }
   const saved = deal ? isSaved(deal.id) : false;
 
   useSEO({
@@ -115,6 +146,10 @@ export default function DealDetail() {
   const similar = getSimilarDeals(deal, 3);
   // Only the deal owner sees edit tools
   const isOwner = isLoggedIn && currentUser && String(currentUser.id) === String(deal.sellerId);
+
+  // The exact address is visible to: the owner, anyone once approved, or
+  // everyone if the seller chose the "public" policy.
+  const addressVisible = isOwner || addressGranted || addressPolicy === 'public';
 
   return (
     <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh' }}>
@@ -166,7 +201,7 @@ export default function DealDetail() {
             </div>
 
             {/* Street View — directly under photos, lazy-loaded (no tokens used until tapped) */}
-            {(isOwner || addressGranted) && (
+            {addressVisible && (
               <StreetView
                 address={deal.address}
                 city={deal.city}
@@ -182,10 +217,10 @@ export default function DealDetail() {
               </h1>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', flexWrap: 'wrap' }}>
                 <MapPin size={16} />
-                <span style={{ fontSize: '16px', fontFamily: addressGranted ? 'inherit' : 'monospace' }}>
-                  {getDisplayAddress(deal, addressGranted)}, {deal.city}, {deal.state} {deal.zip}
+                <span style={{ fontSize: '16px', fontFamily: addressVisible ? 'inherit' : 'monospace' }}>
+                  {getDisplayAddress(deal, addressVisible)}, {deal.city}, {deal.state} {deal.zip}
                 </span>
-                {!addressGranted && (
+                {!addressVisible && (
                   <button
                     onClick={startAddressRequest}
                     style={{
@@ -399,7 +434,7 @@ export default function DealDetail() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {addressGranted ? (
+                {addressVisible ? (
                   <div style={{
                     width: '100%', padding: '14px', borderRadius: '12px',
                     background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
@@ -407,7 +442,7 @@ export default function DealDetail() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   }}>
                     <CheckCircle size={18} />
-                    Address Unlocked
+                    {addressPolicy === 'public' && !addressGranted && !isOwner ? 'Address Visible' : 'Address Unlocked'}
                   </div>
                 ) : (
                   <button
@@ -581,15 +616,56 @@ export default function DealDetail() {
         }}
       />
 
-      {/* Address Request Modal */}
+      {/* Buyer fills the request — no longer auto-grants. */}
       {showAddressReq && (
         <AddressRequestModal
           deal={deal}
           sellerName={deal.sellerName}
           onClose={() => setShowAddressReq(false)}
-          onSubmit={() => { setAddressGranted(true); toast(`Address request sent to ${deal.sellerName}. You'll get a notification when they respond.`, 'success', 4500); }}
+          onSubmit={() => {
+            setShowAddressReq(false);
+            logActivity({
+              actorId: currentUser?.id, actorName: currentUser?.name,
+              type: 'address_request',
+              detail: `${deal.title} — ${deal.city}, ${deal.state}`,
+              targetId: deal.sellerId,
+            });
+            toast(`Request sent to ${deal.sellerName}. They'll review it.`, 'success', 3500);
+            // Surface the seller's side so the approve/deny/DM flow is usable.
+            setShowOwnerModal(true);
+          }}
         />
       )}
+
+      {/* Guest hits "Request Address" → animated signup sell. */}
+      <AddressSignupSlider
+        open={showSignupSlider}
+        onClose={() => setShowSignupSlider(false)}
+        redirectTo={`/marketplace/${deal.id}`}
+      />
+
+      {/* Seller-side: approve / deny / DM the requester. */}
+      <AddressRequestOwnerModal
+        open={showOwnerModal}
+        deal={deal}
+        owner={seller && seller.id ? seller : { id: deal.sellerId, name: deal.sellerName, avatar: deal.sellerAvatar }}
+        requester={currentUser}
+        onClose={() => setShowOwnerModal(false)}
+        onApprove={() => {
+          setShowOwnerModal(false);
+          grantAddress(`Address approved — unlocked for ${deal.city}, ${deal.state}.`);
+        }}
+        onDeny={() => {
+          setShowOwnerModal(false);
+          logActivity({
+            actorId: currentUser?.id, actorName: currentUser?.name,
+            type: 'address_denied',
+            detail: `${deal.title} — ${deal.city}, ${deal.state}`,
+            targetId: deal.sellerId,
+          });
+          toast('Request denied. The buyer was not given the address.', 'info', 3500);
+        }}
+      />
 
       {/* Share to Feed Modal */}
       {showShare && (

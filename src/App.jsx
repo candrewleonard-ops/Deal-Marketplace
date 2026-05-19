@@ -27,6 +27,8 @@ import NotFound from './pages/NotFound';
 import BidRequest from './pages/BidRequest';
 import HowTo from './pages/HowTo';
 import PostDeal from './pages/PostDeal';
+import SuperAdmin from './pages/SuperAdmin';
+import SuperAdminUser from './pages/SuperAdminUser';
 import { DMGuard, AuthGuard } from './components/RouteGuards';
 import ScrollToTop from './components/ScrollToTop';
 import './index.css';
@@ -92,6 +94,8 @@ export default function App() {
         <Route path="/bid-request/:dealId" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
         <Route path="/how-to" element={<AppLayout><HowTo /></AppLayout>} />
         <Route path="/post-deal" element={<AuthGuard reason="post a deal"><AppLayout hideFooter hideTabBar><PostDeal /></AppLayout></AuthGuard>} />
+        <Route path="/super-admin" element={<AppLayout hideFooter><SuperAdmin /></AppLayout>} />
+        <Route path="/super-admin/user/:id" element={<AppLayout hideFooter><SuperAdminUser /></AppLayout>} />
         <Route path="*" element={<AppLayout hideFooter><NotFound /></AppLayout>} />
       </Routes>
     </Router>

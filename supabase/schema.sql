@@ -33,8 +33,12 @@ create table if not exists public.deals (
   photos           jsonb not null default '[]'::jsonb,
   seller_id        text,
   seller_name      text,
-  status           text not null default 'available'
+  status           text not null default 'available',
+  address_visibility text not null default 'request'  -- 'public' | 'request' | 'dmd'
 );
+
+-- If the table already existed, add the new column:
+alter table public.deals add column if not exists address_visibility text not null default 'request';
 
 alter table public.deals enable row level security;
 

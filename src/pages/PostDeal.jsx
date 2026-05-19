@@ -12,6 +12,7 @@ import AddressAutocomplete from '../components/AddressAutocomplete';
 import { uploadImage } from '../lib/images';
 import { createDeal } from '../lib/deals';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { logActivity } from '../lib/activityLog';
 
 const DEAL_TYPES = [
   { value: 'fix-flip',   label: 'Fix & Flip',       color: '#ef4444' },
@@ -51,6 +52,7 @@ export default function PostDeal() {
     contractedPrice: '', listingPrice: '',
     arv: '', rehabLow: '', rehabHigh: '',
     description: '', youtubeUrl: '',
+    addressVisibility: 'request', // 'public' | 'request' | 'dmd'
   });
   const [showVideoNudge, setShowVideoNudge] = useState(true);
   const [photos, setPhotos] = useState([]); // { id, url, name }
@@ -177,6 +179,13 @@ export default function PostDeal() {
         setSubmitting(false);
         return;
       }
+      logActivity({
+        actorId: currentUser?.id,
+        actorName: currentUser?.name,
+        type: 'deal_create',
+        detail: `${form.title} — ${form.city}, ${form.state} ($${Number(form.listingPrice || 0).toLocaleString()})`,
+        targetId: res.deal?._supabaseId || null,
+      });
       toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
       navigate('/marketplace');
     } catch (err) {
@@ -310,8 +319,41 @@ export default function PostDeal() {
                 />
               </div>
             </div>
-            <div style={{ color: '#64748b', fontSize: 12, marginBottom: 14, lineHeight: 1.5 }}>
-              🔒 The exact address stays hidden from buyers until you approve their request.
+            {/* Address visibility policy */}
+            <div style={{ marginBottom: 14 }}>
+              <Label>Who can see the exact address?</Label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                {[
+                  { v: 'public', t: 'Anyone can see it', d: 'Address shown to any signed-in buyer — no request needed.' },
+                  { v: 'request', t: 'Require my approval', d: "Buyers must request it; you approve or deny each one." },
+                  { v: 'dmd', t: "Auto-share with buyers I've DM'd", d: "If you've messaged them before they get it instantly; everyone else still requests." },
+                ].map(opt => {
+                  const on = form.addressVisibility === opt.v;
+                  return (
+                    <button
+                      key={opt.v} type="button"
+                      onClick={() => update('addressVisibility', opt.v)}
+                      style={{
+                        textAlign: 'left', cursor: 'pointer',
+                        background: on ? 'rgba(139,92,246,0.12)' : '#0d0d1a',
+                        border: `1.5px solid ${on ? '#8b5cf6' : '#1e1e2e'}`,
+                        borderRadius: 10, padding: '10px 12px',
+                        display: 'flex', alignItems: 'flex-start', gap: 10,
+                      }}
+                    >
+                      <span style={{
+                        width: 16, height: 16, borderRadius: '50%', flexShrink: 0, marginTop: 1,
+                        border: `2px solid ${on ? '#8b5cf6' : '#475569'}`,
+                        background: on ? '#8b5cf6' : 'transparent',
+                      }} />
+                      <span>
+                        <span style={{ color: on ? '#a78bfa' : '#f8fafc', fontWeight: 700, fontSize: 13 }}>{opt.t}</span>
+                        <span style={{ display: 'block', color: '#94a3b8', fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{opt.d}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Subtle, dismissible video nudge — right under the address */}

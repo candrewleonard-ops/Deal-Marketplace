@@ -43,6 +43,11 @@ export function AuthProvider({ children }) {
 
   const currentUser = users.find(u => u.id === currentUserId) || users[0];
 
+  // Only these emails get the Super Admin page / god-mode tools.
+  const SUPER_ADMIN_EMAILS = ['candrewleonard@gmail.com'];
+  const effectiveEmail = (profile?.email || currentUser?.email || '').toLowerCase();
+  const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(effectiveEmail);
+
   /** Roles array — e.g. ['Wholesaler'] or ['Fix N Flipper', 'Landlord'] */
   const roles = profile?.roles || [];
 
@@ -108,6 +113,7 @@ export function AuthProvider({ children }) {
         roles,
         primaryRole,
         isWholesalerOnly,
+        isSuperAdmin,
         defaultLandingPath,
         isLoggedIn,
         isAuthenticated,

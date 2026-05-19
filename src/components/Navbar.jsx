@@ -45,7 +45,7 @@ const drawerMore = [
 export default function Navbar() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, isSuperAdmin } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -159,6 +159,21 @@ export default function Navbar() {
 
           {/* Right cluster */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
+            {isSuperAdmin && (
+              <Link
+                to="/super-admin"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 12px', borderRadius: 8,
+                  background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2))',
+                  border: '1px solid rgba(239,68,68,0.5)',
+                  color: '#f87171', textDecoration: 'none', fontSize: 13, fontWeight: 800,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Shield size={14} /> Super Admin
+              </Link>
+            )}
             {currentUser?.isAdmin && !isMobile && (
               <Link
                 to="/admin"
@@ -488,6 +503,7 @@ export default function Navbar() {
                   />
                 ))}
                 <DrawerItem to={currentUser ? `/profile/${currentUser.id}` : '/auth'} icon={User} label="View Profile" onClick={() => setDrawerOpen(false)} />
+                {isSuperAdmin && <DrawerItem to="/super-admin" icon={Shield} label="Super Admin" onClick={() => setDrawerOpen(false)} danger />}
                 {currentUser?.isAdmin && <DrawerItem to="/admin" icon={Shield} label="Admin" onClick={() => setDrawerOpen(false)} danger />}
               </DrawerSection>
 

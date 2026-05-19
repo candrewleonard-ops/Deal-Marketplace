@@ -3,7 +3,7 @@ export const users = [
     id: 'me',
     name: 'Trial User',
     username: 'trial_user',
-    email: 'trial@allstreetlive.com',
+    email: 'candrewleonard@gmail.com',
     avatar: 'https://picsum.photos/seed/trialuser/200/200',
     coverPhoto: 'https://picsum.photos/seed/trialcover/1200/400',
     location: 'Dallas, TX',

@@ -43,6 +43,7 @@ export function rowToDeal(r) {
     tags: [],                  // live deals carry no seller tag badges yet
     lotSize: null,
     status: r.status || 'available',
+    addressVisibility: r.address_visibility || 'request', // 'public' | 'request' | 'dmd'
     daysListed: 0,
     createdAt: r.created_at,
   };
@@ -79,6 +80,7 @@ export async function createDeal(form, photoUrls, seller) {
     seller_id: seller?.id != null ? String(seller.id) : null,
     seller_name: seller?.name || null,
     status: 'available',
+    address_visibility: form.addressVisibility || 'request',
   };
   const { data, error } = await supabase
     .from('deals')
@@ -112,6 +114,33 @@ export async function getLiveDeal(namespacedId) {
     .single();
   if (error || !data) return null;
   return rowToDeal(data);
+}
+
+/** Publisher/super-admin edit of a live deal. `patch` uses app field names. */
+export async function updateLiveDeal(namespacedId, patch) {
+  if (!isSupabaseConfigured || !isLiveDealId(namespacedId)) {
+    return { ok: false, reason: 'not-configured' };
+  }
+  const realId = namespacedId.slice(ASL.length + 1);
+  const map = {
+    title: 'title', dealType: 'deal_type', address: 'address', city: 'city',
+    state: 'state', zip: 'zip', beds: 'beds', baths: 'baths', sqft: 'sqft',
+    yearBuilt: 'year_built', contractedPrice: 'contracted_price',
+    listingPrice: 'listing_price', arv: 'arv', rehabLow: 'rehab_low',
+    rehabHigh: 'rehab_high', description: 'description', youtubeUrl: 'youtube_url',
+    status: 'status', addressVisibility: 'address_visibility',
+  };
+  const row = {};
+  for (const [k, col] of Object.entries(map)) {
+    if (k in patch) {
+      row[col] = ['beds','baths','sqft','yearBuilt','contractedPrice','listingPrice','arv','rehabLow','rehabHigh']
+        .includes(k) ? numOrNull(patch[k]) : (patch[k] ?? null);
+    }
+  }
+  const { data, error } = await supabase
+    .from('deals').update(row).eq('id', realId).select().single();
+  if (error) return { ok: false, reason: error.message };
+  return { ok: true, deal: rowToDeal(data) };
 }
 
 function numOrNull(v) {
