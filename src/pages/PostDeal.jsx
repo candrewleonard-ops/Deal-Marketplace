@@ -20,6 +20,17 @@ const DEAL_TYPES = [
 
 const MAX_PHOTOS = 12;
 
+// Vibrant gradient palette — used for empty photo slots + accents so the
+// gallery feels alive (matches the lively tiles in the onboarding tour).
+const GRADIENTS = [
+  'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+  'linear-gradient(135deg, #ef4444, #f59e0b)',
+  'linear-gradient(135deg, #10b981, #06b6d4)',
+  'linear-gradient(135deg, #f59e0b, #ec4899)',
+  'linear-gradient(135deg, #06b6d4, #8b5cf6)',
+  'linear-gradient(135deg, #ec4899, #8b5cf6)',
+];
+
 export default function PostDeal() {
   useSEO({ title: 'Post a Deal', description: 'List your off-market deal in under a minute.' });
   const { toast } = useToast();
@@ -524,9 +535,10 @@ function PhotoGallery({
               <div style={{
                 position: 'absolute', top: 8, left: 8,
                 display: 'flex', alignItems: 'center', gap: 4,
-                padding: '4px 8px', borderRadius: 999,
-                background: 'rgba(139,92,246,0.9)', color: '#fff',
-                fontSize: 10, fontWeight: 800, letterSpacing: 0.4,
+                padding: '5px 10px', borderRadius: 999,
+                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                color: '#fff', fontSize: 10, fontWeight: 900, letterSpacing: 0.5,
+                boxShadow: '0 4px 14px rgba(139,92,246,0.6)',
               }}>
                 <Star size={10} fill="#fff" /> COVER
               </div>
@@ -567,7 +579,7 @@ function PhotoGallery({
           </div>
         ))}
 
-        {/* Upload tile (the "blank" that fills as you drop) */}
+        {/* Upload tile — vibrant, lively */}
         {photos.length < MAX_PHOTOS && (
           <button
             type="button"
@@ -576,27 +588,69 @@ function PhotoGallery({
             onDragLeave={() => setDragOver(false)}
             onDrop={onDrop}
             style={{
-              aspectRatio: '4 / 3', borderRadius: 12,
-              border: `2px dashed ${dragOver ? '#8b5cf6' : '#1e1e2e'}`,
-              background: dragOver ? 'rgba(139,92,246,0.08)' : '#12121e',
-              color: '#94a3b8', cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+              aspectRatio: '4 / 3', borderRadius: 12, border: 'none',
+              background: GRADIENTS[photos.length % GRADIENTS.length],
+              color: '#fff', cursor: 'pointer', position: 'relative', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+              boxShadow: dragOver
+                ? '0 0 0 3px rgba(255,255,255,0.7), 0 12px 30px rgba(139,92,246,0.45)'
+                : '0 8px 24px rgba(0,0,0,0.35)',
+              transform: dragOver ? 'scale(1.02)' : 'scale(1)',
               transition: 'all 0.15s',
             }}
           >
+            {/* sheen */}
             <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)',
+              position: 'absolute', inset: 0,
+              background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.28), transparent 55%)',
+              pointerEvents: 'none',
+            }} />
+            <div style={{
+              width: 46, height: 46, borderRadius: 12,
+              background: 'rgba(255,255,255,0.22)',
+              border: '1px solid rgba(255,255,255,0.4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
             }}>
-              {photos.length === 0 ? <Camera size={18} style={{ color: '#a78bfa' }} /> : <Upload size={18} style={{ color: '#a78bfa' }} />}
+              {photos.length === 0 ? <Camera size={20} color="#fff" /> : <Upload size={20} color="#fff" />}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1' }}>
-              {photos.length === 0 ? 'Drop photos or click' : 'Add more'}
+            <div style={{ fontSize: 13, fontWeight: 900, textShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
+              {photos.length === 0 ? 'Add photos' : 'Add more'}
             </div>
-            <div style={{ fontSize: 10, color: '#64748b' }}>JPG · PNG · HEIC</div>
+            <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.9 }}>Drop or click · JPG · PNG · HEIC</div>
           </button>
         )}
+
+        {/* Colorful empty slots so the gallery looks alive while you fill it */}
+        {Array.from({ length: Math.max(0, Math.min(6, MAX_PHOTOS) - photos.length - 1) }).map((_, k) => {
+          const slot = photos.length + 1 + k;
+          return (
+            <button
+              key={`ghost-${k}`}
+              type="button"
+              onClick={onPick}
+              style={{
+                aspectRatio: '4 / 3', borderRadius: 12, border: 'none',
+                background: GRADIENTS[(photos.length + 1 + k) % GRADIENTS.length],
+                position: 'relative', overflow: 'hidden', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                opacity: 0.45, transition: 'opacity 0.15s, transform 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'scale(1.02)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.45; e.currentTarget.style.transform = 'scale(1)'; }}
+            >
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'radial-gradient(circle at 70% 80%, rgba(255,255,255,0.22), transparent 55%)',
+                pointerEvents: 'none',
+              }} />
+              <Camera size={18} color="rgba(255,255,255,0.85)" />
+              <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 11, fontWeight: 800 }}>
+                Photo {slot}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {photos.length === 0 && (
@@ -616,11 +670,12 @@ const inp = { width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13
 
 function ctrlBtn(disabled) {
   return {
-    width: 26, height: 26, borderRadius: 7, border: 'none',
-    background: disabled ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.18)',
-    color: disabled ? '#475569' : '#fff',
+    width: 28, height: 28, borderRadius: 8, border: 'none',
+    background: disabled ? 'rgba(255,255,255,0.08)' : 'rgba(139,92,246,0.85)',
+    color: disabled ? 'rgba(255,255,255,0.35)' : '#fff',
     cursor: disabled ? 'default' : 'pointer',
-    fontWeight: 800, fontSize: 13, lineHeight: 1,
+    fontWeight: 900, fontSize: 14, lineHeight: 1,
+    boxShadow: disabled ? 'none' : '0 3px 10px rgba(139,92,246,0.5)',
   };
 }
 
