@@ -42,8 +42,6 @@ export default function DealCard({ deal }) {
   const saved = isSaved(deal.id);
   const typeColor = DEAL_TYPE_COLORS[deal.dealType] || DEAL_TYPE_COLORS['fix-flip'];
 
-  const profit = deal.potentialProfit || ((deal.arv || 0) - (deal.listingPrice || deal.price || 0) - (deal.repairCost || 0));
-
   function openDeal(e) {
     if (e) e.preventDefault();
     if (!requireAuth(`view this property in ${deal.city || 'the marketplace'}`, 'open-deal', `/marketplace/${deal.id}`)) {
@@ -191,11 +189,11 @@ export default function DealCard({ deal }) {
             </div>
           </div>
 
-          {/* Profit highlight */}
-          {profit > 0 && (
+          {/* ARV / repairs factual strip (no profit claims) */}
+          {(deal.arv > 0 || deal.repairCost > 0) && (
             <div style={{
-              background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.04))',
-              border: '1px solid rgba(16,185,129,0.25)',
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.10), rgba(16,185,129,0.03))',
+              border: '1px solid rgba(16,185,129,0.22)',
               borderRadius: 12,
               padding: '10px 12px',
               display: 'flex', alignItems: 'center', gap: 10,
@@ -203,12 +201,12 @@ export default function DealCard({ deal }) {
             }}>
               <TrendingUp size={18} style={{ color: '#10b981' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Projected profit</div>
-                <div style={{ color: '#10b981', fontWeight: 900, fontSize: 18, lineHeight: 1.1 }}>+{fmt(profit)}</div>
+                <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV (seller-reported)</div>
+                <div style={{ color: '#10b981', fontWeight: 900, fontSize: 18, lineHeight: 1.1 }}>{fmt(deal.arv)}</div>
               </div>
               {deal.repairCost > 0 && (
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Repairs</div>
+                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Est. repairs</div>
                   <div style={{ color: '#f59e0b', fontWeight: 700, fontSize: 13 }}>{fmt(deal.repairCost)}</div>
                 </div>
               )}
@@ -368,14 +366,15 @@ export default function DealCard({ deal }) {
           <MapPin size={11} style={{ color: '#8b5cf6' }} />
           {deal.city}, {deal.state}
         </div>
-        {profit > 0 && (
+        {deal.arv > 0 && (
           <div style={{
-            background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+            background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.18)',
             borderRadius: 10, padding: '8px 12px', marginBottom: 12,
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
             <TrendingUp size={14} style={{ color: '#10b981' }} />
-            <span style={{ color: '#10b981', fontWeight: 800, fontSize: 14 }}>+{fmt(profit)} projected profit</span>
+            <span style={{ color: '#10b981', fontWeight: 800, fontSize: 14 }}>{fmt(deal.arv)} ARV</span>
+            <span style={{ color: '#64748b', fontSize: 12 }}>· seller-reported</span>
           </div>
         )}
         {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (

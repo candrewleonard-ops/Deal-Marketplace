@@ -32,9 +32,10 @@ export default function PostDeal() {
     address: '', city: '', state: '', zip: '',
     beds: '', baths: '', sqft: '', yearBuilt: '',
     contractedPrice: '', listingPrice: '',
-    arv: '', repairCost: '',
+    arv: '', rehabLow: '', rehabHigh: '',
     description: '', youtubeUrl: '',
   });
+  const [showVideoNudge, setShowVideoNudge] = useState(true);
   const [photos, setPhotos] = useState([]); // { id, url, name }
   const [dragOver, setDragOver] = useState(false);
   const dragIndex = useRef(null);
@@ -98,13 +99,13 @@ export default function PostDeal() {
     });
   }
 
-  const profit = (parseInt(form.arv) || 0) - (parseInt(form.listingPrice) || 0) - (parseInt(form.repairCost) || 0);
-  const canPost = form.title && form.city && form.state && form.listingPrice && form.arv;
+  // Minimum to post: a name, a street address, and at least one photo.
+  const canPost = !!form.title.trim() && !!form.address.trim() && photos.length >= 1;
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!canPost) {
-      toast('Add a title, city/state, listing price, and ARV to post.', 'info');
+      toast('Add a deal name, the street address, and at least one photo to post.', 'info');
       return;
     }
     toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
@@ -114,7 +115,7 @@ export default function PostDeal() {
   const fullAddress = [form.address, form.city, form.state, form.zip].filter(Boolean).join(', ');
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: 96 }}>
+    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: 150 }}>
       {/* Top bar */}
       <div style={{
         background: '#0d0d1a', borderBottom: '1px solid #1e1e2e',
@@ -188,6 +189,34 @@ export default function PostDeal() {
               🔒 Exact address stays hidden until you approve a buyer's request.
             </div>
           )}
+
+          {/* Subtle YouTube nudge — sits right under the address */}
+          {showVideoNudge && !form.youtubeUrl && (
+            <div style={{
+              marginTop: 12,
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 14px', borderRadius: 10,
+              background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(139,92,246,0.06))',
+              border: '1px solid rgba(239,68,68,0.18)',
+            }}>
+              <Video size={15} style={{ color: '#f87171', flexShrink: 0 }} />
+              <span style={{ color: '#cbd5e1', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
+                Deals with a <strong style={{ color: '#f8fafc' }}>video walkthrough</strong> get far more
+                serious buyers. Add a YouTube link below — it embeds right on your listing.
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowVideoNudge(false)}
+                aria-label="Dismiss"
+                style={{
+                  background: 'none', border: 'none', color: '#64748b',
+                  cursor: 'pointer', flexShrink: 0, padding: 2, lineHeight: 0,
+                }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Photo gallery — directly under name + address */}
@@ -246,65 +275,133 @@ export default function PostDeal() {
             </div>
           </Card>
 
-          {/* Financials */}
+          {/* Financials — List Price is the headline */}
           <Card title="The numbers" icon={DollarSign}>
+            {/* LIST PRICE — the most important public number */}
             <div style={{
-              background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)',
-              borderRadius: 10, padding: '10px 12px', marginBottom: 14,
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(6,182,212,0.10))',
+              border: '1px solid rgba(139,92,246,0.4)',
+              borderRadius: 14, padding: '16px 18px', marginBottom: 16,
             }}>
-              <div style={{ color: '#a78bfa', fontSize: 12, fontWeight: 700 }}>🔒 Contracted price stays private</div>
-              <div style={{ color: '#94a3b8', fontSize: 12 }}>Only the listing price shows publicly.</div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-              <Box label="Contracted (private)"><input value={form.contractedPrice} onChange={e => update('contractedPrice', e.target.value)} type="number" placeholder="65000" className="input-dark" style={inp} /></Box>
-              <Box label="Listing price *"><input value={form.listingPrice} onChange={e => update('listingPrice', e.target.value)} type="number" placeholder="90000" className="input-dark" style={inp} /></Box>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <Box label="ARV *"><input value={form.arv} onChange={e => update('arv', e.target.value)} type="number" placeholder="320000" className="input-dark" style={inp} /></Box>
-              <Box label="Repair estimate"><input value={form.repairCost} onChange={e => update('repairCost', e.target.value)} type="number" placeholder="55000" className="input-dark" style={inp} /></Box>
-            </div>
-            {form.arv && form.listingPrice && (
-              <div style={{ background: '#1a1a2e', border: '1px solid #1e1e2e', borderRadius: 10, padding: 14, marginTop: 14 }}>
-                <div style={{ color: '#475569', fontSize: 11, fontWeight: 700 }}>ESTIMATED BUYER PROFIT</div>
-                <div style={{ color: profit > 0 ? '#10b981' : '#ef4444', fontSize: 24, fontWeight: 800 }}>
-                  ${Math.round(profit).toLocaleString()}
-                </div>
+              <label style={{
+                color: '#a78bfa', fontSize: 12, fontWeight: 800,
+                letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <DollarSign size={13} /> LIST PRICE — shown publicly
+              </label>
+              <div style={{ position: 'relative', marginTop: 8 }}>
+                <span style={{
+                  position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                  color: '#f8fafc', fontSize: 26, fontWeight: 900, pointerEvents: 'none',
+                }}>$</span>
+                <input
+                  value={form.listingPrice}
+                  onChange={e => update('listingPrice', e.target.value)}
+                  type="number"
+                  placeholder="90,000"
+                  style={{
+                    width: '100%', padding: '12px 14px 12px 34px',
+                    borderRadius: 10, background: '#0d0d1a',
+                    border: '1px solid rgba(139,92,246,0.35)',
+                    color: '#f8fafc', fontSize: 26, fontWeight: 900, outline: 'none',
+                  }}
+                />
               </div>
-            )}
+              <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 8 }}>
+                This is the headline number buyers see. Your contracted price stays private.
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+              <Box label="Contracted price (private)"><input value={form.contractedPrice} onChange={e => update('contractedPrice', e.target.value)} type="number" placeholder="65000" className="input-dark" style={inp} /></Box>
+              <Box label="ARV (seller-reported)"><input value={form.arv} onChange={e => update('arv', e.target.value)} type="number" placeholder="320000" className="input-dark" style={inp} /></Box>
+            </div>
+
+            <Label>Rehab estimate range</Label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                <input value={form.rehabLow} onChange={e => update('rehabLow', e.target.value)} type="number" placeholder="Low (e.g. 40,000)" className="input-dark" style={{ ...inp, paddingLeft: 22 }} />
+              </div>
+              <span style={{ color: '#64748b', fontSize: 13, fontWeight: 700 }}>to</span>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                <input value={form.rehabHigh} onChange={e => update('rehabHigh', e.target.value)} type="number" placeholder="High (e.g. 60,000)" className="input-dark" style={{ ...inp, paddingLeft: 22 }} />
+              </div>
+            </div>
+            <div style={{
+              marginTop: 10, padding: '8px 11px', borderRadius: 8,
+              background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)',
+              color: '#fbbf24', fontSize: 11.5, lineHeight: 1.5,
+            }}>
+              Buyers see this as a range and run their own numbers in the deal calculator.
+              ARV is your estimate — buyers are told to verify it themselves.
+            </div>
           </Card>
         </div>
 
-        {/* Description + video */}
+        {/* Description + video — larger on desktop */}
         <Card title="Description & video" icon={Video} style={{ marginTop: 18 }}>
           <Box label="Deal description">
             <textarea
               value={form.description} onChange={e => update('description', e.target.value)}
-              placeholder="Scope of work, neighborhood, comps, timing, exit strategy…"
-              rows={5} className="input-dark" style={{ ...inp, resize: 'vertical' }}
+              placeholder="Scope of work, neighborhood, comps, timing, exit strategy, why it's a deal…"
+              rows={isMobile ? 6 : 10}
+              className="input-dark"
+              style={{
+                ...inp,
+                resize: 'vertical',
+                fontSize: isMobile ? 14 : 16,
+                lineHeight: 1.6,
+                minHeight: isMobile ? 140 : 240,
+                padding: '14px 16px',
+              }}
             />
           </Box>
-          <div style={{ marginTop: 12 }}>
-            <Box label="YouTube walkthrough URL (optional)">
-              <input value={form.youtubeUrl} onChange={e => update('youtubeUrl', e.target.value)} placeholder="https://youtube.com/watch?v=..." className="input-dark" style={inp} />
-            </Box>
+          <div style={{ marginTop: 16 }}>
+            <label style={{
+              color: '#94a3b8', fontSize: 13, fontWeight: 700,
+              display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8,
+            }}>
+              <Video size={15} style={{ color: '#f87171' }} /> YouTube walkthrough URL
+              <span style={{ color: '#64748b', fontWeight: 600 }}>(optional, but recommended)</span>
+            </label>
+            <input
+              value={form.youtubeUrl}
+              onChange={e => update('youtubeUrl', e.target.value)}
+              placeholder="https://youtube.com/watch?v=..."
+              className="input-dark"
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 10,
+                fontSize: isMobile ? 14 : 16,
+                fontWeight: 600,
+              }}
+            />
+            <div style={{ color: '#64748b', fontSize: 12, marginTop: 6 }}>
+              Paste any YouTube link — it embeds automatically on your live listing.
+            </div>
           </div>
         </Card>
       </form>
 
-      {/* Sticky submit bar */}
+      {/* Sticky submit bar — large + prominent */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
-        background: 'rgba(13,13,26,0.96)', backdropFilter: 'blur(12px)',
+        background: 'rgba(13,13,26,0.98)', backdropFilter: 'blur(14px)',
         borderTop: '1px solid #1e1e2e',
-        padding: '12px 16px calc(12px + env(safe-area-inset-bottom))',
+        padding: `${isMobile ? 16 : 20}px ${isMobile ? 16 : 24}px calc(${isMobile ? 16 : 20}px + env(safe-area-inset-bottom))`,
+        boxShadow: '0 -12px 40px rgba(0,0,0,0.5)',
       }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 15 : 18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {form.title || 'Untitled deal'}
             </div>
-            <div style={{ color: '#64748b', fontSize: 12 }}>
-              {photos.length} photo{photos.length !== 1 ? 's' : ''} · {canPost ? 'Ready to post' : 'Fill required fields'}
+            <div style={{ color: canPost ? '#34d399' : '#64748b', fontSize: isMobile ? 12 : 14, fontWeight: 600, marginTop: 2 }}>
+              {photos.length} photo{photos.length !== 1 ? 's' : ''} ·{' '}
+              {canPost ? '✓ Ready to post' : 'Need: name, street address & 1 photo'}
             </div>
           </div>
           <button
@@ -312,18 +409,22 @@ export default function PostDeal() {
             onClick={handleSubmit}
             disabled={!canPost}
             style={{
-              padding: '13px 26px', borderRadius: 12,
+              padding: isMobile ? '16px 28px' : '18px 44px',
+              borderRadius: 14,
               background: canPost ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.05)',
               border: canPost ? 'none' : '1px solid #1e1e2e',
               color: canPost ? '#fff' : '#475569',
-              fontWeight: 800, fontSize: 15,
+              fontWeight: 900, fontSize: isMobile ? 17 : 20, letterSpacing: 0.2,
               cursor: canPost ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', gap: 8,
-              boxShadow: canPost ? '0 10px 28px rgba(139,92,246,0.4)' : 'none',
+              display: 'flex', alignItems: 'center', gap: 10,
+              boxShadow: canPost ? '0 14px 38px rgba(139,92,246,0.5)' : 'none',
               flexShrink: 0,
+              transition: 'transform 0.12s',
             }}
+            onMouseDown={(e) => { if (canPost) e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
-            <CheckCircle2 size={17} /> Post Deal
+            <CheckCircle2 size={isMobile ? 20 : 24} /> Post Deal
           </button>
         </div>
       </div>

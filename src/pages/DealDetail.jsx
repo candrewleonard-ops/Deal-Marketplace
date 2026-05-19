@@ -12,6 +12,7 @@ import ImageCarousel from '../components/ImageCarousel';
 import AddressRequestModal from '../components/AddressRequestModal';
 import CarsonFirstAddressModal, { hasSeenCarsonNote, markCarsonNoteSeen } from '../components/CarsonFirstAddressModal';
 import StreetView from '../components/StreetView';
+import ProfitCalculator from '../components/ProfitCalculator';
 import { getDisplayAddress } from '../utils/address';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -190,10 +191,10 @@ export default function DealDetail() {
                 gridTemplateColumns: '1fr 1fr',
               }}>
                 {[
-                  { label: 'Asking',  value: formatCurrency(deal.price),           color: '#f8fafc', accent: '#8b5cf6' },
-                  { label: 'ARV',     value: formatCurrency(deal.arv),             color: '#10b981', accent: '#10b981' },
-                  { label: 'Repairs', value: formatCurrency(deal.repairCost),      color: '#f59e0b', accent: '#ef4444' },
-                  { label: 'Profit',  value: `+${formatCurrency(deal.potentialProfit)}`, color: '#10b981', accent: '#10b981' },
+                  { label: 'List Price', value: formatCurrency(deal.price),      color: '#f8fafc', accent: '#8b5cf6' },
+                  { label: 'ARV',        value: formatCurrency(deal.arv),         color: '#10b981', accent: '#10b981' },
+                  { label: 'Est. Repairs', value: formatCurrency(deal.repairCost), color: '#f59e0b', accent: '#ef4444' },
+                  { label: 'Deal Type',  value: dealTypeLabels[deal.dealType] || '—', color: '#06b6d4', accent: '#06b6d4' },
                 ].map(({ label, value, color, accent }, i) => (
                   <div key={label} style={{
                     padding: '14px 14px',
@@ -220,8 +221,8 @@ export default function DealDetail() {
                 {[
                   { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
                   { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
-                  { label: 'Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
-                  { label: 'Potential Profit', value: formatCurrency(deal.potentialProfit), color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.2)' },
+                  { label: 'Est. Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
+                  { label: 'Deal Type', value: dealTypeLabels[deal.dealType] || '—', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)', border: 'rgba(6, 182, 212, 0.2)' },
                 ].map(({ label, value, color, bg, border }) => (
                   <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
                     <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
@@ -232,6 +233,18 @@ export default function DealDetail() {
                 ))}
               </div>
             )}
+
+            {/* ── Deal Calculator (replaces any static profit figure) ── */}
+            <ProfitCalculator
+              listingPrice={deal.price || deal.listingPrice || 0}
+              arv={deal.arv || 0}
+              rehabDefault={
+                deal.rehabLow != null && deal.rehabHigh != null
+                  ? Math.round((deal.rehabLow + deal.rehabHigh) / 2)
+                  : (deal.repairCost || 0)
+              }
+              isMobile={isMobile}
+            />
 
             {/* Property Details */}
             <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
@@ -344,9 +357,9 @@ export default function DealDetail() {
                   <div style={{ color: '#475569', fontSize: '10px', fontWeight: 700 }}>ARV</div>
                   <div style={{ color: '#10b981', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.arv)}</div>
                 </div>
-                <div style={{ flex: 1, background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-                  <div style={{ color: '#475569', fontSize: '10px', fontWeight: 700 }}>PROFIT</div>
-                  <div style={{ color: '#f59e0b', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.potentialProfit)}</div>
+                <div style={{ flex: 1, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
+                  <div style={{ color: '#475569', fontSize: '10px', fontWeight: 700 }}>EST. REPAIRS</div>
+                  <div style={{ color: '#f59e0b', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.repairCost)}</div>
                 </div>
               </div>
 

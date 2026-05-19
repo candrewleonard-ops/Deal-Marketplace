@@ -17,7 +17,7 @@ export default function SavedDeals() {
   const [selected, setSelected] = useState(new Set());
 
   const totalValue = savedDeals.reduce((sum, d) => sum + (d.listingPrice || d.price || 0), 0);
-  const totalProfit = savedDeals.reduce((sum, d) => sum + (d.potentialProfit || 0), 0);
+  const totalRepairs = savedDeals.reduce((sum, d) => sum + (d.repairCost || 0), 0);
   const totalARV = savedDeals.reduce((sum, d) => sum + (d.arv || 0), 0);
 
   function toggleSelected(id) {
@@ -182,9 +182,9 @@ export default function SavedDeals() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' }}>
                   {[
                     { label: 'Total List Price', value: totalValue, color: '#f8fafc' },
-                    { label: 'Total ARV', value: totalARV, color: '#10b981' },
-                    { label: 'Potential Profit', value: totalProfit, color: '#f59e0b' },
-                    { label: 'Avg Per Deal', value: totalValue / savedDeals.length, color: '#06b6d4' },
+                    { label: 'Total ARV (seller-reported)', value: totalARV, color: '#10b981' },
+                    { label: 'Total Est. Repairs', value: totalRepairs, color: '#ef4444' },
+                    { label: 'Avg List / Deal', value: totalValue / savedDeals.length, color: '#06b6d4' },
                   ].map(({ label, value, color }) => (
                     <div key={label} style={{
                       background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', padding: '16px',
