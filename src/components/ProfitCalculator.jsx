@@ -44,11 +44,23 @@ export default function ProfitCalculator({
   }), [listingPrice, arv, rehabDefault]);
 
   const [v, setV] = useState(defaults);
+  // Down payment + total cash invested are editable $ figures. `null` =
+  // "untouched", so they auto-track price+rehab until the buyer types their
+  // own number, then they hold it (buyer does their own calc).
+  const [downOverride, setDownOverride] = useState(null);
+  const [cashOverride, setCashOverride] = useState(null);
+
   const set = (k) => (e) => {
     const raw = e.target.value;
     setV((s) => ({ ...s, [k]: raw === '' ? '' : Number(raw) }));
   };
   const num = (k) => (v[k] === '' ? 0 : Number(v[k]) || 0);
+
+  function resetAll() {
+    setV(defaults);
+    setDownOverride(null);
+    setCashOverride(null);
+  }
 
   const r = useMemo(() => {
     const price = num('price');
@@ -57,12 +69,18 @@ export default function ProfitCalculator({
     const rate = num('rate');
     const points = num('points');
     const months = num('months');
-    const down = num('down');
     const realtorPct = num('realtor');
 
     const basis = price + rehab;
-    const downCash = basis * (down / 100);
-    const loan = basis - downCash;
+    const downDefault = Math.round(basis * 0.10);          // 10% of price+rehab
+    const downCash = downOverride === null || downOverride === ''
+      ? downDefault : Number(downOverride) || 0;
+    // Total cash invested defaults to the FULL deal cost (all-cash).
+    const cashDefault = basis;
+    const cashInvested = cashOverride === null || cashOverride === ''
+      ? cashDefault : Number(cashOverride) || 0;
+
+    const loan = Math.max(0, basis - downCash);
     const interest = loan * (rate / 100) * (months / 12);
     const pointsCost = loan * (points / 100);
     const closing = av * 0.0075 * 2;        // 0.75% ARV, buy + sell
@@ -71,11 +89,17 @@ export default function ProfitCalculator({
 
     const totalCosts = price + rehab + interest + pointsCost + closing + insurance + realtor;
     const netProfit = av - totalCosts;
-    const cashInvested = downCash + pointsCost + interest + closing + insurance;
     const coc = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
 
-    return { downCash, loan, interest, pointsCost, closing, insurance, realtor, netProfit, cashInvested, coc };
-  }, [v]); // eslint-disable-line react-hooks/exhaustive-deps
+    return {
+      basis, downDefault, downCash, cashDefault, cashInvested,
+      loan, interest, pointsCost, closing, insurance, realtor, netProfit, coc,
+    };
+  }, [v, downOverride, cashOverride]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // What the two editable $ fields actually display.
+  const downDisplay = downOverride === null ? r.downDefault : downOverride;
+  const cashDisplay = cashOverride === null ? r.cashDefault : cashOverride;
 
   const positive = r.netProfit >= 0;
 
@@ -99,7 +123,7 @@ export default function ProfitCalculator({
           </div>
         </div>
         <button
-          onClick={() => setV(defaults)}
+          onClick={resetAll}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
@@ -122,7 +146,12 @@ export default function ProfitCalculator({
         <NumberField label="HML rate" value={v.rate} onChange={set('rate')} suffix="%" />
         <NumberField label="Points / fees" value={v.points} onChange={set('points')} suffix="%" />
         <NumberField label="Hold (months)" value={v.months} onChange={set('months')} />
-        <NumberField label="Down payment" value={v.down} onChange={set('down')} suffix="%" />
+        <NumberField
+          label="Down payment"
+          value={downDisplay}
+          onChange={(e) => setDownOverride(e.target.value === '' ? '' : Number(e.target.value))}
+          prefix="$"
+        />
         <NumberField label="Realtor" value={v.realtor} onChange={set('realtor')} suffix="%" />
       </div>
 
@@ -184,21 +213,39 @@ export default function ProfitCalculator({
           borderRadius: 12, padding: 16,
         }}>
           <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <TrendingUp size={12} /> CASH-ON-CASH RETURN
+            <TrendingUp size={12} /> TOTAL CASH INVESTED
           </div>
-          <div style={{ color: '#a78bfa', fontWeight: 900, fontSize: 28, marginTop: 4 }}>
-            {(Number.isFinite(r.coc) ? r.coc : 0).toFixed(1)}%
+          <div style={{ position: 'relative', marginTop: 4 }}>
+            <span style={{
+              position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+              color: '#a78bfa', fontWeight: 900, fontSize: 28, pointerEvents: 'none',
+            }}>$</span>
+            <input
+              type="number"
+              value={cashDisplay}
+              onChange={(e) => setCashOverride(e.target.value === '' ? '' : Number(e.target.value))}
+              style={{
+                width: '100%', background: 'transparent', border: 'none', outline: 'none',
+                color: '#a78bfa', fontWeight: 900, fontSize: 28,
+                padding: '0 0 0 20px',
+              }}
+            />
           </div>
-          <div style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>
-            on {money(r.cashInvested)} cash invested
+          <div style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
+            Defaults to the full price + rehab — edit to your real cash in.
+            <span style={{ color: '#94a3b8', fontWeight: 700 }}>
+              {' '}Cash-on-cash ≈ {(Number.isFinite(r.coc) ? r.coc : 0).toFixed(1)}%
+            </span>
           </div>
         </div>
       </div>
 
       <div style={{ color: '#475569', fontSize: 11, lineHeight: 1.5, marginTop: 12 }}>
-        Assumes the purchase + rehab is HML-financed at {pct(num('down'))} down. Cash invested =
-        down payment + points + interest + closing + insurance. All figures are estimates and
-        change with your actual financing, timeline, and market.
+        Purchase + rehab is assumed HML-financed; the down payment is your cash at close
+        (defaults to 10% of price + rehab). <strong style={{ color: '#64748b' }}>Total cash
+        invested</strong> defaults to the full price + rehab (all-cash) so cash-on-cash starts
+        conservative — change it to whatever you actually put in. All figures are estimates and
+        change with your real financing, timeline, and market.
       </div>
     </div>
   );
