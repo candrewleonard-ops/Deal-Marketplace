@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import Logo from './Logo';
 
 const SECTIONS = [
   {
@@ -34,7 +34,7 @@ const SECTIONS = [
   {
     title: 'Company',
     links: [
-      { label: 'About TREIM',      to: '/landing' },
+      { label: 'About All Street Live', to: '/landing' },
       { label: 'How It Works',     to: '/landing' },
       { label: 'Contact',          to: '/messages' },
       { label: 'Help Center',      to: '/landing' },
@@ -75,15 +75,8 @@ export default function Footer() {
         }}>
           {/* Brand column */}
           <div>
-            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', marginBottom: '14px' }}>
-              <div style={{
-                width: '34px', height: '34px', borderRadius: '8px',
-                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Building2 size={18} style={{ color: '#fff' }} />
-              </div>
-              <span className="gradient-text" style={{ fontSize: '22px', fontWeight: 900 }}>TREIM</span>
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', marginBottom: '14px' }}>
+              <Logo size="md" />
             </Link>
             <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.6, margin: '0 0 16px', maxWidth: '280px' }}>
               The #1 marketplace for real estate investors. Post deals free, find buyers fast, build your network.
@@ -179,7 +172,7 @@ export default function Footer() {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px',
         }}>
           <div style={{ color: '#475569', fontSize: '12px' }}>
-            © {new Date().getFullYear()} TREIM — The Real Estate Investment Marketplace. All rights reserved.
+            © {new Date().getFullYear()} All Street Live — Real Estate · Real Time. All rights reserved.
           </div>
           <div style={{ display: 'flex', gap: '18px', fontSize: '12px' }}>
             {['Terms', 'Privacy', 'Cookies', 'DMCA'].map(t => (

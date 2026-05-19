@@ -434,7 +434,7 @@ export default function MyDeals() {
               <button onClick={() => setShowPromo(null)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><XIcon size={20} /></button>
             </div>
             <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Boost your deal's visibility and reach more active buyers on TREIM.</p>
+              <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Boost your deal's visibility and reach more active buyers on All Street Live.</p>
               {promoTiers.map(tier => (
                 <div key={tier.name} style={{ background: '#1a1a2e', border: `1px solid ${tier.color}30`, borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer', transition: 'border-color 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = tier.color}

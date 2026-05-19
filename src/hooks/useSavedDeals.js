@@ -1,6 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const KEY = 'treim_saved_deals';
+const KEY = 'asl_saved_deals';
+const LEGACY_KEY = 'treim_saved_deals';
+const SAVED_EVENT = 'asl-saved-change';
+
+// One-time migration: move any pre-rebrand saved list to the new key.
+(function migrateLegacy() {
+  try {
+    if (localStorage.getItem(KEY) == null && localStorage.getItem(LEGACY_KEY) != null) {
+      localStorage.setItem(KEY, localStorage.getItem(LEGACY_KEY));
+      localStorage.removeItem(LEGACY_KEY);
+    }
+  } catch { /* ignore */ }
+})();
 
 function read() {
   try {
@@ -11,7 +23,7 @@ function read() {
 
 function write(ids) {
   try { localStorage.setItem(KEY, JSON.stringify(ids)); } catch {}
-  window.dispatchEvent(new Event('treim-saved-change'));
+  window.dispatchEvent(new Event(SAVED_EVENT));
 }
 
 export function useSavedDeals() {
@@ -19,10 +31,10 @@ export function useSavedDeals() {
 
   useEffect(() => {
     const sync = () => setIds(read());
-    window.addEventListener('treim-saved-change', sync);
+    window.addEventListener(SAVED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
-      window.removeEventListener('treim-saved-change', sync);
+      window.removeEventListener(SAVED_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
   }, []);

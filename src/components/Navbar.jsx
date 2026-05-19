@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Building2, ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
+  ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
   Crown, Shield, UsersRound, Heart, GraduationCap
 } from 'lucide-react';
@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import PostDealModal from './PostDealModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import CyclingText from './CyclingText';
+import Logo from './Logo';
 
 const HOWTO_PHRASES = [
   'Buy Fix n Flips',
@@ -77,21 +78,8 @@ export default function Navbar() {
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '0 12px' : '0 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 56 : 64, gap: isMobile ? 8 : 24 }}>
           {/* Logo */}
-          <Link to="/marketplace" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: 8,
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Building2 size={18} color="#fff" />
-            </div>
-            <span style={{
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              fontWeight: 900, fontSize: isMobile ? 16 : 18, letterSpacing: '-0.5px',
-            }}>
-              TREIM
-            </span>
+          <Link to="/marketplace" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            <Logo size={isMobile ? 'sm' : 'sm'} />
           </Link>
 
           {/* DESKTOP: inline nav links */}

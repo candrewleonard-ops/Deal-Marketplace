@@ -45,7 +45,7 @@ export default function PostCard({ post }) {
   }
 
   function handleCopyLink() {
-    navigator.clipboard.writeText(`https://treim.app/post/${post.id}`).catch(() => {});
+    navigator.clipboard.writeText(`https://allstreetlive.com/post/${post.id}`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

@@ -5,6 +5,7 @@ import { validateUsername } from '../utils/username';
 import { users } from '../data/users';
 import { useAuth } from '../context/AuthContext';
 import RoleSelectionModal from '../components/RoleSelectionModal';
+import Logo from '../components/Logo';
 
 const userTags = [
   'Fix N Flipper', 'Wholesaler', 'Marketer', 'Realtor', 'Cash Buyer',
@@ -136,18 +137,9 @@ export default function Auth() {
       <div style={{ width: '100%', maxWidth: '480px', position: 'relative' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '48px', height: '48px', borderRadius: '14px',
-              background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 30px rgba(139, 92, 246, 0.4)',
-            }}>
-              <Home size={24} style={{ color: '#fff' }} />
-            </div>
-            <span className="gradient-text" style={{ fontSize: '28px', fontWeight: 900 }}>TREIM</span>
+          <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex' }}>
+            <Logo size="lg" tagline />
           </Link>
-          <p style={{ color: '#475569', marginTop: '8px', fontSize: '14px' }}>The #1 Marketplace for Real Estate Investors</p>
         </div>
 
         {/* Card */}
@@ -269,7 +261,7 @@ export default function Auth() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   }}
                 >
-                  Sign In to TREIM
+                  Sign In to All Street Live
                   <ArrowRight size={18} />
                 </button>
 
@@ -292,7 +284,7 @@ export default function Auth() {
                       Create Your Account
                     </h2>
                     <p style={{ color: '#475569', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
-                      Join 10,000+ real estate investors on TREIM
+                      Join 10,000+ real estate investors on All Street Live
                     </p>
 
                     {/* Profile Type */}

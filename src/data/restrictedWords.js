@@ -8,5 +8,5 @@ export const restrictedWords = [
   'nword', 'fword', 'rword', 'cword', 'sword',
   // Reserved / impersonation
   'admin', 'moderator', 'owner', 'staff', 'support', 'official',
-  'treim', 'carson',
+  'allstreet', 'allstreetlive', 'carson',
 ];

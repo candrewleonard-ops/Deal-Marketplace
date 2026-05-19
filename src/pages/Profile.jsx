@@ -105,7 +105,7 @@ export default function Profile() {
   }
 
   function handleCopyLink() {
-    navigator.clipboard.writeText(`https://treim.app/profile/${profile.id}`).catch(() => {});
+    navigator.clipboard.writeText(`https://allstreetlive.com/profile/${profile.id}`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -834,7 +834,7 @@ export default function Profile() {
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '13px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  https://treim.app/profile/{profile.id}
+                  https://allstreetlive.com/profile/{profile.id}
                 </span>
                 <button
                   onClick={handleCopyLink}

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Home, Users, MapPin, Zap, TrendingUp, Shield, CheckCircle, Star } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const stats = [
   { value: '10,000+', label: 'Active Investors' },
@@ -54,9 +55,9 @@ const steps = [
 ];
 
 const testimonials = [
-  { name: 'Marcus Johnson', role: 'Wholesaler · Atlanta, GA', text: 'I\'ve closed 12 deals in the last 6 months through TREIM buyers. This platform changed my business.', avatar: 'https://picsum.photos/seed/user1/100/100', rating: 5 },
+  { name: 'Marcus Johnson', role: 'Wholesaler · Atlanta, GA', text: 'I\'ve closed 12 deals in the last 6 months through All Street Live buyers. This platform changed my business.', avatar: 'https://picsum.photos/seed/user1/100/100', rating: 5 },
   { name: 'Sarah Mitchell', role: 'Creative Finance · Houston, TX', text: 'The social network helps me stay connected with investors nationwide. My buyer list doubled.', avatar: 'https://picsum.photos/seed/user4/100/100', rating: 5 },
-  { name: 'Kevin Washington', role: 'Buy & Hold · Memphis, TN', text: 'Found 8 rental properties through TREIM in one year. The deal quality here is unmatched.', avatar: 'https://picsum.photos/seed/user5/100/100', rating: 5 },
+  { name: 'Kevin Washington', role: 'Buy & Hold · Memphis, TN', text: 'Found 8 rental properties through All Street Live in one year. The deal quality here is unmatched.', avatar: 'https://picsum.photos/seed/user5/100/100', rating: 5 },
 ];
 
 export default function Landing() {
@@ -80,22 +81,8 @@ export default function Landing() {
 
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '32px' }}>
-            <div style={{
-              width: '72px', height: '72px', borderRadius: '20px',
-              background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '32px', fontWeight: 900, color: '#fff',
-              boxShadow: '0 0 40px rgba(139, 92, 246, 0.4)',
-            }}>
-              <Home size={36} />
-            </div>
-            <div style={{ textAlign: 'left' }}>
-              <div className="gradient-text" style={{ fontSize: '48px', fontWeight: 900, lineHeight: 1, letterSpacing: '-2px' }}>
-                TREIM
-              </div>
-              <div style={{ color: '#475569', fontSize: '14px', fontWeight: 500 }}>The REI Marketplace</div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
+            <Logo size="lg" tagline />
           </div>
 
           {/* Headline */}
@@ -195,7 +182,7 @@ export default function Landing() {
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 style={{ color: '#f8fafc', fontSize: '36px', fontWeight: 800, marginBottom: '12px', letterSpacing: '-0.5px' }}>
-              How <span className="gradient-text">TREIM</span> Works
+              How <span className="gradient-text">All Street Live</span> Works
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '16px' }}>Get started in minutes. Close deals in days.</p>
           </div>
@@ -266,7 +253,7 @@ export default function Landing() {
             Ready to Scale Your REI?
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '32px', lineHeight: 1.7 }}>
-            Join 10,000+ investors already using TREIM to find deals,<br />connect with buyers, and grow their portfolios.
+            Join 10,000+ investors already using All Street Live to find deals,<br />connect with buyers, and grow their portfolios.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -304,15 +291,8 @@ export default function Landing() {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', marginBottom: '40px' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <div style={{
-                  width: '36px', height: '36px', borderRadius: '8px',
-                  background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Home size={18} style={{ color: '#fff' }} />
-                </div>
-                <span className="gradient-text" style={{ fontWeight: 900, fontSize: '20px' }}>TREIM</span>
+              <div style={{ marginBottom: '16px' }}>
+                <Logo size="md" />
               </div>
               <p style={{ color: '#475569', fontSize: '14px', lineHeight: 1.6 }}>
                 The #1 Marketplace for Real Estate Investors. Connecting deals, investors, and opportunities nationwide.
@@ -321,7 +301,7 @@ export default function Landing() {
             {[
               { title: 'Platform', links: ['Marketplace', 'Social Feed', 'Contractors', 'Meetups', 'Messages'] },
               { title: 'Investors', links: ['Wholesalers', 'Cash Buyers', 'Hard Money', 'Property Managers', 'Agents'] },
-              { title: 'Company', links: ['About TREIM', 'Blog', 'Press', 'Careers', 'Contact'] },
+              { title: 'Company', links: ['About All Street Live', 'Blog', 'Press', 'Careers', 'Contact'] },
             ].map(({ title, links }) => (
               <div key={title}>
                 <h4 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '16px', fontSize: '14px' }}>{title}</h4>
@@ -340,7 +320,7 @@ export default function Landing() {
 
           <div style={{ borderTop: '1px solid #1e1e2e', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
             <p style={{ color: '#334155', fontSize: '13px', margin: 0 }}>
-              © 2026 The REI Marketplace (TREIM). All rights reserved.
+              © 2026 All Street Live. All rights reserved.
             </p>
             <div style={{ display: 'flex', gap: '20px' }}>
               {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map(l => (

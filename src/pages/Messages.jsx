@@ -16,7 +16,7 @@ const conversations = [
 
 const initialMessageHistory = {
   1: [
-    { id: 1, from: 2, text: "Hey Marcus! I saw your Atlanta deal on TREIM.", time: '10:32 AM', type: 'text' },
+    { id: 1, from: 2, text: "Hey Marcus! I saw your Atlanta deal on All Street Live.", time: '10:32 AM', type: 'text' },
     { id: 2, from: 1, text: "Hey Diana! Yes, great deal - 3/2 brick ranch, ARV $320k. Can close in 10 days.", time: '10:35 AM', type: 'text' },
     { id: 3, from: 2, text: "Very interested! Is the assignment fee negotiable?", time: '10:36 AM', type: 'text' },
     { id: 4, from: 1, text: "It's firm at $25k - we have another buyer interested and the numbers are solid. ARV supported by 3 comps.", time: '10:40 AM', type: 'text' },

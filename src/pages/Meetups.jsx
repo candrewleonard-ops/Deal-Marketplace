@@ -298,7 +298,7 @@ function MeetupCard({ meetup, featured, onToast }) {
   }
 
   function handleShare() {
-    navigator.clipboard.writeText(`https://treim.app/meetups/${meetup.id}`).catch(() => {});
+    navigator.clipboard.writeText(`https://allstreetlive.com/meetups/${meetup.id}`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     onToast && onToast('Link copied to clipboard!');

@@ -58,7 +58,7 @@ const testimonials = [
     name: 'Sarah M.',
     role: 'Fix & Flip Investor, Dallas TX',
     avatar: 'https://picsum.photos/seed/user4/100/100',
-    text: 'The priority listing placement alone is worth it. My deals get 3x more address requests now. Closed 4 extra deals last quarter that I attribute directly to TREIM VIP.',
+    text: 'The priority listing placement alone is worth it. My deals get 3x more address requests now. Closed 4 extra deals last quarter that I attribute directly to All Street Live VIP.',
     stars: 5,
   },
   {
@@ -76,7 +76,7 @@ const faqs = [
   { q: 'Is there a free trial?', a: 'Yes! VIP comes with a 7-day free trial. VIP Max comes with a 3-day trial. No credit card required to start the trial.' },
   { q: 'What is the money-back guarantee?', a: 'We offer a 30-day money-back guarantee for all paid plans. If you\'re not completely satisfied, contact support and we\'ll issue a full refund.' },
   { q: 'Can I switch between VIP and VIP Max?', a: 'Yes, you can upgrade or downgrade at any time. Changes take effect immediately for upgrades, and at the next billing cycle for downgrades.' },
-  { q: 'Do you offer team/business plans?', a: 'Yes! Business accounts get custom pricing for teams of 3+. Contact us at team@treim.app for enterprise pricing.' },
+  { q: 'Do you offer team/business plans?', a: 'Yes! Business accounts get custom pricing for teams of 3+. Contact us at team@allstreetlive.com for enterprise pricing.' },
 ];
 
 export default function Premium() {
@@ -118,7 +118,7 @@ export default function Premium() {
             Close More Deals, Faster
           </h1>
           <p style={{ color: '#94a3b8', fontSize: '18px', margin: '0 0 20px' }}>
-            Unlock your full investor potential on TREIM
+            Unlock your full investor potential on All Street Live
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
             {['30 DMs/day instead of 5', 'Priority deal placement', 'Unlimited address requests'].map(p => (
@@ -231,7 +231,7 @@ export default function Premium() {
         <div style={{ marginBottom: '64px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>SOCIAL PROOF</div>
-            <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '28px', margin: 0 }}>Investors Love TREIM Premium</h2>
+            <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '28px', margin: 0 }}>Investors Love All Street Live Premium</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
             {testimonials.map((t, i) => (

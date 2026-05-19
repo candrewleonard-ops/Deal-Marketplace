@@ -603,7 +603,7 @@ export default function DealDetail() {
             <div style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.15)', borderRadius: '16px', padding: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <Shield size={18} style={{ color: '#10b981' }} />
-                <span style={{ color: '#10b981', fontWeight: 700, fontSize: '14px' }}>TREIM Buyer Protection</span>
+                <span style={{ color: '#10b981', fontWeight: 700, fontSize: '14px' }}>All Street Live Buyer Protection</span>
               </div>
               <ul style={{ color: '#94a3b8', fontSize: '13px', margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <li>Verified seller profile</li>
@@ -653,7 +653,7 @@ export default function DealDetail() {
             </div>
             <div style={{ padding: '20px' }}>
               <textarea
-                defaultValue={`Check out this deal in ${deal.city}, ${deal.state}!\n\n${deal.title}\n\nListing Price: ${formatCurrency(deal.listingPrice || deal.price)}\nARV: ${formatCurrency(deal.arv)}\n\nhttps://treim.com/marketplace/${deal.id}`}
+                defaultValue={`Check out this deal in ${deal.city}, ${deal.state}!\n\n${deal.title}\n\nListing Price: ${formatCurrency(deal.listingPrice || deal.price)}\nARV: ${formatCurrency(deal.arv)}\n\nhttps://allstreetlive.com/marketplace/${deal.id}`}
                 className="input-dark"
                 rows={6}
                 style={{ width: '100%', padding: '12px', borderRadius: '10px', fontSize: '14px', resize: 'vertical', marginBottom: '12px' }}
