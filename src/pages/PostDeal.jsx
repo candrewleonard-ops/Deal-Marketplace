@@ -7,6 +7,7 @@ import {
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useSEO } from '../hooks/useSEO';
+import { useIsMobile } from '../hooks/useIsMobile';
 import AddressAutocomplete from '../components/AddressAutocomplete';
 
 const DEAL_TYPES = [
@@ -24,6 +25,7 @@ export default function PostDeal() {
   const { toast } = useToast();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
