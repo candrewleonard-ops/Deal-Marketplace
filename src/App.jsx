@@ -28,6 +28,7 @@ import BidRequest from './pages/BidRequest';
 import HowTo from './pages/HowTo';
 import PostDeal from './pages/PostDeal';
 import { DMGuard, AuthGuard } from './components/RouteGuards';
+import ScrollToTop from './components/ScrollToTop';
 import './index.css';
 
 function AppLayout({ children, hideFooter, hideTabBar }) {
@@ -67,6 +68,7 @@ function AppLayout({ children, hideFooter, hideTabBar }) {
 export default function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<AppLayout hideFooter><Marketplace /></AppLayout>} />
         <Route path="/landing" element={<Landing />} />
