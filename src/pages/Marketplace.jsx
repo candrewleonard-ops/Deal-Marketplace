@@ -46,6 +46,21 @@ const CITIES = [
   'Baltimore, MD','Philadelphia, PA','Las Vegas, NV','Columbus, OH',
 ];
 
+// Yellow-accented selectable chip for the desktop Quick Filters rail.
+function chip(on) {
+  return {
+    flex: 1, padding: '8px 0', borderRadius: 8, cursor: 'pointer',
+    background: on ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)',
+    border: `1px solid ${on ? '#f59e0b' : '#1e1e2e'}`,
+    color: on ? '#fbbf24' : '#94a3b8',
+    fontSize: 12, fontWeight: 800,
+  };
+}
+const priceInp = {
+  width: '100%', padding: '9px 10px 9px 22px', borderRadius: 9,
+  background: '#12121e', border: '1px solid #1e1e2e',
+  color: '#f8fafc', fontSize: 13, fontWeight: 700, outline: 'none',
+};
 
 export default function Marketplace() {
   useSEO({
@@ -60,6 +75,9 @@ export default function Marketplace() {
   const [priceValue,      setPriceValue]      = useState(1000000);
   const [priceMode,       setPriceMode]       = useState('max');
   const [minBeds,         setMinBeds]         = useState(0);
+  const [minBaths,        setMinBaths]        = useState(0);
+  const [priceMin,        setPriceMin]        = useState('');
+  const [priceMax,        setPriceMax]        = useState('');
   const [sortBy,          setSortBy]          = useState('newest');
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
@@ -125,6 +143,11 @@ export default function Marketplace() {
       if (priceMode === 'max' && lp > priceValue) return false;
       if (priceMode === 'min' && lp < priceValue) return false;
       if (minBeds > 0 && d.beds < minBeds) return false;
+      if (minBaths > 0 && (d.baths || 0) < minBaths) return false;
+      const pmin = Number(priceMin) || 0;
+      const pmax = Number(priceMax) || 0;
+      if (pmin && lp < pmin) return false;
+      if (pmax && lp > pmax) return false;
       if (newestOnly && d.daysListed > 7) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -132,7 +155,7 @@ export default function Marketplace() {
       }
       return true;
     });
-  }, [allDeals, activeType, search, city, priceValue, priceMode, minBeds, selectedStates, newestOnly]);
+  }, [allDeals, activeType, search, city, priceValue, priceMode, minBeds, minBaths, priceMin, priceMax, selectedStates, newestOnly]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -333,6 +356,111 @@ export default function Marketplace() {
 
           {/* The actual map */}
           <USMap deals={deals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
+
+          {/* ── Quick Filters (desktop) — fills the left rail ── */}
+          <div style={{
+            background: 'linear-gradient(180deg, rgba(245,158,11,0.07), rgba(245,158,11,0.02))',
+            border: '1px solid rgba(245,158,11,0.28)',
+            borderRadius: 14, padding: '16px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <SlidersHorizontal size={15} style={{ color: '#fbbf24' }} />
+                <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 14 }}>Quick Filters</span>
+              </div>
+              {(minBeds > 0 || minBaths > 0 || priceMin || priceMax) && (
+                <button
+                  onClick={() => { setMinBeds(0); setMinBaths(0); setPriceMin(''); setPriceMax(''); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20,
+                    background: 'rgba(245,158,11,0.14)', border: '1px solid rgba(245,158,11,0.35)',
+                    color: '#fbbf24', cursor: 'pointer', fontSize: 11, fontWeight: 700,
+                  }}
+                >
+                  <RotateCcw size={10} /> Clear
+                </button>
+              )}
+            </div>
+
+            {/* Bedrooms */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 7 }}>BEDROOMS</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[0, 1, 2, 3, 4, 5].map(n => {
+                  const on = minBeds === n;
+                  return (
+                    <button key={n} onClick={() => setMinBeds(n)} style={chip(on)}>
+                      {n === 0 ? 'Any' : `${n}+`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bathrooms */}
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 7 }}>BATHROOMS</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {[0, 1, 2, 3, 4].map(n => {
+                  const on = minBaths === n;
+                  return (
+                    <button key={n} onClick={() => setMinBaths(n)} style={chip(on)}>
+                      {n === 0 ? 'Any' : `${n}+`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Price range */}
+            <div>
+              <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 7 }}>LISTING PRICE</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                  <input
+                    type="number" value={priceMin} onChange={e => setPriceMin(e.target.value)}
+                    placeholder="Min"
+                    style={priceInp}
+                  />
+                </div>
+                <span style={{ color: '#64748b', fontSize: 13, fontWeight: 700 }}>–</span>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                  <input
+                    type="number" value={priceMax} onChange={e => setPriceMax(e.target.value)}
+                    placeholder="Max"
+                    style={priceInp}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                {[['< $25k', '', '25000'], ['$25–50k', '25000', '50000'], ['$50–100k', '50000', '100000'], ['$100k+', '100000', '']].map(([label, lo, hi]) => (
+                  <button
+                    key={label}
+                    onClick={() => { setPriceMin(lo); setPriceMax(hi); }}
+                    style={{
+                      padding: '5px 10px', borderRadius: 16, cursor: 'pointer',
+                      background: (String(priceMin) === lo && String(priceMax) === hi) ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${(String(priceMin) === lo && String(priceMax) === hi) ? '#f59e0b' : '#1e1e2e'}`,
+                      color: (String(priceMin) === lo && String(priceMax) === hi) ? '#fbbf24' : '#94a3b8',
+                      fontSize: 11, fontWeight: 700,
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(245,158,11,0.18)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <span style={{ color: '#94a3b8', fontSize: 12 }}>Matching deals</span>
+              <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: 15 }}>{sorted.length}</span>
+            </div>
+          </div>
 
           {/* Active state chips */}
           {selectedStates.length > 0 && (
