@@ -6,6 +6,7 @@ import {
   Shield, CheckCircle, X, Zap, Eye
 } from 'lucide-react';
 import { getDealById, getSimilarDeals } from '../data/deals';
+import { getLiveDeal, isLiveDealId } from '../lib/deals';
 import { getUserById } from '../data/users';
 import DealCard from '../components/DealCard';
 import ImageCarousel from '../components/ImageCarousel';
@@ -45,7 +46,23 @@ function formatCurrency(n) {
 
 export default function DealDetail() {
   const { id } = useParams();
-  const deal = getDealById(id);
+  const mockDeal = getDealById(id);
+  const [liveDeal, setLiveDeal] = useState(null);
+  const [liveChecked, setLiveChecked] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    if (!mockDeal && isLiveDealId(id)) {
+      getLiveDeal(id)
+        .then(d => { if (alive) { setLiveDeal(d); setLiveChecked(true); } })
+        .catch(() => { if (alive) setLiveChecked(true); });
+    } else {
+      setLiveChecked(true);
+    }
+    return () => { alive = false; };
+  }, [id, mockDeal]);
+
+  const deal = mockDeal || liveDeal;
   const { currentUser, isLoggedIn, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
 
   // If a guest lands here directly (deep-link), surface the sign-up prompt.
@@ -83,8 +100,12 @@ export default function DealDetail() {
     return (
       <div style={{ background: '#0a0a0f', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ color: '#f8fafc', fontWeight: 700 }}>Deal not found</h2>
-          <Link to="/marketplace" style={{ color: '#8b5cf6', textDecoration: 'none' }}>← Back to Marketplace</Link>
+          <h2 style={{ color: '#f8fafc', fontWeight: 700 }}>
+            {liveChecked ? 'Deal not found' : 'Loading deal…'}
+          </h2>
+          {liveChecked && (
+            <Link to="/marketplace" style={{ color: '#8b5cf6', textDecoration: 'none' }}>← Back to Marketplace</Link>
+          )}
         </div>
       </div>
     );

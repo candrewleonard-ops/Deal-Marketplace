@@ -9,6 +9,9 @@ import { useAuth } from '../context/AuthContext';
 import { useSEO } from '../hooks/useSEO';
 import { useIsMobile } from '../hooks/useIsMobile';
 import AddressAutocomplete from '../components/AddressAutocomplete';
+import { uploadImage } from '../lib/images';
+import { createDeal } from '../lib/deals';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const DEAL_TYPES = [
   { value: 'fix-flip',   label: 'Fix & Flip',       color: '#ef4444' },
@@ -54,6 +57,7 @@ export default function PostDeal() {
   const [dragOver, setDragOver] = useState(false);
   const dragIndex = useRef(null);
   const [overIndex, setOverIndex] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -66,6 +70,7 @@ export default function PostDeal() {
         id: `${Date.now()}-${i}-${file.name}`,
         url: URL.createObjectURL(file),
         name: file.name,
+        file, // kept so we can upload to storage on submit
       }));
       if (files.length > room) {
         toast(`Only ${MAX_PHOTOS} photos max — added the first ${room}.`, 'info');
@@ -126,18 +131,18 @@ export default function PostDeal() {
   // Minimum to post: a name, a street address, and at least one photo.
   const canPost = !!form.title.trim() && !!form.address.trim() && photos.length >= 1;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e?.preventDefault?.();
+    if (submitting) return;
+
     const title = form.title.trim();
     const address = resolveAddress();
-    // Keep state in sync if autofill bypassed onChange.
     if (address && address !== form.address) update('address', address);
 
     const missing = [];
     if (!title) missing.push('a deal name');
     if (!address) missing.push('the street address');
     if (photos.length < 1) missing.push('at least one photo');
-
     if (missing.length) {
       const list = missing.length === 1
         ? missing[0]
@@ -145,8 +150,42 @@ export default function PostDeal() {
       toast(`Add ${list} to post your deal.`, 'info', 4000);
       return;
     }
-    toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
-    navigate('/my-deals');
+
+    if (!isSupabaseConfigured) {
+      toast('Preview mode — connect the database to save deals for real.', 'info', 4500);
+      navigate('/my-deals');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // 1. Upload photos to Storage (in display order)
+      const urls = [];
+      for (const p of photos) {
+        if (p.file) {
+          const { url } = await uploadImage(p.file);
+          if (url) urls.push(url);
+        } else if (p.url) {
+          urls.push(p.url);
+        }
+      }
+      // 2. Insert the deal row
+      const res = await createDeal(
+        { ...form, address },
+        urls,
+        { id: currentUser?.id, name: currentUser?.name },
+      );
+      if (!res.ok) {
+        toast(`Couldn't save the deal: ${res.reason}`, 'error', 6000);
+        setSubmitting(false);
+        return;
+      }
+      toast('🎉 Deal posted! It\'s now live in the marketplace.', 'success', 4500);
+      navigate('/marketplace');
+    } catch (err) {
+      toast(`Upload failed: ${err?.message || err}`, 'error', 6000);
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -447,8 +486,9 @@ export default function PostDeal() {
               {form.title || 'Untitled deal'}
             </div>
             <div style={{ color: canPost ? '#34d399' : '#64748b', fontSize: isMobile ? 12 : 14, fontWeight: 600, marginTop: 2 }}>
-              {photos.length} photo{photos.length !== 1 ? 's' : ''} ·{' '}
-              {canPost ? '✓ Ready to post' : 'Need: name, street address & 1 photo'}
+              {submitting
+                ? 'Uploading photos & saving…'
+                : `${photos.length} photo${photos.length !== 1 ? 's' : ''} · ${canPost ? '✓ Ready to post' : 'Need: name, street address & 1 photo'}`}
             </div>
           </div>
           {/* Always pressable — clicking it tells you exactly what's missing
@@ -456,6 +496,7 @@ export default function PostDeal() {
           <button
             type="submit"
             onClick={handleSubmit}
+            disabled={submitting}
             style={{
               padding: isMobile ? '16px 28px' : '18px 44px',
               borderRadius: 14,
@@ -463,17 +504,17 @@ export default function PostDeal() {
               border: 'none',
               color: '#fff',
               fontWeight: 900, fontSize: isMobile ? 17 : 20, letterSpacing: 0.2,
-              cursor: 'pointer',
+              cursor: submitting ? 'wait' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 10,
               boxShadow: '0 14px 38px rgba(139,92,246,0.5)',
-              opacity: canPost ? 1 : 0.92,
+              opacity: submitting ? 0.7 : (canPost ? 1 : 0.92),
               flexShrink: 0,
               transition: 'transform 0.12s',
             }}
-            onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+            onMouseDown={(e) => { if (!submitting) e.currentTarget.style.transform = 'scale(0.97)'; }}
             onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
-            <CheckCircle2 size={isMobile ? 20 : 24} /> Post Deal
+            <CheckCircle2 size={isMobile ? 20 : 24} /> {submitting ? 'Posting…' : 'Post Deal'}
           </button>
         </div>
       </div>

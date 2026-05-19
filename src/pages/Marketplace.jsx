@@ -7,6 +7,7 @@ import {
 import DealCard from '../components/DealCard';
 import USMap from '../components/USMap';
 import { deals, dealTypes } from '../data/deals';
+import { listLiveDeals } from '../lib/deals';
 import { useSEO } from '../hooks/useSEO';
 import { useAuth } from '../context/AuthContext';
 
@@ -62,8 +63,19 @@ export default function Marketplace() {
   const [sortBy,          setSortBy]          = useState('newest');
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
+  const [liveDeals,       setLiveDeals]       = useState([]);
   const navigate = useNavigate();
   const { isAuthenticated, requireAuth } = useAuth();
+
+  // Pull user-posted deals from the database (no-op if Supabase isn't set up).
+  useEffect(() => {
+    let alive = true;
+    listLiveDeals().then(rows => { if (alive) setLiveDeals(rows); }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
+  // Posted deals appear first, then the seed/sample deals.
+  const allDeals = useMemo(() => [...liveDeals, ...deals], [liveDeals]);
 
   function goPostDeal() {
     if (!isAuthenticated) {
@@ -76,11 +88,11 @@ export default function Marketplace() {
   // States that actually have deals (for the mobile dropdown), sorted by deal count desc
   const statesWithDeals = useMemo(() => {
     const counts = {};
-    for (const d of deals) counts[d.state] = (counts[d.state] || 0) + 1;
+    for (const d of allDeals) counts[d.state] = (counts[d.state] || 0) + 1;
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
       .map(([abbr, count]) => ({ abbr, count, name: STATE_NAMES[abbr] || abbr }));
-  }, []);
+  }, [allDeals]);
 
   function handleStateToggle(abbr) {
     if (abbr === '__CLEAR__') { setSelectedStates([]); return; }
@@ -102,7 +114,7 @@ export default function Marketplace() {
   }
 
   const filtered = useMemo(() => {
-    return deals.filter(d => {
+    return allDeals.filter(d => {
       if (activeType !== 'all' && d.dealType !== activeType) return false;
       if (city !== 'All Cities') {
         const [c, s] = city.split(', ');
@@ -120,7 +132,7 @@ export default function Marketplace() {
       }
       return true;
     });
-  }, [activeType, search, city, priceValue, priceMode, minBeds, selectedStates, newestOnly]);
+  }, [allDeals, activeType, search, city, priceValue, priceMode, minBeds, selectedStates, newestOnly]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
@@ -337,7 +349,7 @@ export default function Marketplace() {
           {selectedStates.length > 0 && (
             <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '10px', padding: '12px' }}>
               {selectedStates.map(abbr => {
-                const count = deals.filter(d => d.state === abbr).length;
+                const count = allDeals.filter(d => d.state === abbr).length;
                 return (
                   <div key={abbr} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #1e1e2e', lastChild: { borderBottom: 'none' } }}>
                     <span style={{ color: '#94a3b8', fontSize: '12px' }}>{abbr}</span>

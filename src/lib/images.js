@@ -54,11 +54,25 @@ export function avatarUrl(user, size = 96) {
 }
 
 /**
- * Stubbed upload. Returns an object URL today so the UI can preview the file.
- * Replace with a real POST to /api/uploads when the backend is in place.
+ * Uploads to Supabase Storage when configured; otherwise falls back to an
+ * in-browser object URL (preview only — not persisted).
  */
 export async function uploadImage(file) {
   if (!file) throw new Error('No file provided');
+
+  const { supabase, isSupabaseConfigured, PHOTO_BUCKET } = await import('./supabase');
+
+  if (isSupabaseConfigured) {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `deals/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+    if (error) throw error;
+    const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path);
+    return { key: path, url: data.publicUrl, size: file.size, mime: file.type, isLocal: false };
+  }
+
   const previewUrl = typeof URL !== 'undefined' && URL.createObjectURL
     ? URL.createObjectURL(file)
     : '';
