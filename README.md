@@ -1,16 +1,56 @@
-# React + Vite
+# AllStreet Live — Deal Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The code behind [allstreetlive.com](https://allstreetlive.com) — an off-market real
+estate deal marketplace: listings with scope-of-work condition reports, a deal
+calculator, live property tours, DMs with in-app calls, groups, meetups,
+contractor directory, education hub, and admin tooling.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19 + Vite** single-page app, styled with **Tailwind CSS 4** tokens +
+  inline styles (Robinhood-inspired near-black/green/gold theme in `src/index.css`)
+- **Supabase** (Postgres + Storage) for user-posted deals & photos — public
+  client keys are baked into `src/lib/supabase.js`, RLS enforces access;
+  seed/demo content lives in `src/data/`
+- **react-router-dom** — routes in `src/App.jsx`; listing URLs are SEO slugs
+  (`/marketplace/phoenix-fixer-hot-market-deal-2`, see `src/utils/slug.js`)
+- **react-simple-maps** for the marketplace state map, **lucide-react** icons
+- Deployed on **Cloudflare Pages** (`public/_redirects` handles SPA routing);
+  the production branch is configured in the Cloudflare dashboard
 
-## React Compiler
+## Develop
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # production build to dist/
+npm run lint
+```
 
-## Expanding the ESLint configuration
+## Environment
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Copy `.env.example` to `.env.local` (or set in Cloudflare Pages → Settings →
+Environment variables): `VITE_GOOGLE_MAPS_API_KEY` for address autocomplete +
+Street View, `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` to override the
+baked-in database.
+
+### Supabase migration for Scope of Work
+
+Posted deals save their 15-question condition report to a `scope_of_work`
+jsonb column. If the column doesn't exist yet, run this once in the Supabase
+SQL editor (posting still works without it — the scope is just dropped):
+
+```sql
+alter table deals add column if not exists scope_of_work jsonb;
+```
+
+## Layout
+
+| Path | What lives there |
+| --- | --- |
+| `src/pages/` | One file per route (Marketplace is the homepage; LiveTours/LiveRoom are the live-streaming section) |
+| `src/components/` | Shared UI: Navbar, DealCard, BuyBoxModal, CallOverlay, modals, US map |
+| `src/data/` | Demo deals/users/posts + `scopeOfWork.js` (the 15 questions) + `liveTours.js` |
+| `src/lib/` | Supabase client, deals CRUD, DM history, inbox/unread state, activity log |
+| `src/context/` | Auth + toast providers |
+| `src/hooks/`, `src/utils/` | `useSEO`, mobile detection, slug + address helpers |

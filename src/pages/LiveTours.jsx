@@ -7,7 +7,6 @@ import { liveNow, upcomingTours, getLiveNotifPrefs, setLiveNotifsEnabled, toggle
 import { getFollowing } from '../lib/inbox';
 import { users } from '../data/users';
 import { deals, getDealById } from '../data/deals';
-import { dealPath } from '../utils/slug';
 import { useAuth } from '../context/AuthContext';
 import { useSEO } from '../hooks/useSEO';
 import { useIsMobile } from '../hooks/useIsMobile';
