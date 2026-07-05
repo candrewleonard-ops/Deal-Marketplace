@@ -84,8 +84,8 @@ export default function StreetView({ address, city, state, zip }) {
         aria-label="Load street view"
         style={{
           width: '100%',
-          background: '#12121e',
-          border: '1px solid #1e1e2e',
+          background: '#131614',
+          border: '1px solid #232925',
           borderRadius: 14,
           padding: '12px 14px',
           marginBottom: 16,
@@ -95,23 +95,23 @@ export default function StreetView({ address, city, state, zip }) {
           WebkitTapHighlightColor: 'transparent',
           transition: 'border-color 0.15s, background 0.15s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(139,92,246,0.45)'; e.currentTarget.style.background = '#14142a'; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e2e'; e.currentTarget.style.background = '#12121e'; }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0, 200, 5,0.45)'; e.currentTarget.style.background = '#14142a'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = '#232925'; e.currentTarget.style.background = '#131614'; }}
       >
         <div style={{
           width: 38, height: 38, borderRadius: 10,
-          background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+          background: 'linear-gradient(135deg,#00c805,#00e5a0)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
-          boxShadow: '0 6px 16px rgba(139,92,246,0.35)',
+          boxShadow: '0 6px 16px rgba(0, 200, 5,0.35)',
         }}>
           <Camera size={18} color="#fff" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 14 }}>Street View</div>
-          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 1 }}>Tap to load — see the property from the street</div>
+          <div style={{ color: '#95a29b', fontSize: 12, marginTop: 1 }}>Tap to load — see the property from the street</div>
         </div>
-        <ChevronRight size={18} style={{ color: '#475569' }} />
+        <ChevronRight size={18} style={{ color: '#5a675f' }} />
       </button>
     );
   }
@@ -120,12 +120,12 @@ export default function StreetView({ address, city, state, zip }) {
   if (phase === 'loading') {
     return (
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e',
+        background: '#131614', border: '1px solid #232925',
         borderRadius: 14, padding: '14px 16px', marginBottom: 16,
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
-        <Loader2 size={16} style={{ color: '#a78bfa', animation: 'addr-spin 0.8s linear infinite' }} />
-        <span style={{ color: '#94a3b8', fontSize: 14 }}>Loading street view…</span>
+        <Loader2 size={16} style={{ color: '#4ade80', animation: 'addr-spin 0.8s linear infinite' }} />
+        <span style={{ color: '#95a29b', fontSize: 14 }}>Loading street view…</span>
       </div>
     );
   }
@@ -134,22 +134,22 @@ export default function StreetView({ address, city, state, zip }) {
   if (phase === 'ok') {
     return (
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e',
+        background: '#131614', border: '1px solid #232925',
         borderRadius: 14, overflow: 'hidden', marginBottom: 16,
       }}>
         <div style={{
           padding: '10px 14px',
           display: 'flex', alignItems: 'center', gap: 10,
-          borderBottom: '1px solid #1e1e2e',
+          borderBottom: '1px solid #232925',
         }}>
-          <Camera size={14} style={{ color: '#a78bfa' }} />
+          <Camera size={14} style={{ color: '#4ade80' }} />
           <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13, flex: 1 }}>Street View</span>
           <a
             href={mapsLink}
             target="_blank" rel="noopener noreferrer"
             style={{
               display: 'flex', alignItems: 'center', gap: 4,
-              color: '#a78bfa', fontSize: 11, fontWeight: 700,
+              color: '#4ade80', fontSize: 11, fontWeight: 700,
               textDecoration: 'none',
             }}
           >
@@ -207,7 +207,7 @@ export default function StreetView({ address, city, state, zip }) {
   if (phase === 'none') {
     return (
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e',
+        background: '#131614', border: '1px solid #232925',
         borderRadius: 14, padding: '14px 16px', marginBottom: 16,
         display: 'flex', alignItems: 'center', gap: 12,
       }}>
@@ -217,11 +217,11 @@ export default function StreetView({ address, city, state, zip }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <ImageOff size={18} style={{ color: '#94a3b8' }} />
+          <ImageOff size={18} style={{ color: '#95a29b' }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13 }}>No street view available</div>
-          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 1 }}>Google doesn't have street imagery for this address.</div>
+          <div style={{ color: '#95a29b', fontSize: 12, marginTop: 1 }}>Google doesn't have street imagery for this address.</div>
         </div>
         <a
           href={mapsLink}
@@ -229,8 +229,8 @@ export default function StreetView({ address, city, state, zip }) {
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 4,
             padding: '6px 10px', borderRadius: 8,
-            background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)',
-            color: '#a78bfa', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+            background: 'rgba(0, 200, 5,0.12)', border: '1px solid rgba(0, 200, 5,0.3)',
+            color: '#4ade80', textDecoration: 'none', fontSize: 12, fontWeight: 700,
             flexShrink: 0,
           }}
         >
@@ -243,7 +243,7 @@ export default function StreetView({ address, city, state, zip }) {
   // ── Error ──
   return (
     <div style={{
-      background: '#12121e', border: '1px solid rgba(239,68,68,0.3)',
+      background: '#131614', border: '1px solid rgba(239,68,68,0.3)',
       borderRadius: 14, padding: '14px 16px', marginBottom: 16,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -262,8 +262,8 @@ export default function StreetView({ address, city, state, zip }) {
           onClick={loadStreetView}
           style={{
             padding: '5px 10px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-            color: '#94a3b8', cursor: 'pointer', fontSize: 11, fontWeight: 700,
+            background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+            color: '#95a29b', cursor: 'pointer', fontSize: 11, fontWeight: 700,
           }}
         >
           Retry
@@ -278,8 +278,8 @@ export default function StreetView({ address, city, state, zip }) {
           {errorMsg}
         </div>
       )}
-      <div style={{ color: '#64748b', fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
-        Most common cause: <strong style={{ color: '#94a3b8' }}>Street View Static API</strong> isn't enabled in Google Cloud Console, or the API key's allowed-APIs list doesn't include it.
+      <div style={{ color: '#707d75', fontSize: 11, marginTop: 8, lineHeight: 1.5 }}>
+        Most common cause: <strong style={{ color: '#95a29b' }}>Street View Static API</strong> isn't enabled in Google Cloud Console, or the API key's allowed-APIs list doesn't include it.
       </div>
     </div>
   );
@@ -325,7 +325,7 @@ function Fullscreen({ src, address, mapsLink, location, apiKey, onClose }) {
       >
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 800, fontSize: 14 }}>Street View</div>
-          <div style={{ color: '#94a3b8', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ color: '#95a29b', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {address}
           </div>
         </div>

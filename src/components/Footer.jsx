@@ -63,7 +63,7 @@ export default function Footer() {
 
   return (
     <footer style={{
-      background: '#0d0d1a', borderTop: '1px solid #1e1e2e',
+      background: '#0e100e', borderTop: '1px solid #232925',
       padding: '48px 20px 24px', marginTop: '60px',
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -78,7 +78,7 @@ export default function Footer() {
             <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', marginBottom: '14px' }}>
               <Logo size="md" />
             </Link>
-            <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.6, margin: '0 0 16px', maxWidth: '280px' }}>
+            <p style={{ color: '#95a29b', fontSize: '13px', lineHeight: 1.6, margin: '0 0 16px', maxWidth: '280px' }}>
               The #1 marketplace for real estate investors. Post deals free, find buyers fast, build your network.
             </p>
             {/* Social icons */}
@@ -90,14 +90,14 @@ export default function Footer() {
                   aria-label={label}
                   style={{
                     width: '34px', height: '34px', borderRadius: '8px',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#94a3b8', transition: 'all 0.2s',
+                    color: '#95a29b', transition: 'all 0.2s',
                     fontWeight: 800, fontSize: '13px',
                     textDecoration: 'none',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#8b5cf6'; e.currentTarget.style.color = '#8b5cf6'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e2e'; e.currentTarget.style.color = '#94a3b8'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#00c805'; e.currentTarget.style.color = '#00c805'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#232925'; e.currentTarget.style.color = '#95a29b'; }}
                 >
                   {glyph}
                 </a>
@@ -116,9 +116,9 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       to={link.to}
-                      style={{ color: '#94a3b8', fontSize: '13px', textDecoration: 'none', transition: 'color 0.15s' }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#8b5cf6'; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; }}
+                      style={{ color: '#95a29b', fontSize: '13px', textDecoration: 'none', transition: 'color 0.15s' }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#00c805'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = '#95a29b'; }}
                     >
                       {link.label}
                     </Link>
@@ -131,8 +131,8 @@ export default function Footer() {
 
         {/* Newsletter CTA */}
         <div style={{
-          background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.08))',
-          border: '1px solid rgba(139,92,246,0.2)',
+          background: 'linear-gradient(135deg, rgba(0, 200, 5,0.08), rgba(0, 229, 160,0.08))',
+          border: '1px solid rgba(0, 200, 5,0.2)',
           borderRadius: '14px', padding: '20px 24px', marginBottom: '28px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap',
         }}>
@@ -140,7 +140,7 @@ export default function Footer() {
             <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', marginBottom: '2px' }}>
               🔥 Get hot deals in your inbox
             </div>
-            <div style={{ color: '#94a3b8', fontSize: '13px' }}>
+            <div style={{ color: '#95a29b', fontSize: '13px' }}>
               Weekly roundup of the best deals across your favorite markets. Free, unsubscribe anytime.
             </div>
           </div>
@@ -168,17 +168,17 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div style={{
-          borderTop: '1px solid #1e1e2e', paddingTop: '20px',
+          borderTop: '1px solid #232925', paddingTop: '20px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px',
         }}>
-          <div style={{ color: '#475569', fontSize: '12px' }}>
+          <div style={{ color: '#5a675f', fontSize: '12px' }}>
             © {new Date().getFullYear()} All Street Live — Real Estate · Real Time. All rights reserved.
           </div>
           <div style={{ display: 'flex', gap: '18px', fontSize: '12px' }}>
             {['Terms', 'Privacy', 'Cookies', 'DMCA'].map(t => (
-              <a key={t} href="#" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.15s' }}
+              <a key={t} href="#" style={{ color: '#95a29b', textDecoration: 'none', transition: 'color 0.15s' }}
                  onMouseEnter={e => { e.currentTarget.style.color = '#f8fafc'; }}
-                 onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; }}
+                 onMouseLeave={e => { e.currentTarget.style.color = '#95a29b'; }}
               >
                 {t}
               </a>

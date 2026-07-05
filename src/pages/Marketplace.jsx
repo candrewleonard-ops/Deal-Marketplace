@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search, SlidersHorizontal, X, TrendingUp, ChevronDown, ChevronUp,
   RotateCcw, MapPin
 } from 'lucide-react';
 import DealCard from '../components/DealCard';
+import BuyBoxModal, { BuyBoxSideButton } from '../components/BuyBoxModal';
 import USMap from '../components/USMap';
 import { deals, dealTypes } from '../data/deals';
 import { listLiveDeals } from '../lib/deals';
@@ -51,14 +52,14 @@ function chip(on) {
   return {
     flex: 1, padding: '8px 0', borderRadius: 8, cursor: 'pointer',
     background: on ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)',
-    border: `1px solid ${on ? '#f59e0b' : '#1e1e2e'}`,
-    color: on ? '#fbbf24' : '#94a3b8',
+    border: `1px solid ${on ? '#f59e0b' : '#232925'}`,
+    color: on ? '#fbbf24' : '#95a29b',
     fontSize: 12, fontWeight: 800,
   };
 }
 const priceInp = {
   width: '100%', padding: '9px 10px 9px 22px', borderRadius: 9,
-  background: '#12121e', border: '1px solid #1e1e2e',
+  background: '#131614', border: '1px solid #232925',
   color: '#f8fafc', fontSize: 13, fontWeight: 700, outline: 'none',
 };
 
@@ -82,8 +83,44 @@ export default function Marketplace() {
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [liveDeals,       setLiveDeals]       = useState([]);
+  const [showBuyBox,      setShowBuyBox]      = useState(false);
+  const buyBoxSnapshot = useRef(null);
   const navigate = useNavigate();
   const { isAuthenticated, requireAuth } = useAuth();
+
+  // Mobile: pop the Buy Box once per session so buyers can dial in their
+  // criteria immediately. The side handle brings it back anytime.
+  useEffect(() => {
+    if (!isMobile) return;
+    let seen = false;
+    try { seen = !!sessionStorage.getItem('asl-buybox-seen-v1'); } catch { seen = true; }
+    if (!seen) {
+      const t = setTimeout(() => openBuyBox(), 700);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile]);
+
+  function openBuyBox() {
+    buyBoxSnapshot.current = {
+      activeType, selectedStates, minBeds, minBaths, priceMin, priceMax,
+    };
+    setShowBuyBox(true);
+  }
+
+  function closeBuyBox(apply) {
+    if (!apply && buyBoxSnapshot.current) {
+      const s = buyBoxSnapshot.current;
+      setActiveType(s.activeType);
+      setSelectedStates(s.selectedStates);
+      setMinBeds(s.minBeds);
+      setMinBaths(s.minBaths);
+      setPriceMin(s.priceMin);
+      setPriceMax(s.priceMax);
+    }
+    try { sessionStorage.setItem('asl-buybox-seen-v1', '1'); } catch { /* ignore */ }
+    setShowBuyBox(false);
+  }
 
   // Pull user-posted deals from the database (no-op if Supabase isn't set up).
   useEffect(() => {
@@ -172,12 +209,12 @@ export default function Marketplace() {
     || priceValue < 1000000 || minBeds > 0 || selectedStates.length > 0 || newestOnly;
 
   return (
-    <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div className="page-enter" style={{ background: '#0a0b0a', minHeight: '100vh' }}>
 
       {/* ── Top header bar ── */}
       <div style={{
-        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a0f 100%)',
-        borderBottom: '1px solid #1e1e2e',
+        background: 'linear-gradient(180deg, #0e100e 0%, #0a0b0a 100%)',
+        borderBottom: '1px solid #232925',
         padding: isMobile ? '12px 14px' : '18px 20px',
         position: 'relative',
         overflow: 'hidden',
@@ -186,7 +223,7 @@ export default function Marketplace() {
         <div style={{
           position: 'absolute', top: '-40%', left: '-5%',
           width: 300, height: 300, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 200, 5,0.12), transparent 70%)',
           filter: 'blur(30px)',
           pointerEvents: 'none',
         }} />
@@ -201,8 +238,8 @@ export default function Marketplace() {
               }}>
                 <span className="gradient-text">Deal</span> Marketplace
               </h1>
-              <p style={{ color: '#94a3b8', margin: '2px 0 0', fontSize: '13px' }}>
-                <span style={{ color: '#8b5cf6', fontWeight: 700 }}>{sorted.length}</span>
+              <p style={{ color: '#95a29b', margin: '2px 0 0', fontSize: '13px' }}>
+                <span style={{ color: '#00c805', fontWeight: 700 }}>{sorted.length}</span>
                 {' '}of {deals.length} off-market deals
                 {selectedStates.length > 0 && ` · ${selectedStates.join(', ')}`}
               </p>
@@ -224,7 +261,7 @@ export default function Marketplace() {
           {/* Search + city + filters row */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <div style={{ flex: isMobile ? '1 1 100%' : 1, minWidth: 180, position: 'relative' }}>
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#8b5cf6', pointerEvents: 'none' }} />
+              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#00c805', pointerEvents: 'none' }} />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder={isMobile ? 'Search deals…' : 'Search city, market, or keyword…'}
                 className="input-dark"
@@ -253,13 +290,13 @@ export default function Marketplace() {
                 ))}
               </select>
             )}
-            <button onClick={() => setNewestOnly(n => !n)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px 14px', borderRadius: '9px', background: newestOnly ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.04)', border: newestOnly ? 'none' : '1px solid #1e1e2e', color: newestOnly ? '#fff' : '#94a3b8', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+            <button onClick={() => setNewestOnly(n => !n)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px 14px', borderRadius: '9px', background: newestOnly ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)', border: newestOnly ? 'none' : '1px solid #232925', color: newestOnly ? '#fff' : '#95a29b', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
               <TrendingUp size={13} /> Newest
             </button>
-            <button onClick={() => setShowFilters(f => !f)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px', borderRadius: '9px', background: showFilters ? 'rgba(139,92,246,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showFilters ? 'rgba(139,92,246,0.3)' : '#1e1e2e'}`, color: showFilters ? '#8b5cf6' : '#94a3b8', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
+            <button onClick={() => setShowFilters(f => !f)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px', borderRadius: '9px', background: showFilters ? 'rgba(0, 200, 5,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showFilters ? 'rgba(0, 200, 5,0.3)' : '#232925'}`, color: showFilters ? '#00c805' : '#95a29b', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
               <SlidersHorizontal size={14} />
               Filters
-              {(priceValue < 1000000 || minBeds > 0) && <span style={{ background: '#8b5cf6', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>!</span>}
+              {(priceValue < 1000000 || minBeds > 0) && <span style={{ background: '#00c805', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>!</span>}
             </button>
             {/* Sort */}
             <select value={sortBy} onChange={e => setSortBy(e.target.value)}
@@ -275,31 +312,31 @@ export default function Marketplace() {
 
           {/* Advanced filters panel */}
           {showFilters && (
-            <div style={{ marginTop: '12px', background: '#1a1a2e', border: '1px solid #1e1e2e', borderRadius: '10px', padding: '16px', display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <div style={{ marginTop: '12px', background: '#1a1f1b', border: '1px solid #232925', borderRadius: '10px', padding: '16px', display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <div style={{ flex: 1, minWidth: '200px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <label style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700 }}>
+                  <label style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700 }}>
                     {priceMode === 'max' ? 'MAX' : 'MIN'} LISTING PRICE
                   </label>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     {['min','max'].map(m => (
-                      <button key={m} onClick={() => setPriceMode(m)} style={{ padding: '2px 8px', borderRadius: '10px', background: priceMode === m ? 'rgba(139,92,246,0.2)' : 'transparent', border: `1px solid ${priceMode === m ? '#8b5cf6' : '#1e1e2e'}`, color: priceMode === m ? '#8b5cf6' : '#94a3b8', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}>{m}</button>
+                      <button key={m} onClick={() => setPriceMode(m)} style={{ padding: '2px 8px', borderRadius: '10px', background: priceMode === m ? 'rgba(0, 200, 5,0.2)' : 'transparent', border: `1px solid ${priceMode === m ? '#00c805' : '#232925'}`, color: priceMode === m ? '#00c805' : '#95a29b', cursor: 'pointer', fontSize: '10px', fontWeight: 700 }}>{m}</button>
                     ))}
                   </div>
                 </div>
                 <input type="range" min={0} max={1000000} step={5000} value={priceValue}
                   onChange={e => setPriceValue(parseInt(e.target.value))}
-                  style={{ width: '100%', accentColor: '#8b5cf6', marginBottom: '4px' }}
+                  style={{ width: '100%', accentColor: '#00c805', marginBottom: '4px' }}
                 />
                 <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>
                   {priceValue >= 1000000 ? 'No Max' : `$${priceValue.toLocaleString()}`}
                 </div>
               </div>
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, display: 'block', marginBottom: '8px' }}>MIN BEDS</label>
+                <label style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, display: 'block', marginBottom: '8px' }}>MIN BEDS</label>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   {[0,1,2,3,4,5].map(n => (
-                    <button key={n} onClick={() => setMinBeds(n)} style={{ width: '34px', height: '34px', borderRadius: '7px', background: minBeds === n ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)', border: `1px solid ${minBeds === n ? '#8b5cf6' : '#1e1e2e'}`, color: minBeds === n ? '#8b5cf6' : '#94a3b8', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>
+                    <button key={n} onClick={() => setMinBeds(n)} style={{ width: '34px', height: '34px', borderRadius: '7px', background: minBeds === n ? 'rgba(0, 200, 5,0.2)' : 'rgba(255,255,255,0.04)', border: `1px solid ${minBeds === n ? '#00c805' : '#232925'}`, color: minBeds === n ? '#00c805' : '#95a29b', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>
                       {n === 0 ? 'Any' : `${n}+`}
                     </button>
                   ))}
@@ -311,7 +348,7 @@ export default function Marketplace() {
           {/* Deal type tabs */}
           <div style={{ display: 'flex', gap: '6px', marginTop: '12px', flexWrap: 'wrap' }}>
             {dealTypes.map(({ value, label }) => (
-              <button key={value} onClick={() => setActiveType(value)} style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, background: activeType === value ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.04)', border: `1px solid ${activeType === value ? 'transparent' : '#1e1e2e'}`, color: activeType === value ? '#fff' : '#94a3b8', cursor: 'pointer', transition: 'all 0.15s' }}>
+              <button key={value} onClick={() => setActiveType(value)} style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, background: activeType === value ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)', border: `1px solid ${activeType === value ? 'transparent' : '#232925'}`, color: activeType === value ? '#fff' : '#95a29b', cursor: 'pointer', transition: 'all 0.15s' }}>
                 {label}
               </button>
             ))}
@@ -322,42 +359,21 @@ export default function Marketplace() {
       {/* ── Body: map+deals on desktop, deals-only on mobile ── */}
       <div style={{ maxWidth: 1500, margin: '0 auto', display: 'flex', gap: 0, minHeight: 'calc(100vh - 200px)', flexDirection: isMobile ? 'column' : 'row' }}>
 
-        {/* ── LEFT: sticky map panel (hidden on mobile) ── */}
+        {/* ── LEFT: sticky filter + map rail (hidden on mobile) ──
+             Filters live at the TOP of the rail so they're visible without
+             scrolling; the state map sits underneath. */}
         <div style={{
-          width: '600px', flexShrink: 0,
+          width: 'clamp(320px, 27vw, 430px)', flexShrink: 0,
           position: 'sticky', top: '0',
           height: 'calc(100vh - 64px)',
           overflowY: 'auto',
-          borderRight: '1px solid #1e1e2e',
-          background: '#0d0d1a',
-          padding: '16px 12px',
+          borderRight: '1px solid #232925',
+          background: '#0e100e',
+          padding: '14px 12px',
           display: isMobile ? 'none' : 'flex',
-          flexDirection: 'column', gap: '14px',
+          flexDirection: 'column', gap: '12px',
         }}>
-          {/* Map header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <MapPin size={15} style={{ color: '#8b5cf6' }} />
-              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>Browse by State</span>
-            </div>
-            {selectedStates.length > 0 && (
-              <button
-                onClick={() => setSelectedStates([])}
-                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)', color: '#a78bfa', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}
-              >
-                <RotateCcw size={10} /> Reset
-              </button>
-            )}
-          </div>
-
-          <p style={{ color: '#475569', fontSize: '12px', margin: 0, lineHeight: 1.5 }}>
-            Click any state to filter deals. Click again to deselect.
-          </p>
-
-          {/* The actual map */}
-          <USMap deals={deals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
-
-          {/* ── Quick Filters (desktop) — fills the left rail ── */}
+          {/* ── Quick Filters — always visible at the top of the rail ── */}
           <div style={{
             background: 'linear-gradient(180deg, rgba(245,158,11,0.07), rgba(245,158,11,0.02))',
             border: '1px solid rgba(245,158,11,0.28)',
@@ -417,16 +433,16 @@ export default function Marketplace() {
               <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 7 }}>LISTING PRICE</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ position: 'relative', flex: 1 }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#707d75', fontSize: 13, fontWeight: 700 }}>$</span>
                   <input
                     type="number" value={priceMin} onChange={e => setPriceMin(e.target.value)}
                     placeholder="Min"
                     style={priceInp}
                   />
                 </div>
-                <span style={{ color: '#64748b', fontSize: 13, fontWeight: 700 }}>–</span>
+                <span style={{ color: '#707d75', fontSize: 13, fontWeight: 700 }}>–</span>
                 <div style={{ position: 'relative', flex: 1 }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#707d75', fontSize: 13, fontWeight: 700 }}>$</span>
                   <input
                     type="number" value={priceMax} onChange={e => setPriceMax(e.target.value)}
                     placeholder="Max"
@@ -442,8 +458,8 @@ export default function Marketplace() {
                     style={{
                       padding: '5px 10px', borderRadius: 16, cursor: 'pointer',
                       background: (String(priceMin) === lo && String(priceMax) === hi) ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${(String(priceMin) === lo && String(priceMax) === hi) ? '#f59e0b' : '#1e1e2e'}`,
-                      color: (String(priceMin) === lo && String(priceMax) === hi) ? '#fbbf24' : '#94a3b8',
+                      border: `1px solid ${(String(priceMin) === lo && String(priceMax) === hi) ? '#f59e0b' : '#232925'}`,
+                      color: (String(priceMin) === lo && String(priceMax) === hi) ? '#fbbf24' : '#95a29b',
                       fontSize: 11, fontWeight: 700,
                     }}
                   >
@@ -457,16 +473,38 @@ export default function Marketplace() {
               marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(245,158,11,0.18)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
-              <span style={{ color: '#94a3b8', fontSize: 12 }}>Matching deals</span>
+              <span style={{ color: '#95a29b', fontSize: 12 }}>Matching deals</span>
               <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: 15 }}>{sorted.length}</span>
             </div>
           </div>
+
+          {/* ── Browse by State map — under the filters ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+              <MapPin size={15} style={{ color: '#00c805' }} />
+              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>Browse by State</span>
+            </div>
+            {selectedStates.length > 0 && (
+              <button
+                onClick={() => setSelectedStates([])}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '20px', background: 'rgba(0, 200, 5,0.12)', border: '1px solid rgba(0, 200, 5,0.25)', color: '#4ade80', cursor: 'pointer', fontSize: '11px', fontWeight: 700 }}
+              >
+                <RotateCcw size={10} /> Reset
+              </button>
+            )}
+          </div>
+
+          <p style={{ color: '#5a675f', fontSize: '12px', margin: 0, lineHeight: 1.5 }}>
+            Click any state to filter deals. Click again to deselect.
+          </p>
+
+          <USMap deals={deals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
 
           {/* Active state chips */}
           {selectedStates.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
               {selectedStates.map(abbr => (
-                <span key={abbr} onClick={() => handleStateToggle(abbr)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#a78bfa', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                <span key={abbr} onClick={() => handleStateToggle(abbr)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(0, 200, 5,0.15)', border: '1px solid rgba(0, 200, 5,0.3)', color: '#4ade80', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                   {abbr} <span style={{ fontSize: '14px', lineHeight: 1 }}>×</span>
                 </span>
               ))}
@@ -475,13 +513,13 @@ export default function Marketplace() {
 
           {/* Deal count per selected state summary */}
           {selectedStates.length > 0 && (
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '10px', padding: '12px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '10px', padding: '12px' }}>
               {selectedStates.map(abbr => {
                 const count = allDeals.filter(d => d.state === abbr).length;
                 return (
-                  <div key={abbr} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #1e1e2e', lastChild: { borderBottom: 'none' } }}>
-                    <span style={{ color: '#94a3b8', fontSize: '12px' }}>{abbr}</span>
-                    <span style={{ color: '#8b5cf6', fontWeight: 700, fontSize: '12px' }}>{count} deal{count !== 1 ? 's' : ''}</span>
+                  <div key={abbr} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #232925', lastChild: { borderBottom: 'none' } }}>
+                    <span style={{ color: '#95a29b', fontSize: '12px' }}>{abbr}</span>
+                    <span style={{ color: '#00c805', fontWeight: 700, fontSize: '12px' }}>{count} deal{count !== 1 ? 's' : ''}</span>
                   </div>
                 );
               })}
@@ -499,8 +537,8 @@ export default function Marketplace() {
             <div style={{ textAlign: 'center', padding: '80px 20px' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>🏚️</div>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '6px' }}>No deals found</h3>
-              <p style={{ color: '#475569', fontSize: '14px', marginBottom: '20px' }}>Try adjusting your filters or selecting different states</p>
-              <button onClick={resetAll} style={{ padding: '11px 24px', borderRadius: '10px', background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: '14px' }}>
+              <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '20px' }}>Try adjusting your filters or selecting different states</p>
+              <button onClick={resetAll} style={{ padding: '11px 24px', borderRadius: '10px', background: 'linear-gradient(135deg,#00c805,#00e5a0)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: '14px' }}>
                 Clear All Filters
               </button>
             </div>
@@ -509,8 +547,8 @@ export default function Marketplace() {
               {/* Sponsored section */}
               {sorted.some(d => d.isSponsored) && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                  <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', whiteSpace: 'nowrap' }}>SPONSORED</span>
-                  <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #1e1e2e, transparent)' }} />
+                  <span style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', whiteSpace: 'nowrap' }}>SPONSORED</span>
+                  <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #232925, transparent)' }} />
                 </div>
               )}
 
@@ -519,8 +557,8 @@ export default function Marketplace() {
                   <div key={deal.id}>
                     {idx === sorted.filter(d => d.isSponsored).length && idx > 0 && (
                       <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '10px', margin: '6px 0 14px' }}>
-                        <span style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>ALL DEALS</span>
-                        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #1e1e2e, transparent)' }} />
+                        <span style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>ALL DEALS</span>
+                        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #232925, transparent)' }} />
                       </div>
                     )}
                     <DealCard deal={deal} />
@@ -532,6 +570,21 @@ export default function Marketplace() {
         </div>
       </div>
 
+      {/* ── Mobile Buy Box: auto-pops once, reopenable via side handle ── */}
+      {isMobile && !showBuyBox && <BuyBoxSideButton onClick={openBuyBox} />}
+      <BuyBoxModal
+        open={isMobile && showBuyBox}
+        onClose={closeBuyBox}
+        matchCount={sorted.length}
+        activeType={activeType} setActiveType={setActiveType}
+        dealTypes={dealTypes}
+        selectedStates={selectedStates} setSelectedStates={setSelectedStates}
+        statesWithDeals={statesWithDeals}
+        minBeds={minBeds} setMinBeds={setMinBeds}
+        minBaths={minBaths} setMinBaths={setMinBaths}
+        priceMin={priceMin} setPriceMin={setPriceMin}
+        priceMax={priceMax} setPriceMax={setPriceMax}
+      />
     </div>
   );
 }

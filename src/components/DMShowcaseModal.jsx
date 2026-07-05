@@ -64,8 +64,8 @@ export default function DMShowcaseModal() {
         style={{
           width: '100%', maxWidth: 540,
           maxHeight: '94vh', overflowY: 'auto',
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #12121e 100%)',
-          border: '1px solid rgba(139,92,246,0.3)',
+          background: 'linear-gradient(180deg, #1a1f1b 0%, #131614 100%)',
+          border: '1px solid rgba(0, 200, 5,0.3)',
           borderRadius: 22,
           boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset',
           position: 'relative',
@@ -79,7 +79,7 @@ export default function DMShowcaseModal() {
             position: 'absolute', top: 12, right: 12, zIndex: 3,
             background: 'rgba(255,255,255,0.08)', border: 'none',
             borderRadius: '50%', width: 36, height: 36,
-            color: '#94a3b8', cursor: 'pointer',
+            color: '#95a29b', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
@@ -95,9 +95,9 @@ export default function DMShowcaseModal() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '5px 11px', borderRadius: 999,
-            background: 'rgba(139,92,246,0.15)',
-            border: '1px solid rgba(139,92,246,0.35)',
-            color: '#a78bfa', fontSize: 11, fontWeight: 800, letterSpacing: 0.6,
+            background: 'rgba(0, 200, 5,0.15)',
+            border: '1px solid rgba(0, 200, 5,0.35)',
+            color: '#4ade80', fontSize: 11, fontWeight: 800, letterSpacing: 0.6,
             marginBottom: 12,
           }}>
             <Zap size={12} /> SIGN UP — FREE
@@ -109,7 +109,7 @@ export default function DMShowcaseModal() {
             Message deal contacts
           </h2>
           <p style={{
-            color: '#94a3b8', fontSize: 14, margin: '8px 0 0',
+            color: '#95a29b', fontSize: 14, margin: '8px 0 0',
             lineHeight: 1.55, maxWidth: 380, marginLeft: 'auto', marginRight: 'auto',
           }}>
             Talk directly to wholesalers, lenders, and contractors on every deal — no email middleman, no waiting.
@@ -125,8 +125,8 @@ export default function DMShowcaseModal() {
         <div style={{ padding: '18px 28px 4px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
             {[
-              { icon: Send, color: '#8b5cf6', text: 'DM any wholesaler or seller in one tap' },
-              { icon: Clock, color: '#06b6d4', text: 'Get replies in minutes, not days' },
+              { icon: Send, color: '#00c805', text: 'DM any wholesaler or seller in one tap' },
+              { icon: Clock, color: '#00e5a0', text: 'Get replies in minutes, not days' },
               { icon: Shield, color: '#10b981', text: 'Verified profiles — no spam, no scams' },
             ].map(({ icon: Icon, color, text }) => (
               <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -138,7 +138,7 @@ export default function DMShowcaseModal() {
                 }}>
                   <Icon size={13} style={{ color }} />
                 </div>
-                <span style={{ color: '#e2e8f0', fontSize: 13.5, lineHeight: 1.5 }}>{text}</span>
+                <span style={{ color: '#e4eae6', fontSize: 13.5, lineHeight: 1.5 }}>{text}</span>
               </div>
             ))}
           </div>
@@ -150,11 +150,11 @@ export default function DMShowcaseModal() {
             onClick={goSignup}
             style={{
               padding: '15px 18px', borderRadius: 12,
-              background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+              background: 'linear-gradient(135deg, #00c805, #00e5a0)',
               color: '#fff', fontWeight: 800, fontSize: 15,
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              boxShadow: '0 12px 32px rgba(139,92,246,0.45)',
+              boxShadow: '0 12px 32px rgba(0, 200, 5,0.45)',
               transition: 'transform 0.15s',
             }}
             onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
@@ -168,7 +168,7 @@ export default function DMShowcaseModal() {
             style={{
               padding: '12px 18px', borderRadius: 12,
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-              color: '#e2e8f0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
+              color: '#e4eae6', fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
             }}
           >
             I already have an account — Sign in
@@ -178,7 +178,7 @@ export default function DMShowcaseModal() {
         <div style={{
           padding: '10px 24px 14px',
           borderTop: '1px solid rgba(255,255,255,0.05)',
-          textAlign: 'center', color: '#475569', fontSize: 11,
+          textAlign: 'center', color: '#5a675f', fontSize: 11,
           background: 'rgba(255,255,255,0.015)',
         }}>
           Free forever — no credit card. Verified by email + phone.
@@ -204,7 +204,7 @@ export default function DMShowcaseModal() {
 function DMScreenshot() {
   return (
     <div style={{
-      background: '#0d0d1a', borderRadius: 14, overflow: 'hidden',
+      background: '#0e100e', borderRadius: 14, overflow: 'hidden',
       border: '1px solid rgba(255,255,255,0.08)',
       boxShadow: '0 18px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.03) inset',
     }}>
@@ -217,7 +217,7 @@ function DMScreenshot() {
       }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%',
-          background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+          background: 'linear-gradient(135deg,#00c805,#00e5a0)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 900, fontSize: 14,
         }}>
@@ -228,15 +228,15 @@ function DMScreenshot() {
             Marcus Johnson
             <span style={{
               width: 13, height: 13, borderRadius: '50%',
-              background: '#10b981', border: '2px solid #0d0d1a',
+              background: '#10b981', border: '2px solid #0e100e',
               flexShrink: 0,
             }} />
           </div>
-          <div style={{ color: '#64748b', fontSize: 11 }}>
+          <div style={{ color: '#707d75', fontSize: 11 }}>
             Wholesaler · Atlanta, GA · <span style={{ color: '#34d399', fontWeight: 700 }}>Online now</span>
           </div>
         </div>
-        <MessageSquare size={16} style={{ color: '#a78bfa' }} />
+        <MessageSquare size={16} style={{ color: '#4ade80' }} />
       </div>
 
       {/* Messages */}
@@ -261,14 +261,14 @@ function DMScreenshot() {
         <div style={{
           alignSelf: 'flex-start',
           padding: '6px 12px', borderRadius: 16,
-          background: 'rgba(139,92,246,0.12)',
-          color: '#a78bfa', fontSize: 11, fontWeight: 700,
+          background: 'rgba(0, 200, 5,0.12)',
+          color: '#4ade80', fontSize: 11, fontWeight: 700,
           display: 'flex', alignItems: 'center', gap: 5,
         }}>
           <span style={{ display: 'flex', gap: 2 }}>
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#a78bfa', animation: 'dm-typing 1s infinite' }} />
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#a78bfa', animation: 'dm-typing 1s infinite 0.15s' }} />
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#a78bfa', animation: 'dm-typing 1s infinite 0.3s' }} />
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#4ade80', animation: 'dm-typing 1s infinite' }} />
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#4ade80', animation: 'dm-typing 1s infinite 0.15s' }} />
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#4ade80', animation: 'dm-typing 1s infinite 0.3s' }} />
           </span>
           Marcus is typing…
         </div>
@@ -283,13 +283,13 @@ function DMScreenshot() {
       }}>
         <div style={{
           flex: 1, padding: '8px 14px', borderRadius: 999,
-          background: 'rgba(255,255,255,0.05)', color: '#64748b', fontSize: 12,
+          background: 'rgba(255,255,255,0.05)', color: '#707d75', fontSize: 12,
         }}>
           Sign up to reply…
         </div>
         <div style={{
           width: 34, height: 34, borderRadius: '50%',
-          background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+          background: 'linear-gradient(135deg,#00c805,#00e5a0)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <Send size={14} color="#fff" />
@@ -316,11 +316,11 @@ function DMBubble({ from, text, status }) {
       <div style={{
         padding: '8px 13px', borderRadius: 16,
         background: isMe
-          ? 'linear-gradient(135deg, #8b5cf6, #6d3df5)'
+          ? 'linear-gradient(135deg, #00c805, #6d3df5)'
           : 'rgba(255,255,255,0.05)',
-        color: isMe ? '#fff' : '#e2e8f0',
+        color: isMe ? '#fff' : '#e4eae6',
         fontSize: 13, lineHeight: 1.5,
-        boxShadow: isMe ? '0 4px 12px rgba(139,92,246,0.3)' : 'none',
+        boxShadow: isMe ? '0 4px 12px rgba(0, 200, 5,0.3)' : 'none',
         borderBottomRightRadius: isMe ? 4 : 16,
         borderBottomLeftRadius: isMe ? 16 : 4,
       }}>

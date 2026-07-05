@@ -39,7 +39,7 @@ function AppLayout({ children, hideFooter, hideTabBar }) {
   return (
     <div
       style={{
-        backgroundColor: '#0a0a0f',
+        backgroundColor: '#0a0b0a',
         color: '#f8fafc',
         display: 'flex',
         flexDirection: 'column',

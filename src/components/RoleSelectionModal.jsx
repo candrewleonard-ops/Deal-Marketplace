@@ -11,9 +11,9 @@ const ROLES = [
   { key: 'Hard Money Lender', icon: DollarSign, color: '#f59e0b', desc: 'Fund deals for investors' },
   { key: 'Fix N Flipper',     icon: Hammer,     color: '#ef4444', desc: 'Buy, renovate, sell' },
   { key: 'Landlord',          icon: Home,       color: '#10b981', desc: 'Buy & hold rentals' },
-  { key: 'Wholesaler',        icon: Megaphone,  color: '#8b5cf6', desc: 'Find deals & assign' },
-  { key: 'Developer',         icon: Building2,  color: '#06b6d4', desc: 'Build new construction' },
-  { key: 'Other',             icon: MoreHorizontal, color: '#94a3b8', desc: 'Describe your role' },
+  { key: 'Wholesaler',        icon: Megaphone,  color: '#00c805', desc: 'Find deals & assign' },
+  { key: 'Developer',         icon: Building2,  color: '#00e5a0', desc: 'Build new construction' },
+  { key: 'Other',             icon: MoreHorizontal, color: '#95a29b', desc: 'Describe your role' },
 ];
 
 /**
@@ -64,8 +64,8 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
         style={{
           width: '100%', maxWidth: 520,
           maxHeight: '94vh', overflowY: 'auto',
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #12121e 100%)',
-          border: '1px solid rgba(139,92,246,0.3)',
+          background: 'linear-gradient(180deg, #1a1f1b 0%, #131614 100%)',
+          border: '1px solid rgba(0, 200, 5,0.3)',
           borderRadius: 22,
           boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
           animation: 'role-card-in 0.28s cubic-bezier(.2,.9,.3,1)',
@@ -87,7 +87,7 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
           }}>
             Which one are you?
           </h2>
-          <p style={{ color: '#94a3b8', margin: '8px 0 0', fontSize: 14 }}>
+          <p style={{ color: '#95a29b', margin: '8px 0 0', fontSize: 14 }}>
             Pick all that fit — we'll personalize your feed.
           </p>
         </div>
@@ -105,8 +105,8 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6,
                     padding: 14, borderRadius: 12,
-                    background: on ? `${r.color}14` : '#0d0d1a',
-                    border: `1.5px solid ${on ? r.color : '#1e1e2e'}`,
+                    background: on ? `${r.color}14` : '#0e100e',
+                    border: `1.5px solid ${on ? r.color : '#232925'}`,
                     cursor: 'pointer', textAlign: 'left',
                     transition: 'all 0.15s',
                     position: 'relative',
@@ -140,7 +140,7 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
                       </div>
                     )}
                   </div>
-                  <span style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.4 }}>
+                  <span style={{ color: '#95a29b', fontSize: 11, lineHeight: 1.4 }}>
                     {r.desc}
                   </span>
                 </button>
@@ -158,7 +158,7 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
               style={{
                 width: '100%', marginTop: 12,
                 padding: '12px 14px', borderRadius: 10,
-                background: '#0d0d1a', border: '1px solid #1e1e2e',
+                background: '#0e100e', border: '1px solid #232925',
                 color: '#f8fafc', fontSize: 14, outline: 'none',
               }}
             />
@@ -174,20 +174,20 @@ export default function RoleSelectionModal({ open, onClose, contactInfo }) {
               width: '100%', padding: '14px 18px', borderRadius: 12,
               background: selected.length === 0
                 ? 'rgba(255,255,255,0.05)'
-                : 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-              color: selected.length === 0 ? '#475569' : '#fff',
+                : 'linear-gradient(135deg, #00c805, #00e5a0)',
+              color: selected.length === 0 ? '#5a675f' : '#fff',
               fontWeight: 800, fontSize: 15,
               border: 'none',
               cursor: selected.length === 0 ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              boxShadow: selected.length > 0 ? '0 10px 28px rgba(139,92,246,0.4)' : 'none',
+              boxShadow: selected.length > 0 ? '0 10px 28px rgba(0, 200, 5,0.4)' : 'none',
             }}
           >
             Continue
             <ArrowRight size={17} />
           </button>
           <p style={{
-            color: '#475569', fontSize: 11, textAlign: 'center',
+            color: '#5a675f', fontSize: 11, textAlign: 'center',
             margin: '10px 0 0', lineHeight: 1.5,
           }}>
             You can change this later in your profile.

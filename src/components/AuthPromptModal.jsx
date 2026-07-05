@@ -60,8 +60,8 @@ export default function AuthPromptModal() {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: 'linear-gradient(180deg, #161629 0%, #12121e 60%)',
-          border: '1px solid rgba(139,92,246,0.25)',
+          background: 'linear-gradient(180deg, #161a17 0%, #131614 60%)',
+          border: '1px solid rgba(0, 200, 5,0.25)',
           borderRadius: '22px',
           width: '100%',
           maxWidth: '460px',
@@ -80,7 +80,7 @@ export default function AuthPromptModal() {
             position: 'absolute', top: 12, right: 12,
             background: 'rgba(255,255,255,0.06)', border: 'none',
             borderRadius: '50%', width: 36, height: 36,
-            color: '#94a3b8', cursor: 'pointer',
+            color: '#95a29b', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             zIndex: 2,
           }}
@@ -91,15 +91,15 @@ export default function AuthPromptModal() {
         {/* Hero header */}
         <div style={{
           padding: '32px 28px 22px',
-          background: 'radial-gradient(ellipse at top, rgba(139,92,246,0.18) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at top, rgba(0, 200, 5,0.18) 0%, transparent 70%)',
           textAlign: 'center',
           borderBottom: '1px solid rgba(255,255,255,0.05)',
         }}>
           <div style={{
             width: 64, height: 64, borderRadius: 18,
-            background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+            background: 'linear-gradient(135deg,#00c805,#00e5a0)',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 12px 40px rgba(139,92,246,0.45)',
+            boxShadow: '0 12px 40px rgba(0, 200, 5,0.45)',
             marginBottom: 14,
             position: 'relative',
           }}>
@@ -107,7 +107,7 @@ export default function AuthPromptModal() {
             <div style={{
               position: 'absolute', bottom: -4, right: -4,
               width: 28, height: 28, borderRadius: '50%',
-              background: '#0a0a0f', border: '2px solid #f59e0b',
+              background: '#0a0b0a', border: '2px solid #f59e0b',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <Lock size={12} color="#f59e0b" />
@@ -118,7 +118,7 @@ export default function AuthPromptModal() {
           }}>
             Sign up to {reason}
           </h2>
-          <p style={{ color: '#94a3b8', margin: '8px 0 0', fontSize: 14, lineHeight: 1.5 }}>
+          <p style={{ color: '#95a29b', margin: '8px 0 0', fontSize: 14, lineHeight: 1.5 }}>
             Join 10,000+ real estate investors browsing exclusive off-market deals on AllStreet Live.
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function AuthPromptModal() {
                 }}>
                   <Check size={11} color="#10b981" strokeWidth={3} />
                 </div>
-                <span style={{ color: '#e2e8f0', fontSize: 13.5, lineHeight: 1.5 }}>{line}</span>
+                <span style={{ color: '#e4eae6', fontSize: 13.5, lineHeight: 1.5 }}>{line}</span>
               </div>
             ))}
           </div>
@@ -166,7 +166,7 @@ export default function AuthPromptModal() {
             style={{
               padding: '13px 18px', borderRadius: 12,
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-              color: '#e2e8f0', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+              color: '#e4eae6', fontWeight: 700, fontSize: 14, cursor: 'pointer',
             }}
           >
             I already have an account — Sign In
@@ -177,7 +177,7 @@ export default function AuthPromptModal() {
               onClick={continueAsDemo}
               style={{
                 background: 'none', border: 'none',
-                color: '#64748b', fontSize: 12, fontWeight: 600,
+                color: '#707d75', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', textDecoration: 'underline',
                 textUnderlineOffset: 3,
               }}
@@ -193,12 +193,12 @@ export default function AuthPromptModal() {
           background: 'rgba(255,255,255,0.02)',
           textAlign: 'center',
           fontSize: 11,
-          color: '#475569',
+          color: '#5a675f',
         }}>
           By continuing, you agree to AllStreet Live's{' '}
-          <Link to="#" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Terms</Link>
+          <Link to="#" style={{ color: '#00c805', textDecoration: 'none' }}>Terms</Link>
           {' '}&{' '}
-          <Link to="#" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Privacy Policy</Link>
+          <Link to="#" style={{ color: '#00c805', textDecoration: 'none' }}>Privacy Policy</Link>
         </div>
       </div>
 

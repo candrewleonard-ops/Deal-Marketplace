@@ -17,14 +17,14 @@ const BUCKET_ORDER = ['Today', 'Yesterday', 'Earlier'];
 const initialNotifications = [
   {
     id: 1, type: 'address_request', read: false, time: '5 min ago',
-    icon: Home, color: '#8b5cf6',
+    icon: Home, color: '#00c805',
     title: 'New address request',
     body: 'Diana Cruz requested the address for your Atlanta Brick Ranch deal',
     actionLabel: 'Review', actionTo: '/my-deals',
   },
   {
     id: 2, type: 'message', read: false, time: '32 min ago',
-    icon: MessageSquare, color: '#06b6d4',
+    icon: MessageSquare, color: '#00e5a0',
     title: 'New message',
     body: 'Trevor Banks: "Numbers look good, can we schedule a call this week?"',
     actionLabel: 'Reply', actionTo: '/messages',
@@ -38,7 +38,7 @@ const initialNotifications = [
   },
   {
     id: 4, type: 'deal', read: true, time: '2 hours ago',
-    icon: Home, color: '#8b5cf6',
+    icon: Home, color: '#00c805',
     title: 'New deal in your market',
     body: 'Marcus Johnson just posted a new fix & flip deal in Atlanta, GA',
     actionLabel: 'View Deal', actionTo: '/marketplace',
@@ -52,7 +52,7 @@ const initialNotifications = [
   },
   {
     id: 7, type: 'meetup', read: true, time: '1 day ago',
-    icon: Calendar, color: '#06b6d4',
+    icon: Calendar, color: '#00e5a0',
     title: 'Upcoming meetup reminder',
     body: 'Dallas REI Meetup is tomorrow at 6pm — 47 investors attending',
     actionLabel: 'View Event', actionTo: '/meetups',
@@ -116,13 +116,13 @@ export default function Notifications() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       {/* Header */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '24px 20px' }}>
+      <div style={{ background: '#0e100e', borderBottom: '1px solid #232925', padding: '24px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <Bell size={22} style={{ color: '#8b5cf6' }} />
+              <Bell size={22} style={{ color: '#00c805' }} />
               <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', margin: 0 }}>Notifications</h1>
               {unreadCount > 0 && (
                 <span style={{
@@ -141,8 +141,8 @@ export default function Notifications() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '5px',
                     padding: '8px 14px', borderRadius: '8px',
-                    background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)',
-                    color: '#a78bfa', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                    background: 'rgba(0, 200, 5,0.1)', border: '1px solid rgba(0, 200, 5,0.3)',
+                    color: '#4ade80', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
                   }}
                 >
                   <Check size={13} /> Mark all read
@@ -153,8 +153,8 @@ export default function Notifications() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '5px',
                   padding: '8px 14px', borderRadius: '8px',
-                  background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-                  color: '#94a3b8', textDecoration: 'none', fontSize: '12px', fontWeight: 700,
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
+                  color: '#95a29b', textDecoration: 'none', fontSize: '12px', fontWeight: 700,
                 }}
               >
                 <Settings size={13} /> Preferences
@@ -170,9 +170,9 @@ export default function Notifications() {
                 onClick={() => setFilter(f.id)}
                 style={{
                   padding: '6px 14px', borderRadius: '20px',
-                  background: filter === f.id ? 'linear-gradient(135deg,#8b5cf6,#06b6d4)' : 'rgba(255,255,255,0.04)',
-                  border: filter === f.id ? 'none' : '1px solid #1e1e2e',
-                  color: filter === f.id ? '#fff' : '#94a3b8',
+                  background: filter === f.id ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)',
+                  border: filter === f.id ? 'none' : '1px solid #232925',
+                  color: filter === f.id ? '#fff' : '#95a29b',
                   fontSize: '12px', fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -186,17 +186,17 @@ export default function Notifications() {
       {/* List */}
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '20px' }}>
         {filtered.length === 0 ? (
-          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '60px 20px', textAlign: 'center' }}>
-            <Bell size={36} style={{ color: '#475569', marginBottom: '12px' }} />
+          <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: '60px 20px', textAlign: 'center' }}>
+            <Bell size={36} style={{ color: '#5a675f', marginBottom: '12px' }} />
             <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px', margin: '0 0 6px' }}>You're all caught up!</h3>
-            <p style={{ color: '#94a3b8', fontSize: '13px', margin: 0 }}>No notifications matching this filter.</p>
+            <p style={{ color: '#95a29b', fontSize: '13px', margin: 0 }}>No notifications matching this filter.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {BUCKET_ORDER.filter(b => grouped[b].length > 0).map(bucket => (
               <div key={bucket}>
                 <div style={{
-                  color: '#64748b', fontSize: 11, fontWeight: 800,
+                  color: '#707d75', fontSize: 11, fontWeight: 800,
                   letterSpacing: 1.2, textTransform: 'uppercase',
                   marginBottom: 8, paddingLeft: 4,
                 }}>
@@ -210,8 +210,8 @@ export default function Notifications() {
                         key={n.id}
                         onClick={() => markRead(n.id)}
                         style={{
-                          background: n.read ? '#12121e' : 'rgba(139,92,246,0.04)',
-                          border: `1px solid ${n.read ? '#1e1e2e' : 'rgba(139,92,246,0.2)'}`,
+                          background: n.read ? '#131614' : 'rgba(0, 200, 5,0.04)',
+                          border: `1px solid ${n.read ? '#232925' : 'rgba(0, 200, 5,0.2)'}`,
                           borderRadius: '12px', padding: '14px 16px',
                           display: 'flex', alignItems: 'flex-start', gap: '12px',
                           cursor: 'pointer', transition: 'background 0.15s',
@@ -228,11 +228,11 @@ export default function Notifications() {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
                             <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>{n.title}</span>
-                            {!n.read && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#8b5cf6', flexShrink: 0 }} />}
+                            {!n.read && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00c805', flexShrink: 0 }} />}
                           </div>
-                          <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.5 }}>{n.body}</p>
+                          <p style={{ color: '#95a29b', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.5 }}>{n.body}</p>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ color: '#475569', fontSize: '11px' }}>{n.time}</span>
+                            <span style={{ color: '#5a675f', fontSize: '11px' }}>{n.time}</span>
                             <Link
                               to={n.actionTo}
                               onClick={e => e.stopPropagation()}
@@ -246,7 +246,7 @@ export default function Notifications() {
                         <button
                           onClick={e => { e.stopPropagation(); dismiss(n.id); }}
                           style={{
-                            background: 'none', border: 'none', color: '#475569',
+                            background: 'none', border: 'none', color: '#5a675f',
                             cursor: 'pointer', padding: '4px',
                           }}
                         >

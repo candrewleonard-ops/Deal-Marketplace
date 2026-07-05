@@ -1,11 +1,11 @@
 import { Star, Phone, Shield, CheckCircle } from 'lucide-react';
 
 const tradeColors = {
-  'HVAC': '#06b6d4',
+  'HVAC': '#00e5a0',
   'Plumbing': '#3b82f6',
   'Electrical': '#f59e0b',
-  'Painting/Cosmetic': '#ec4899',
-  'Flooring': '#8b5cf6',
+  'Painting/Cosmetic': '#f59e0b',
+  'Flooring': '#00c805',
   'Roofing': '#ef4444',
   'Foundation/Structural': '#10b981',
 };
@@ -13,8 +13,8 @@ const tradeColors = {
 export default function ContractorCard({ contractor, revealed }) {
   return (
     <div style={{
-      background: '#1a1a2e',
-      border: '1px solid #1e1e2e',
+      background: '#1a1f1b',
+      border: '1px solid #232925',
       borderRadius: '12px',
       padding: '16px',
       transition: 'all 0.2s',
@@ -23,10 +23,10 @@ export default function ContractorCard({ contractor, revealed }) {
         {/* Avatar */}
         <div style={{
           width: '48px', height: '48px', borderRadius: '12px', flexShrink: 0,
-          background: `${tradeColors[contractor.trade] || '#8b5cf6'}22`,
-          border: `1px solid ${tradeColors[contractor.trade] || '#8b5cf6'}44`,
+          background: `${tradeColors[contractor.trade] || '#00c805'}22`,
+          border: `1px solid ${tradeColors[contractor.trade] || '#00c805'}44`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '20px', fontWeight: 700, color: tradeColors[contractor.trade] || '#8b5cf6',
+          fontSize: '20px', fontWeight: 700, color: tradeColors[contractor.trade] || '#00c805',
         }}>
           {contractor.name.charAt(0)}
         </div>
@@ -38,14 +38,14 @@ export default function ContractorCard({ contractor, revealed }) {
               <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', margin: 0 }}>
                 {contractor.name}
               </h4>
-              <p style={{ color: '#94a3b8', fontSize: '13px', margin: '2px 0 0' }}>
+              <p style={{ color: '#95a29b', fontSize: '13px', margin: '2px 0 0' }}>
                 {contractor.company}
               </p>
             </div>
             <span style={{
-              background: `${tradeColors[contractor.trade] || '#8b5cf6'}18`,
-              color: tradeColors[contractor.trade] || '#8b5cf6',
-              border: `1px solid ${tradeColors[contractor.trade] || '#8b5cf6'}30`,
+              background: `${tradeColors[contractor.trade] || '#00c805'}18`,
+              color: tradeColors[contractor.trade] || '#00c805',
+              border: `1px solid ${tradeColors[contractor.trade] || '#00c805'}30`,
               borderRadius: '20px', padding: '2px 10px', fontSize: '11px', fontWeight: 700,
               flexShrink: 0,
             }}>
@@ -66,8 +66,8 @@ export default function ContractorCard({ contractor, revealed }) {
               ))}
               <span style={{ color: '#f59e0b', fontSize: '13px', fontWeight: 700 }}>{contractor.rating}</span>
             </div>
-            <span style={{ color: '#475569', fontSize: '12px' }}>({contractor.reviewCount} reviews)</span>
-            <span style={{ color: '#475569', fontSize: '12px' }}>• {contractor.yearsExp} yrs exp</span>
+            <span style={{ color: '#5a675f', fontSize: '12px' }}>({contractor.reviewCount} reviews)</span>
+            <span style={{ color: '#5a675f', fontSize: '12px' }}>• {contractor.yearsExp} yrs exp</span>
           </div>
 
           {/* Badges */}
@@ -86,8 +86,8 @@ export default function ContractorCard({ contractor, revealed }) {
             {contractor.insured && (
               <span style={{
                 display: 'flex', alignItems: 'center', gap: '4px',
-                background: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4',
-                border: '1px solid rgba(6, 182, 212, 0.2)',
+                background: 'rgba(0, 229, 160, 0.1)', color: '#00e5a0',
+                border: '1px solid rgba(0, 229, 160, 0.2)',
                 borderRadius: '20px', padding: '2px 8px', fontSize: '11px', fontWeight: 600,
               }}>
                 <Shield size={10} />
@@ -98,14 +98,14 @@ export default function ContractorCard({ contractor, revealed }) {
 
           {/* Phone */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Phone size={14} style={{ color: '#475569' }} />
+            <Phone size={14} style={{ color: '#5a675f' }} />
             {revealed ? (
               <span style={{ color: '#10b981', fontWeight: 700, fontSize: '15px', letterSpacing: '0.5px' }}>
                 {contractor.phone}
               </span>
             ) : (
               <span style={{
-                color: '#475569', fontSize: '14px',
+                color: '#5a675f', fontSize: '14px',
                 filter: 'blur(4px)', userSelect: 'none',
               }}>
                 {contractor.phone}
@@ -113,8 +113,8 @@ export default function ContractorCard({ contractor, revealed }) {
             )}
             {!revealed && (
               <span style={{
-                background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
+                background: 'rgba(0, 200, 5, 0.1)', color: '#00c805',
+                border: '1px solid rgba(0, 200, 5, 0.2)',
                 borderRadius: '4px', padding: '1px 6px', fontSize: '11px', fontWeight: 600,
               }}>
                 Unlock to reveal

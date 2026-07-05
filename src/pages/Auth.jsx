@@ -14,13 +14,13 @@ const userTags = [
 
 const tagColors = {
   'Fix N Flipper': '#ef4444',
-  'Wholesaler': '#8b5cf6',
-  'Marketer': '#06b6d4',
+  'Wholesaler': '#00c805',
+  'Marketer': '#00e5a0',
   'Realtor': '#10b981',
   'Cash Buyer': '#f59e0b',
   'Hard Money Lender': '#f59e0b',
-  'Private Lender': '#06b6d4',
-  'Contractor': '#94a3b8',
+  'Private Lender': '#00e5a0',
+  'Contractor': '#95a29b',
   'Property Manager': '#10b981',
   'Agent/Broker': '#10b981',
 };
@@ -57,7 +57,7 @@ export default function Auth() {
     return s;
   })();
   const pwLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  const pwColors = ['#1e1e2e', '#ef4444', '#f59e0b', '#06b6d4', '#10b981'];
+  const pwColors = ['#232925', '#ef4444', '#f59e0b', '#00e5a0', '#10b981'];
 
   const usernameValidation = username ? validateUsername(username, users) : null;
 
@@ -124,14 +124,14 @@ export default function Auth() {
 
   return (
     <div style={{
-      minHeight: '100vh', background: '#0a0a0f',
+      minHeight: '100vh', background: '#0a0b0a',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '40px 20px',
     }}>
       {/* Background */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 30% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(6, 182, 212, 0.08) 0%, transparent 50%)',
+        background: 'radial-gradient(ellipse at 30% 30%, rgba(0, 200, 5, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(0, 229, 160, 0.08) 0%, transparent 50%)',
       }} />
 
       <div style={{ width: '100%', maxWidth: '480px', position: 'relative' }}>
@@ -144,12 +144,12 @@ export default function Auth() {
 
         {/* Card */}
         <div style={{
-          background: '#12121e', border: '1px solid #1e1e2e',
+          background: '#131614', border: '1px solid #232925',
           borderRadius: '20px', overflow: 'hidden',
           boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
         }}>
           {/* Tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid #1e1e2e' }}>
+          <div style={{ display: 'flex', borderBottom: '1px solid #232925' }}>
             {['login', 'register'].map(t => (
               <button
                 key={t}
@@ -158,8 +158,8 @@ export default function Auth() {
                   flex: 1, padding: '16px',
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontWeight: 700, fontSize: '15px', transition: 'all 0.2s',
-                  color: tab === t ? '#8b5cf6' : '#475569',
-                  borderBottom: tab === t ? '2px solid #8b5cf6' : '2px solid transparent',
+                  color: tab === t ? '#00c805' : '#5a675f',
+                  borderBottom: tab === t ? '2px solid #00c805' : '2px solid transparent',
                   marginBottom: '-1px',
                 }}
               >
@@ -174,7 +174,7 @@ export default function Auth() {
                 <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '24px', marginBottom: '8px', textAlign: 'center' }}>
                   Welcome Back
                 </h2>
-                <p style={{ color: '#475569', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
+                <p style={{ color: '#5a675f', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
                   Sign in to access your deals and network
                 </p>
 
@@ -191,13 +191,13 @@ export default function Auth() {
                       onClick={() => navigate('/marketplace')}
                       style={{
                         padding: '11px 16px', borderRadius: '10px',
-                        background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
+                        background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
                         color: '#f8fafc', fontWeight: 600, fontSize: '13px',
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                         transition: 'all 0.2s',
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#8b5cf6'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e2e'; }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#00c805'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#232925'; }}
                     >
                       <span>{icon}</span> Continue with {name}
                     </button>
@@ -206,14 +206,14 @@ export default function Auth() {
 
                 {/* Divider */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                  <div style={{ flex: 1, height: '1px', background: '#1e1e2e' }} />
-                  <span style={{ color: '#475569', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px' }}>OR CONTINUE WITH EMAIL</span>
-                  <div style={{ flex: 1, height: '1px', background: '#1e1e2e' }} />
+                  <div style={{ flex: 1, height: '1px', background: '#232925' }} />
+                  <span style={{ color: '#5a675f', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px' }}>OR CONTINUE WITH EMAIL</span>
+                  <div style={{ flex: 1, height: '1px', background: '#232925' }} />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Email Address</label>
+                    <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Email Address</label>
                     <input
                       type="email"
                       defaultValue="marcus@reiatlanta.com"
@@ -222,7 +222,7 @@ export default function Auth() {
                     />
                   </div>
                   <div>
-                    <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Password</label>
+                    <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Password</label>
                     <div style={{ position: 'relative' }}>
                       <input
                         type={showPw ? 'text' : 'password'}
@@ -235,7 +235,7 @@ export default function Auth() {
                         onClick={() => setShowPw(!showPw)}
                         style={{
                           position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
-                          background: 'none', border: 'none', color: '#475569', cursor: 'pointer',
+                          background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer',
                         }}
                       >
                         {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -244,10 +244,10 @@ export default function Auth() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                      <input type="checkbox" defaultChecked style={{ accentColor: '#8b5cf6' }} />
-                      <span style={{ color: '#94a3b8', fontSize: '13px' }}>Remember me</span>
+                      <input type="checkbox" defaultChecked style={{ accentColor: '#00c805' }} />
+                      <span style={{ color: '#95a29b', fontSize: '13px' }}>Remember me</span>
                     </label>
-                    <a href="#" style={{ color: '#8b5cf6', fontSize: '13px', textDecoration: 'none' }}>Forgot password?</a>
+                    <a href="#" style={{ color: '#00c805', fontSize: '13px', textDecoration: 'none' }}>Forgot password?</a>
                   </div>
                 </div>
 
@@ -265,12 +265,12 @@ export default function Auth() {
                   <ArrowRight size={18} />
                 </button>
 
-                <p style={{ textAlign: 'center', color: '#475569', fontSize: '13px', marginTop: '20px' }}>
+                <p style={{ textAlign: 'center', color: '#5a675f', fontSize: '13px', marginTop: '20px' }}>
                   Don't have an account?{' '}
                   <button
                     type="button"
                     onClick={() => setTab('register')}
-                    style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
+                    style={{ background: 'none', border: 'none', color: '#00c805', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
                   >
                     Create one free
                   </button>
@@ -283,13 +283,13 @@ export default function Auth() {
                     <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', marginBottom: '8px', textAlign: 'center' }}>
                       Create Your Account
                     </h2>
-                    <p style={{ color: '#475569', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
+                    <p style={{ color: '#5a675f', textAlign: 'center', marginBottom: '24px', fontSize: '14px' }}>
                       Join 10,000+ real estate investors on All Street Live
                     </p>
 
                     {/* Profile Type */}
                     <div style={{ marginBottom: '20px' }}>
-                      <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '10px' }}>Account Type</label>
+                      <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '10px' }}>Account Type</label>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         {[
                           { value: 'personal', label: 'Personal', icon: User, desc: 'Individual investor' },
@@ -300,15 +300,15 @@ export default function Auth() {
                             type="button"
                             onClick={() => setProfileType(value)}
                             style={{
-                              background: profileType === value ? 'rgba(139, 92, 246, 0.1)' : '#1a1a2e',
-                              border: `2px solid ${profileType === value ? '#8b5cf6' : '#1e1e2e'}`,
+                              background: profileType === value ? 'rgba(0, 200, 5, 0.1)' : '#1a1f1b',
+                              border: `2px solid ${profileType === value ? '#00c805' : '#232925'}`,
                               borderRadius: '12px', padding: '16px 12px',
                               cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s',
                             }}
                           >
-                            <Icon size={24} style={{ color: profileType === value ? '#8b5cf6' : '#475569', marginBottom: '6px' }} />
-                            <div style={{ color: profileType === value ? '#f8fafc' : '#94a3b8', fontWeight: 700, fontSize: '14px' }}>{label}</div>
-                            <div style={{ color: '#475569', fontSize: '12px' }}>{desc}</div>
+                            <Icon size={24} style={{ color: profileType === value ? '#00c805' : '#5a675f', marginBottom: '6px' }} />
+                            <div style={{ color: profileType === value ? '#f8fafc' : '#95a29b', fontWeight: 700, fontSize: '14px' }}>{label}</div>
+                            <div style={{ color: '#5a675f', fontSize: '12px' }}>{desc}</div>
                           </button>
                         ))}
                       </div>
@@ -317,7 +317,7 @@ export default function Auth() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       {profileType === 'business' && (
                         <div>
-                          <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Company Name</label>
+                          <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Company Name</label>
                           <input
                             type="text"
                             placeholder="Your Company LLC"
@@ -329,7 +329,7 @@ export default function Auth() {
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         <div>
-                          <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>First Name</label>
+                          <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>First Name</label>
                           <input
                             type="text"
                             value={firstName}
@@ -341,7 +341,7 @@ export default function Auth() {
                           />
                         </div>
                         <div>
-                          <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Last Name</label>
+                          <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Last Name</label>
                           <input
                             type="text"
                             value={lastName}
@@ -355,9 +355,9 @@ export default function Auth() {
                       </div>
 
                       <div>
-                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Email Address</label>
+                        <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Email Address</label>
                         <div style={{ position: 'relative' }}>
-                          <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
+                          <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#5a675f', pointerEvents: 'none' }} />
                           <input
                             type="email"
                             value={email}
@@ -368,15 +368,15 @@ export default function Auth() {
                             style={{ width: '100%', padding: '11px 14px 11px 36px', borderRadius: '10px', fontSize: '14px' }}
                           />
                         </div>
-                        <div style={{ color: '#475569', fontSize: 11, marginTop: 5 }}>
+                        <div style={{ color: '#5a675f', fontSize: 11, marginTop: 5 }}>
                           We'll send a 6-digit verification code here.
                         </div>
                       </div>
 
                       <div>
-                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Phone Number</label>
+                        <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Phone Number</label>
                         <div style={{ position: 'relative' }}>
-                          <Phone size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
+                          <Phone size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#5a675f', pointerEvents: 'none' }} />
                           <input
                             type="tel"
                             value={phone}
@@ -390,7 +390,7 @@ export default function Auth() {
                       </div>
 
                       <div>
-                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Username</label>
+                        <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Username</label>
                         <input
                           type="text"
                           value={username}
@@ -413,7 +413,7 @@ export default function Auth() {
 
                       {profileType === 'business' && (
                         <div>
-                          <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
+                          <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
                             Team Member Emails
                           </label>
                           {teamEmails.map((email, i) => (
@@ -444,7 +444,7 @@ export default function Auth() {
                           <button
                             type="button"
                             onClick={() => setTeamEmails([...teamEmails, ''])}
-                            style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 }}
+                            style={{ background: 'none', border: 'none', color: '#00c805', cursor: 'pointer', fontSize: '13px', fontWeight: 600, padding: 0 }}
                           >
                             + Add team member
                           </button>
@@ -452,7 +452,7 @@ export default function Auth() {
                       )}
 
                       <div>
-                        <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Password</label>
+                        <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Password</label>
                         <div style={{ position: 'relative' }}>
                           <input
                             type={showPw ? 'text' : 'password'}
@@ -465,7 +465,7 @@ export default function Auth() {
                           <button
                             type="button"
                             onClick={() => setShowPw(!showPw)}
-                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}
+                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}
                           >
                             {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
@@ -477,7 +477,7 @@ export default function Auth() {
                               {[1,2,3,4].map(n => (
                                 <div key={n} style={{
                                   flex: 1, height: '4px', borderRadius: '2px',
-                                  background: n <= pwStrength ? pwColors[pwStrength] : '#1e1e2e',
+                                  background: n <= pwStrength ? pwColors[pwStrength] : '#232925',
                                   transition: 'all 0.2s',
                                 }} />
                               ))}
@@ -486,7 +486,7 @@ export default function Auth() {
                               <span style={{ color: pwColors[pwStrength], fontWeight: 600 }}>
                                 {pwLabels[pwStrength]}
                               </span>
-                              <span style={{ color: '#475569' }}>
+                              <span style={{ color: '#5a675f' }}>
                                 {password.length < 8 ? '8+ chars' : ''}
                                 {password.length >= 8 && !/[A-Z]/.test(password) ? ' · uppercase' : ''}
                                 {password.length >= 8 && !/[0-9]/.test(password) ? ' · number' : ''}
@@ -503,7 +503,7 @@ export default function Auth() {
                     <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', marginBottom: '8px', textAlign: 'center' }}>
                       Verify your email
                     </h2>
-                    <p style={{ color: '#94a3b8', textAlign: 'center', marginBottom: '24px', fontSize: '13px', lineHeight: 1.55 }}>
+                    <p style={{ color: '#95a29b', textAlign: 'center', marginBottom: '24px', fontSize: '13px', lineHeight: 1.55 }}>
                       We sent a 6-digit code to <strong style={{ color: '#f8fafc' }}>{email || 'your email'}</strong>. Enter it below to finish creating your account.
                     </p>
 
@@ -525,8 +525,8 @@ export default function Auth() {
                           style={{
                             width: 46, height: 56,
                             textAlign: 'center',
-                            background: '#0d0d1a',
-                            border: `1.5px solid ${digit ? '#8b5cf6' : '#1e1e2e'}`,
+                            background: '#0e100e',
+                            border: `1.5px solid ${digit ? '#00c805' : '#232925'}`,
                             borderRadius: 10,
                             color: '#f8fafc',
                             fontSize: 22, fontWeight: 800,
@@ -552,19 +552,19 @@ export default function Auth() {
                         onClick={() => setStep(1)}
                         style={{
                           background: 'none', border: 'none',
-                          color: '#64748b', fontSize: 12, fontWeight: 600,
+                          color: '#707d75', fontSize: 12, fontWeight: 600,
                           cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
                         }}
                       >
                         Use a different email
                       </button>
-                      <span style={{ color: '#1e1e2e', margin: '0 8px' }}>·</span>
+                      <span style={{ color: '#232925', margin: '0 8px' }}>·</span>
                       <button
                         type="button"
                         onClick={() => { setVerifyCode(['','','','','','']); setVerifyError(''); }}
                         style={{
                           background: 'none', border: 'none',
-                          color: '#a78bfa', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                          color: '#4ade80', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                         }}
                       >
                         Resend code
@@ -573,11 +573,11 @@ export default function Auth() {
 
                     <div style={{
                       padding: '10px 14px', borderRadius: 8,
-                      background: 'rgba(139,92,246,0.06)', border: '1px dashed rgba(139,92,246,0.2)',
-                      color: '#a78bfa', fontSize: 11, lineHeight: 1.5,
+                      background: 'rgba(0, 200, 5,0.06)', border: '1px dashed rgba(0, 200, 5,0.2)',
+                      color: '#4ade80', fontSize: 11, lineHeight: 1.5,
                       textAlign: 'center',
                     }}>
-                      <strong style={{ color: '#cbd5e1' }}>Mock mode:</strong> any 6 digits will work for now.
+                      <strong style={{ color: '#cdd6d0' }}>Mock mode:</strong> any 6 digits will work for now.
                     </div>
                   </>
                 )}
@@ -614,11 +614,11 @@ export default function Auth() {
                 )}
 
                 {step === 1 && (
-                  <p style={{ textAlign: 'center', color: '#475569', fontSize: '12px', marginTop: '16px' }}>
+                  <p style={{ textAlign: 'center', color: '#5a675f', fontSize: '12px', marginTop: '16px' }}>
                     By creating an account you agree to our{' '}
-                    <a href="#" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Terms of Service</a>
+                    <a href="#" style={{ color: '#00c805', textDecoration: 'none' }}>Terms of Service</a>
                     {' '}and{' '}
-                    <a href="#" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Privacy Policy</a>
+                    <a href="#" style={{ color: '#00c805', textDecoration: 'none' }}>Privacy Policy</a>
                   </p>
                 )}
               </form>

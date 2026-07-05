@@ -61,7 +61,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
       <div
         style={{
           width: '100%', maxWidth: 480,
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #12121e 100%)',
+          background: 'linear-gradient(180deg, #1a1f1b 0%, #131614 100%)',
           border: '1px solid rgba(245,158,11,0.35)',
           borderRadius: 22,
           boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset',
@@ -77,7 +77,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
               position: 'absolute', top: 12, right: 12, zIndex: 3,
               background: 'rgba(255,255,255,0.06)', border: 'none',
               borderRadius: '50%', width: 36, height: 36,
-              color: '#94a3b8', cursor: 'pointer',
+              color: '#95a29b', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -122,7 +122,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
             “
           </div>
           <p style={{
-            color: '#e2e8f0', fontSize: 14.5, lineHeight: 1.65,
+            color: '#e4eae6', fontSize: 14.5, lineHeight: 1.65,
             margin: 0, paddingTop: 14, fontStyle: 'italic',
           }}>
             Remember, nobody likes a lying daisy chainer. Be authentic to grow your network &amp; business and earn your business. When deals don't close, everybody involved can be hurt. Play safe.
@@ -143,7 +143,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
             </div>
             <div>
               <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: 13 }}>— Carson</div>
-              <div style={{ color: '#94a3b8', fontSize: 11 }}>Founder, AllStreetLive</div>
+              <div style={{ color: '#95a29b', fontSize: 11 }}>Founder, AllStreetLive</div>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
               width: '100%',
               padding: '13px 18px', borderRadius: 12,
               background: 'linear-gradient(135deg, #f59e0b, #fb923c)',
-              border: 'none', color: '#1a1a2e',
+              border: 'none', color: '#1a1f1b',
               fontWeight: 800, fontSize: 14.5,
               cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -167,7 +167,7 @@ export default function CarsonFirstAddressModal({ open, onContinue, onClose }) {
             <ArrowRight size={16} />
           </button>
           <p style={{
-            color: '#475569', fontSize: 11,
+            color: '#5a675f', fontSize: 11,
             margin: '10px 0 0', textAlign: 'center', lineHeight: 1.5,
           }}>
             You'll only see this message once.

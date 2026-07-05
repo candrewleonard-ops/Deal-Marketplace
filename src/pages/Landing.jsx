@@ -14,13 +14,13 @@ const features = [
     icon: Zap,
     title: 'Free to Post Deals',
     desc: 'List your wholesale deals at no cost. Get your properties in front of thousands of ready buyers instantly.',
-    color: '#8b5cf6',
+    color: '#00c805',
   },
   {
     icon: Users,
     title: 'Built-in Buyer Network',
     desc: 'Access our massive network of cash buyers, hard money lenders, and active investors in every market.',
-    color: '#06b6d4',
+    color: '#00e5a0',
   },
   {
     icon: MapPin,
@@ -62,20 +62,20 @@ const testimonials = [
 
 export default function Landing() {
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       {/* Hero */}
       <section className="hero-bg" style={{ position: 'relative', overflow: 'hidden', padding: '100px 20px 80px' }}>
         {/* Orbs */}
         <div className="orb" style={{
           position: 'absolute', top: '10%', left: '5%',
           width: '400px', height: '400px', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 200, 5, 0.15) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div className="orb-2" style={{
           position: 'absolute', bottom: '10%', right: '5%',
           width: '350px', height: '350px', borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 229, 160, 0.12) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
@@ -91,7 +91,7 @@ export default function Landing() {
             for Real Estate Investors
           </h1>
 
-          <p style={{ color: '#94a3b8', fontSize: 'clamp(16px, 2vw, 20px)', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
+          <p style={{ color: '#95a29b', fontSize: 'clamp(16px, 2vw, 20px)', lineHeight: 1.7, marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
             Connect wholesalers, cash buyers, hard money lenders, and investors nationwide.
             Find deals, close faster, and grow your REI business.
           </p>
@@ -106,7 +106,7 @@ export default function Landing() {
                 padding: '16px 32px', borderRadius: '12px',
                 color: '#fff', textDecoration: 'none',
                 fontSize: '16px', fontWeight: 700,
-                boxShadow: '0 0 30px rgba(139, 92, 246, 0.3)',
+                boxShadow: '0 0 30px rgba(0, 200, 5, 0.3)',
               }}
             >
               Browse Deals
@@ -134,7 +134,7 @@ export default function Landing() {
             {stats.map(({ value, label }) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <div className="gradient-text" style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1 }}>{value}</div>
-                <div style={{ color: '#475569', fontSize: '13px', fontWeight: 500, marginTop: '4px' }}>{label}</div>
+                <div style={{ color: '#5a675f', fontSize: '13px', fontWeight: 500, marginTop: '4px' }}>{label}</div>
               </div>
             ))}
           </div>
@@ -147,7 +147,7 @@ export default function Landing() {
           <h2 style={{ color: '#f8fafc', fontSize: '36px', fontWeight: 800, marginBottom: '12px', letterSpacing: '-0.5px' }}>
             Everything You Need to <span className="gradient-text">Scale Your REI</span>
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>
+          <p style={{ color: '#95a29b', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>
             One platform. Every tool. All investors.
           </p>
         </div>
@@ -158,7 +158,7 @@ export default function Landing() {
               key={title}
               className="card-hover"
               style={{
-                background: '#12121e', border: '1px solid #1e1e2e',
+                background: '#131614', border: '1px solid #232925',
                 borderRadius: '16px', padding: '28px',
               }}
             >
@@ -171,20 +171,20 @@ export default function Landing() {
                 <Icon size={24} style={{ color }} />
               </div>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '10px' }}>{title}</h3>
-              <p style={{ color: '#94a3b8', lineHeight: 1.6, margin: 0, fontSize: '14px' }}>{desc}</p>
+              <p style={{ color: '#95a29b', lineHeight: 1.6, margin: 0, fontSize: '14px' }}>{desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* How It Works */}
-      <section style={{ padding: '80px 20px', background: 'rgba(139, 92, 246, 0.03)', borderTop: '1px solid #1e1e2e', borderBottom: '1px solid #1e1e2e' }}>
+      <section style={{ padding: '80px 20px', background: 'rgba(0, 200, 5, 0.03)', borderTop: '1px solid #232925', borderBottom: '1px solid #232925' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 style={{ color: '#f8fafc', fontSize: '36px', fontWeight: 800, marginBottom: '12px', letterSpacing: '-0.5px' }}>
               How <span className="gradient-text">All Street Live</span> Works
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '16px' }}>Get started in minutes. Close deals in days.</p>
+            <p style={{ color: '#95a29b', fontSize: '16px' }}>Get started in minutes. Close deals in days.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px' }}>
@@ -192,16 +192,16 @@ export default function Landing() {
               <div key={step} style={{ textAlign: 'center', position: 'relative' }}>
                 <div style={{
                   width: '64px', height: '64px', borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                  background: 'linear-gradient(135deg, #00c805, #00e5a0)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 20px',
                   fontWeight: 900, fontSize: '20px', color: '#fff',
-                  boxShadow: '0 0 30px rgba(139, 92, 246, 0.3)',
+                  boxShadow: '0 0 30px rgba(0, 200, 5, 0.3)',
                 }}>
                   {step}
                 </div>
                 <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '10px' }}>{title}</h3>
-                <p style={{ color: '#94a3b8', lineHeight: 1.6, fontSize: '14px', margin: 0 }}>{desc}</p>
+                <p style={{ color: '#95a29b', lineHeight: 1.6, fontSize: '14px', margin: 0 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -221,19 +221,19 @@ export default function Landing() {
             <div
               key={name}
               className="card-hover"
-              style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '28px' }}
+              style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: '28px' }}
             >
               <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
                 {[...Array(rating)].map((_, i) => (
                   <Star key={i} size={16} fill="#f59e0b" style={{ color: '#f59e0b' }} />
                 ))}
               </div>
-              <p style={{ color: '#e2e8f0', fontSize: '15px', lineHeight: 1.7, marginBottom: '20px' }}>"{text}"</p>
+              <p style={{ color: '#e4eae6', fontSize: '15px', lineHeight: 1.7, marginBottom: '20px' }}>"{text}"</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <img src={avatar} alt={name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
                 <div>
                   <p style={{ color: '#f8fafc', fontWeight: 700, margin: 0, fontSize: '14px' }}>{name}</p>
-                  <p style={{ color: '#475569', margin: 0, fontSize: '12px' }}>{role}</p>
+                  <p style={{ color: '#5a675f', margin: 0, fontSize: '12px' }}>{role}</p>
                 </div>
               </div>
             </div>
@@ -245,14 +245,14 @@ export default function Landing() {
       <section style={{ padding: '80px 20px', textAlign: 'center' }}>
         <div style={{
           maxWidth: '700px', margin: '0 auto',
-          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1))',
-          border: '1px solid rgba(139, 92, 246, 0.2)',
+          background: 'linear-gradient(135deg, rgba(0, 200, 5, 0.15), rgba(0, 229, 160, 0.1))',
+          border: '1px solid rgba(0, 200, 5, 0.2)',
           borderRadius: '24px', padding: '60px 40px',
         }}>
           <h2 style={{ color: '#f8fafc', fontSize: '36px', fontWeight: 900, marginBottom: '16px', letterSpacing: '-0.5px' }}>
             Ready to Scale Your REI?
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '32px', lineHeight: 1.7 }}>
+          <p style={{ color: '#95a29b', fontSize: '16px', marginBottom: '32px', lineHeight: 1.7 }}>
             Join 10,000+ investors already using All Street Live to find deals,<br />connect with buyers, and grow their portfolios.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -287,14 +287,14 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer style={{ background: '#0d0d1a', borderTop: '1px solid #1e1e2e', padding: '60px 20px 30px' }}>
+      <footer style={{ background: '#0e100e', borderTop: '1px solid #232925', padding: '60px 20px 30px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', marginBottom: '40px' }}>
             <div>
               <div style={{ marginBottom: '16px' }}>
                 <Logo size="md" />
               </div>
-              <p style={{ color: '#475569', fontSize: '14px', lineHeight: 1.6 }}>
+              <p style={{ color: '#5a675f', fontSize: '14px', lineHeight: 1.6 }}>
                 The #1 Marketplace for Real Estate Investors. Connecting deals, investors, and opportunities nationwide.
               </p>
             </div>
@@ -308,7 +308,7 @@ export default function Landing() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {links.map(link => (
                     <li key={link}>
-                      <a href="#" style={{ color: '#475569', fontSize: '14px', textDecoration: 'none', transition: 'color 0.2s' }}>
+                      <a href="#" style={{ color: '#5a675f', fontSize: '14px', textDecoration: 'none', transition: 'color 0.2s' }}>
                         {link}
                       </a>
                     </li>
@@ -318,13 +318,13 @@ export default function Landing() {
             ))}
           </div>
 
-          <div style={{ borderTop: '1px solid #1e1e2e', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-            <p style={{ color: '#334155', fontSize: '13px', margin: 0 }}>
+          <div style={{ borderTop: '1px solid #232925', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <p style={{ color: '#3e4a43', fontSize: '13px', margin: 0 }}>
               © 2026 All Street Live. All rights reserved.
             </p>
             <div style={{ display: 'flex', gap: '20px' }}>
               {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map(l => (
-                <a key={l} href="#" style={{ color: '#334155', fontSize: '13px', textDecoration: 'none' }}>{l}</a>
+                <a key={l} href="#" style={{ color: '#3e4a43', fontSize: '13px', textDecoration: 'none' }}>{l}</a>
               ))}
             </div>
           </div>

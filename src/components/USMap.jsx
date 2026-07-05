@@ -40,7 +40,7 @@ export default function USMap({ deals = [], selectedStates = [], onStateToggle }
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       {/* Map — fills container, no extra coloring by default */}
-      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#0a0a0f' }}>
+      <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#0a0b0a' }}>
         <ComposableMap
           projection="geoAlbersUsa"
           style={{ width: '100%', height: 'auto', display: 'block' }}
@@ -67,22 +67,22 @@ export default function USMap({ deals = [], selectedStates = [], onStateToggle }
                     onMouseLeave={() => setTooltip(null)}
                     style={{
                       default: {
-                        fill: isSelected ? '#8b5cf6' : '#1e1e2e',
-                        stroke: '#0a0a0f',
+                        fill: isSelected ? '#00c805' : '#232925',
+                        stroke: '#0a0b0a',
                         strokeWidth: 0.8,
                         outline: 'none',
                         cursor: 'pointer',
                         transition: 'fill 0.12s ease',
                       },
                       hover: {
-                        fill: isSelected ? '#7c3aed' : '#2e2e42',
-                        stroke: isSelected ? '#a78bfa' : '#2e2e42',
+                        fill: isSelected ? '#00b105' : '#38403a',
+                        stroke: isSelected ? '#4ade80' : '#38403a',
                         strokeWidth: 1,
                         outline: 'none',
                         cursor: 'pointer',
                       },
                       pressed: {
-                        fill: isSelected ? '#6d28d9' : '#3b3b52',
+                        fill: isSelected ? '#009e04' : '#47514a',
                         outline: 'none',
                       },
                     }}
@@ -100,8 +100,8 @@ export default function USMap({ deals = [], selectedStates = [], onStateToggle }
           position: 'fixed',
           left: tooltip.x + 12,
           top: tooltip.y - 40,
-          background: '#1a1a2e',
-          border: '1px solid #2e2e42',
+          background: '#1a1f1b',
+          border: '1px solid #38403a',
           borderRadius: '8px',
           padding: '8px 12px',
           pointerEvents: 'none',
@@ -109,7 +109,7 @@ export default function USMap({ deals = [], selectedStates = [], onStateToggle }
           boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
         }}>
           <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>{tooltip.name}</div>
-          <div style={{ color: '#8b5cf6', fontWeight: 600, fontSize: '12px' }}>
+          <div style={{ color: '#00c805', fontWeight: 600, fontSize: '12px' }}>
             {tooltip.count} deal{tooltip.count !== 1 ? 's' : ''}
             {selectedStates.includes(tooltip.abbr) ? ' · Selected' : ''}
           </div>

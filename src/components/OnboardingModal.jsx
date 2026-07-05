@@ -7,7 +7,7 @@ const STORAGE_KEY = 'asl-onboarding-seen-v1';
 const SLIDES = [
   {
     icon: Home,
-    color: '#8b5cf6',
+    color: '#00c805',
     title: 'Off-market deals, nationwide',
     body: 'Browse a feed of wholesale, fix & flip, and creative-finance deals from investors across the country. Filter by city, price, and deal type.',
   },
@@ -19,7 +19,7 @@ const SLIDES = [
   },
   {
     icon: Users,
-    color: '#06b6d4',
+    color: '#00e5a0',
     title: 'Connect with operators',
     body: 'DM wholesalers, follow investors, join city groups, and find vetted contractors when you need work done on a flip.',
   },
@@ -74,8 +74,8 @@ export default function OnboardingModal() {
     >
       <div style={{
         width: '100%', maxWidth: 440,
-        background: '#12121e',
-        border: '1px solid #1e1e2e',
+        background: '#131614',
+        border: '1px solid #232925',
         borderRadius: 20,
         padding: '28px 24px',
         position: 'relative',
@@ -89,7 +89,7 @@ export default function OnboardingModal() {
             position: 'absolute', top: 12, right: 12,
             width: 32, height: 32, borderRadius: '50%',
             background: 'rgba(255,255,255,0.05)', border: 'none',
-            color: '#94a3b8', cursor: 'pointer',
+            color: '#95a29b', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
@@ -113,7 +113,7 @@ export default function OnboardingModal() {
           {slide.title}
         </h2>
         <p style={{
-          color: '#94a3b8', fontSize: 14, lineHeight: 1.6, margin: 0,
+          color: '#95a29b', fontSize: 14, lineHeight: 1.6, margin: 0,
           textAlign: 'center',
         }}>
           {slide.body}
@@ -143,8 +143,8 @@ export default function OnboardingModal() {
               onClick={() => setStep(step - 1)}
               style={{
                 flex: 1, padding: '12px 16px', borderRadius: 10,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-                color: '#94a3b8', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
+                color: '#95a29b', fontWeight: 700, fontSize: 14, cursor: 'pointer',
               }}
             >
               Back
@@ -155,7 +155,7 @@ export default function OnboardingModal() {
               style={{
                 flex: 1, padding: '12px 16px', borderRadius: 10,
                 background: 'transparent', border: '1px solid transparent',
-                color: '#64748b', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                color: '#707d75', fontWeight: 600, fontSize: 13, cursor: 'pointer',
               }}
             >
               Skip
@@ -166,11 +166,11 @@ export default function OnboardingModal() {
             onClick={() => isLast ? close() : setStep(step + 1)}
             style={{
               flex: 1.6, padding: '12px 16px', borderRadius: 10,
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
               border: 'none', color: '#fff', fontWeight: 700, fontSize: 14,
               cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              boxShadow: '0 6px 20px rgba(139,92,246,0.35)',
+              boxShadow: '0 6px 20px rgba(0, 200, 5,0.35)',
             }}
           >
             {isLast ? (<>Get started <CheckCircle size={15} /></>) : (<>Next <ArrowRight size={15} /></>)}

@@ -4,8 +4,8 @@ import { meetups, meetupCategories } from '../data/meetups';
 import { Link } from 'react-router-dom';
 
 const categoryColors = {
-  'REI Meetup': '#8b5cf6',
-  'Wholesaler Meetup': '#06b6d4',
+  'REI Meetup': '#00c805',
+  'Wholesaler Meetup': '#00e5a0',
   'REIA Meeting': '#f59e0b',
   'Networking Event': '#10b981',
 };
@@ -66,16 +66,16 @@ export default function Meetups() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh', paddingBottom: '60px' }}>
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.08)), #0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '48px 20px 36px' }}>
+      <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5, 0.15), rgba(0, 229, 160, 0.08)), #0e100e', borderBottom: '1px solid #232925', padding: '48px 20px 36px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '28px' }}>
             <div>
               <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: 'clamp(24px, 4vw, 40px)', margin: '0 0 8px', letterSpacing: '-0.5px' }}>
                 REI Meetups & Events
               </h1>
-              <p style={{ color: '#94a3b8', fontSize: '16px', margin: 0 }}>
+              <p style={{ color: '#95a29b', fontSize: '16px', margin: 0 }}>
                 Connect with {userMeetups.reduce((sum, m) => sum + m.attendees, 0).toLocaleString()}+ investors at events near you
               </p>
             </div>
@@ -99,23 +99,23 @@ export default function Meetups() {
                   style={{
                     padding: '7px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
                     background: activeCategory === cat
-                      ? (cat === 'All' ? 'linear-gradient(135deg, #8b5cf6, #06b6d4)' : `${categoryColors[cat] || '#8b5cf6'}20`)
+                      ? (cat === 'All' ? 'linear-gradient(135deg, #00c805, #00e5a0)' : `${categoryColors[cat] || '#00c805'}20`)
                       : 'rgba(255,255,255,0.04)',
                     border: activeCategory === cat && cat !== 'All'
-                      ? `1px solid ${categoryColors[cat] || '#8b5cf6'}50`
-                      : activeCategory === cat ? '1px solid transparent' : '1px solid #1e1e2e',
+                      ? `1px solid ${categoryColors[cat] || '#00c805'}50`
+                      : activeCategory === cat ? '1px solid transparent' : '1px solid #232925',
                     color: activeCategory === cat
-                      ? (cat === 'All' ? '#fff' : categoryColors[cat] || '#8b5cf6')
-                      : '#94a3b8',
+                      ? (cat === 'All' ? '#fff' : categoryColors[cat] || '#00c805')
+                      : '#95a29b',
                   }}
                 >
                   {cat}
                 </button>
               ))}
             </div>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', borderRadius: '10px', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '10px', overflow: 'hidden' }}>
               {[{ icon: Grid, val: 'grid' }, { icon: Map, val: 'map' }].map(({ icon: Icon, val }) => (
-                <button key={val} onClick={() => setView(val)} style={{ padding: '8px 12px', background: view === val ? 'rgba(139, 92, 246, 0.2)' : 'transparent', border: 'none', cursor: 'pointer', color: view === val ? '#8b5cf6' : '#94a3b8', transition: 'all 0.2s' }}>
+                <button key={val} onClick={() => setView(val)} style={{ padding: '8px 12px', background: view === val ? 'rgba(0, 200, 5, 0.2)' : 'transparent', border: 'none', cursor: 'pointer', color: view === val ? '#00c805' : '#95a29b', transition: 'all 0.2s' }}>
                   <Icon size={16} />
                 </button>
               ))}
@@ -126,12 +126,12 @@ export default function Meetups() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px' }}>
         {/* Business CTA */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.05))', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', padding: '20px 24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.08), rgba(0, 229, 160,0.05))', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '14px', padding: '20px 24px', marginBottom: '32px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           <div style={{ flex: 1 }}>
             <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '16px', margin: '0 0 6px' }}>
               Host a meetup and become the go-to connector in your market
             </h3>
-            <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>
+            <p style={{ color: '#95a29b', fontSize: '14px', margin: 0 }}>
               Build your brand, grow your buyer list, and close more deals. The best networkers close the most deals.
             </p>
           </div>
@@ -146,25 +146,25 @@ export default function Meetups() {
 
         {view === 'map' ? (
           <div style={{
-            background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px',
+            background: '#131614', border: '1px solid #232925', borderRadius: '16px',
             minHeight: '500px', display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             backgroundImage: 'linear-gradient(rgba(30,30,46,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(30,30,46,0.5) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}>
-            <Map size={56} style={{ color: '#8b5cf6', marginBottom: '16px' }} />
+            <Map size={56} style={{ color: '#00c805', marginBottom: '16px' }} />
             <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '20px', margin: '0 0 8px' }}>Map View</h3>
-            <p style={{ color: '#475569', fontSize: '14px', margin: '0 0 24px' }}>
+            <p style={{ color: '#5a675f', fontSize: '14px', margin: '0 0 24px' }}>
               Interactive map showing {filtered.length} events across the US
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
               {filtered.slice(0, 6).map(m => (
-                <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1a1a2e', border: '1px solid #1e1e2e', borderRadius: '20px', padding: '8px 14px', cursor: 'pointer', transition: 'all 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = categoryColors[m.category] || '#8b5cf6'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = '#1e1e2e'}
+                <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1a1f1b', border: '1px solid #232925', borderRadius: '20px', padding: '8px 14px', cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = categoryColors[m.category] || '#00c805'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = '#232925'}
                 >
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: categoryColors[m.category] || '#8b5cf6' }} />
-                  <span style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 500 }}>{m.city}, {m.state}</span>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: categoryColors[m.category] || '#00c805' }} />
+                  <span style={{ color: '#95a29b', fontSize: '12px', fontWeight: 500 }}>{m.city}, {m.state}</span>
                 </div>
               ))}
             </div>
@@ -187,10 +187,10 @@ export default function Meetups() {
                 Upcoming Events ({upcoming.length})
               </h2>
               {upcoming.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px 20px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px' }}>
-                  <Calendar size={48} style={{ color: '#8b5cf6', marginBottom: '16px', opacity: 0.4 }} />
+                <div style={{ textAlign: 'center', padding: '60px 20px', background: '#131614', border: '1px solid #232925', borderRadius: '16px' }}>
+                  <Calendar size={48} style={{ color: '#00c805', marginBottom: '16px', opacity: 0.4 }} />
                   <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>No events in this category</h3>
-                  <p style={{ color: '#475569', fontSize: '14px', marginBottom: '16px' }}>Be the first to host one in your market!</p>
+                  <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '16px' }}>Be the first to host one in your market!</p>
                   <button onClick={() => setShowHost(true)} className="gradient-btn" style={{ padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>Host a Meetup</button>
                 </div>
               ) : (
@@ -206,10 +206,10 @@ export default function Meetups() {
       {/* Host Modal */}
       {showHost && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowHost(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '540px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#12121e', zIndex: 1 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', width: '100%', maxWidth: '540px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: '#131614', zIndex: 1 }}>
               <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Host a Meetup</h2>
-              <button onClick={() => setShowHost(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={20} /></button>
+              <button onClick={() => setShowHost(false)} style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <form onSubmit={handleHostSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {[
@@ -222,7 +222,7 @@ export default function Meetups() {
                 { label: 'Ticket Price ($0 for free)', key: 'ticketPrice', placeholder: '0', type: 'number' },
               ].map(({ label, key, placeholder, type }) => (
                 <div key={key}>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{label}</label>
+                  <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{label}</label>
                   <input
                     type={type}
                     placeholder={placeholder}
@@ -235,20 +235,20 @@ export default function Meetups() {
                 </div>
               ))}
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Category</label>
+                <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Category</label>
                 <select value={hostForm.category} onChange={e => setHostForm({ ...hostForm, category: e.target.value })} className="input-dark" style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', fontSize: '14px', cursor: 'pointer' }}>
                   {meetupCategories.filter(c => c !== 'All').map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
-              <label style={{ display: 'flex', gap: '10px', cursor: 'pointer', padding: '10px', background: '#1a1a2e', borderRadius: '8px' }}>
-                <input type="checkbox" checked={hostForm.isVirtual} onChange={e => setHostForm({ ...hostForm, isVirtual: e.target.checked })} style={{ accentColor: '#8b5cf6', width: '16px', height: '16px', marginTop: '2px' }} />
+              <label style={{ display: 'flex', gap: '10px', cursor: 'pointer', padding: '10px', background: '#1a1f1b', borderRadius: '8px' }}>
+                <input type="checkbox" checked={hostForm.isVirtual} onChange={e => setHostForm({ ...hostForm, isVirtual: e.target.checked })} style={{ accentColor: '#00c805', width: '16px', height: '16px', marginTop: '2px' }} />
                 <div>
                   <div style={{ color: '#f8fafc', fontSize: '14px', fontWeight: 600 }}>🖥 Virtual Event (Zoom / Online)</div>
-                  <div style={{ color: '#475569', fontSize: '12px' }}>Allow remote attendees from anywhere</div>
+                  <div style={{ color: '#5a675f', fontSize: '12px' }}>Allow remote attendees from anywhere</div>
                 </div>
               </label>
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
+                <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
                 <textarea
                   value={hostForm.description}
                   onChange={e => setHostForm({ ...hostForm, description: e.target.value })}
@@ -259,7 +259,7 @@ export default function Meetups() {
                 />
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="button" onClick={() => setShowHost(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="button" onClick={() => setShowHost(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', color: '#95a29b', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
                 <button type="submit" className="gradient-btn" style={{ flex: 2, padding: '14px', borderRadius: '12px', color: '#fff', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer' }}>
                   Create Meetup
                 </button>
@@ -271,7 +271,7 @@ export default function Meetups() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, background: '#12121e', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, background: '#131614', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
           <Check size={16} style={{ color: '#10b981', flexShrink: 0 }} />
           <span style={{ color: '#f8fafc', fontSize: '14px', fontWeight: 500 }}>{toast}</span>
         </div>
@@ -284,7 +284,7 @@ function MeetupCard({ meetup, featured, onToast }) {
   const [registered, setRegistered] = useState(false);
   const [attendeeCount, setAttendeeCount] = useState(meetup.attendees);
   const [copied, setCopied] = useState(false);
-  const color = categoryColors[meetup.category] || '#8b5cf6';
+  const color = categoryColors[meetup.category] || '#00c805';
   const pct = Math.round((attendeeCount / meetup.maxAttendees) * 100);
 
   function handleRegister() {
@@ -308,8 +308,8 @@ function MeetupCard({ meetup, featured, onToast }) {
     <div
       className="card-hover"
       style={{
-        background: '#12121e',
-        border: featured ? `1px solid ${color}40` : '1px solid #1e1e2e',
+        background: '#131614',
+        border: featured ? `1px solid ${color}40` : '1px solid #232925',
         borderRadius: '16px', overflow: 'hidden',
         boxShadow: featured ? `0 0 20px ${color}15` : 'none',
         transition: 'transform 0.2s, box-shadow 0.2s',
@@ -325,7 +325,7 @@ function MeetupCard({ meetup, featured, onToast }) {
         </div>
         {meetup.isVirtual && (
           <div style={{ position: 'absolute', top: '12px', right: '12px' }}>
-            <span style={{ background: 'rgba(139, 92, 246, 0.9)', color: '#fff', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>🖥 Virtual</span>
+            <span style={{ background: 'rgba(0, 200, 5, 0.9)', color: '#fff', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>🖥 Virtual</span>
           </div>
         )}
         <div style={{ position: 'absolute', bottom: '12px', right: '12px' }}>
@@ -342,28 +342,28 @@ function MeetupCard({ meetup, featured, onToast }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <Calendar size={13} style={{ color: '#8b5cf6', flexShrink: 0 }} />
-            <span style={{ color: '#94a3b8', fontSize: '13px' }}>{formatDate(meetup.date)}</span>
+            <Calendar size={13} style={{ color: '#00c805', flexShrink: 0 }} />
+            <span style={{ color: '#95a29b', fontSize: '13px' }}>{formatDate(meetup.date)}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <Clock size={13} style={{ color: '#94a3b8', flexShrink: 0 }} />
-            <span style={{ color: '#94a3b8', fontSize: '13px' }}>{meetup.time}</span>
+            <Clock size={13} style={{ color: '#95a29b', flexShrink: 0 }} />
+            <span style={{ color: '#95a29b', fontSize: '13px' }}>{meetup.time}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <MapPin size={13} style={{ color: '#94a3b8', flexShrink: 0 }} />
-            <span style={{ color: '#94a3b8', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <MapPin size={13} style={{ color: '#95a29b', flexShrink: 0 }} />
+            <span style={{ color: '#95a29b', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {meetup.isVirtual ? 'Online Event (Zoom)' : meetup.location}
             </span>
           </div>
         </div>
 
-        <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.6, marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        <p style={{ color: '#95a29b', fontSize: '13px', lineHeight: 1.6, marginBottom: '12px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {meetup.description}
         </p>
 
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
           {meetup.tags.slice(0, 3).map(tag => (
-            <span key={tag} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e', borderRadius: '20px', padding: '2px 10px', color: '#94a3b8', fontSize: '11px', fontWeight: 500 }}>
+            <span key={tag} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #232925', borderRadius: '20px', padding: '2px 10px', color: '#95a29b', fontSize: '11px', fontWeight: 500 }}>
               #{tag.replace(/\s/g, '')}
             </span>
           ))}
@@ -372,21 +372,21 @@ function MeetupCard({ meetup, featured, onToast }) {
         <div style={{ marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Users size={13} style={{ color: '#94a3b8' }} />
-              <span style={{ color: '#94a3b8', fontSize: '13px' }}>
+              <Users size={13} style={{ color: '#95a29b' }} />
+              <span style={{ color: '#95a29b', fontSize: '13px' }}>
                 <strong style={{ color: '#f8fafc' }}>{attendeeCount.toLocaleString()}</strong> / {meetup.maxAttendees.toLocaleString()}
               </span>
             </div>
-            <span style={{ color: pct >= 80 ? '#ef4444' : '#94a3b8', fontSize: '12px', fontWeight: 600 }}>{pct}% full</span>
+            <span style={{ color: pct >= 80 ? '#ef4444' : '#95a29b', fontSize: '12px', fontWeight: 600 }}>{pct}% full</span>
           </div>
-          <div style={{ height: '4px', background: '#1e1e2e', borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{ height: '100%', borderRadius: '2px', width: `${Math.min(pct, 100)}%`, background: pct >= 80 ? '#ef4444' : `linear-gradient(to right, #8b5cf6, #06b6d4)`, transition: 'width 0.3s ease' }} />
+          <div style={{ height: '4px', background: '#232925', borderRadius: '2px', overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: '2px', width: `${Math.min(pct, 100)}%`, background: pct >= 80 ? '#ef4444' : `linear-gradient(to right, #00c805, #00e5a0)`, transition: 'width 0.3s ease' }} />
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', paddingTop: '10px', borderTop: '1px solid #1e1e2e' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', paddingTop: '10px', borderTop: '1px solid #232925' }}>
           <img src={meetup.hostAvatar} alt={meetup.hostName} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
-          <span style={{ color: '#475569', fontSize: '12px' }}>Hosted by <strong style={{ color: '#94a3b8' }}>{meetup.hostName}</strong></span>
+          <span style={{ color: '#5a675f', fontSize: '12px' }}>Hosted by <strong style={{ color: '#95a29b' }}>{meetup.hostName}</strong></span>
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -394,7 +394,7 @@ function MeetupCard({ meetup, featured, onToast }) {
             onClick={handleRegister}
             style={{
               flex: 1, padding: '10px', borderRadius: '10px',
-              background: registered ? 'rgba(16, 185, 129, 0.15)' : 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+              background: registered ? 'rgba(16, 185, 129, 0.15)' : 'linear-gradient(135deg, #00c805, #00e5a0)',
               border: registered ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
               color: registered ? '#10b981' : '#fff',
               cursor: 'pointer', fontWeight: 700, fontSize: '13px', transition: 'all 0.2s',
@@ -404,7 +404,7 @@ function MeetupCard({ meetup, featured, onToast }) {
           </button>
           <button
             onClick={handleShare}
-            style={{ padding: '10px 12px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : '#1e1e2e'}`, color: copied ? '#10b981' : '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'all 0.2s' }}
+            style={{ padding: '10px 12px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : '#232925'}`, color: copied ? '#10b981' : '#95a29b', cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'all 0.2s' }}
           >
             {copied ? <Check size={15} /> : <Share2 size={15} />}
           </button>

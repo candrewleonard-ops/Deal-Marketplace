@@ -17,7 +17,7 @@ export default function ImageCarousel({ images = [], youtubeId, height = 480 }) 
   const current = slides[idx];
 
   return (
-    <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', background: '#12121e' }}>
+    <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', background: '#131614' }}>
       <div style={{ width: '100%', height: `${height}px`, background: '#000', position: 'relative' }}>
         {current.type === 'image' ? (
           <>
@@ -88,7 +88,7 @@ export default function ImageCarousel({ images = [], youtubeId, height = 480 }) 
                 onClick={() => setIdx(i)}
                 style={{
                   width: i === idx ? '20px' : '8px', height: '8px', borderRadius: '4px',
-                  background: i === idx ? '#8b5cf6' : 'rgba(255,255,255,0.4)',
+                  background: i === idx ? '#00c805' : 'rgba(255,255,255,0.4)',
                   border: 'none', cursor: 'pointer', transition: 'all 0.2s', padding: 0,
                 }}
               />
@@ -147,7 +147,7 @@ function Lightbox({ slides, idx, setIdx, onClose }) {
           color: '#fff',
         }}
       >
-        <div style={{ flex: 1, fontSize: 13, color: '#94a3b8' }}>
+        <div style={{ flex: 1, fontSize: 13, color: '#95a29b' }}>
           {idx + 1} / {imageSlides.length}
         </div>
         <button

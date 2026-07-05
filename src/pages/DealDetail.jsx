@@ -129,13 +129,13 @@ export default function DealDetail() {
 
   if (!deal) {
     return (
-      <div style={{ background: '#0a0a0f', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#0a0b0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#f8fafc', fontWeight: 700 }}>
             {liveChecked ? 'Deal not found' : 'Loading deal…'}
           </h2>
           {liveChecked && (
-            <Link to="/marketplace" style={{ color: '#8b5cf6', textDecoration: 'none' }}>← Back to Marketplace</Link>
+            <Link to="/marketplace" style={{ color: '#00c805', textDecoration: 'none' }}>← Back to Marketplace</Link>
           )}
         </div>
       </div>
@@ -152,24 +152,24 @@ export default function DealDetail() {
   const addressVisible = isOwner || addressGranted || addressPolicy === 'public';
 
   return (
-    <div className="page-enter" style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div className="page-enter" style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       {/* Back nav */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '14px 20px' }}>
+      <div style={{ background: '#0e100e', borderBottom: '1px solid #232925', padding: '14px 20px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <Link
             to="/marketplace"
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              color: '#94a3b8', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
+              color: '#95a29b', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
               transition: 'color 0.2s',
             }}
           >
             <ArrowLeft size={16} />
             Back to Marketplace
           </Link>
-          <span style={{ color: '#1e1e2e' }}>•</span>
-          <span style={{ color: '#475569', fontSize: '14px' }}>{deal.city}, {deal.state}</span>
-          <span style={{ color: '#1e1e2e' }}>•</span>
+          <span style={{ color: '#232925' }}>•</span>
+          <span style={{ color: '#5a675f', fontSize: '14px' }}>{deal.city}, {deal.state}</span>
+          <span style={{ color: '#232925' }}>•</span>
           <span className={dealTypeBadgeClass[deal.dealType]} style={{ borderRadius: '20px', padding: '2px 10px', fontSize: '12px', fontWeight: 700 }}>
             {dealTypeLabels[deal.dealType]}
           </span>
@@ -215,7 +215,7 @@ export default function DealDetail() {
               <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: '28px', marginBottom: '8px', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
                 {deal.title}
               </h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#95a29b', flexWrap: 'wrap' }}>
                 <MapPin size={16} />
                 <span style={{ fontSize: '16px', fontFamily: addressVisible ? 'inherit' : 'monospace' }}>
                   {getDisplayAddress(deal, addressVisible)}, {deal.city}, {deal.state} {deal.zip}
@@ -225,8 +225,8 @@ export default function DealDetail() {
                     onClick={startAddressRequest}
                     style={{
                       marginLeft: '8px', padding: '4px 12px', borderRadius: '16px',
-                      background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.4)',
-                      color: '#8b5cf6', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                      background: 'rgba(0, 200, 5, 0.15)', border: '1px solid rgba(0, 200, 5, 0.4)',
+                      color: '#00c805', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
                     }}
                   >
                     Request Address
@@ -238,8 +238,8 @@ export default function DealDetail() {
             {/* ── Deal Numbers Card (mobile: compact 2x2; desktop: 4 in a row) ── */}
             {isMobile ? (
               <div style={{
-                background: '#12121e',
-                border: '1px solid #1e1e2e',
+                background: '#131614',
+                border: '1px solid #232925',
                 borderRadius: 16,
                 overflow: 'hidden',
                 marginBottom: 20,
@@ -247,22 +247,22 @@ export default function DealDetail() {
                 gridTemplateColumns: '1fr 1fr',
               }}>
                 {[
-                  { label: 'List Price', value: formatCurrency(deal.price),      color: '#f8fafc', accent: '#8b5cf6' },
+                  { label: 'List Price', value: formatCurrency(deal.price),      color: '#f8fafc', accent: '#00c805' },
                   { label: 'ARV',        value: formatCurrency(deal.arv),         color: '#10b981', accent: '#10b981' },
                   { label: 'Est. Repairs', value: formatCurrency(deal.repairCost), color: '#f59e0b', accent: '#ef4444' },
-                  { label: 'Deal Type',  value: dealTypeLabels[deal.dealType] || '—', color: '#06b6d4', accent: '#06b6d4' },
+                  { label: 'Deal Type',  value: dealTypeLabels[deal.dealType] || '—', color: '#00e5a0', accent: '#00e5a0' },
                 ].map(({ label, value, color, accent }, i) => (
                   <div key={label} style={{
                     padding: '14px 14px',
-                    borderRight: i % 2 === 0 ? '1px solid #1e1e2e' : 'none',
-                    borderBottom: i < 2 ? '1px solid #1e1e2e' : 'none',
+                    borderRight: i % 2 === 0 ? '1px solid #232925' : 'none',
+                    borderBottom: i < 2 ? '1px solid #232925' : 'none',
                   }}>
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
                     }}>
                       <div style={{ width: 4, height: 4, borderRadius: '50%', background: accent }} />
                       <span style={{
-                        color: '#94a3b8', fontSize: 10, fontWeight: 700,
+                        color: '#95a29b', fontSize: 10, fontWeight: 700,
                         letterSpacing: 0.5, textTransform: 'uppercase',
                       }}>{label}</span>
                     </div>
@@ -275,13 +275,13 @@ export default function DealDetail() {
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '24px' }}>
                 {[
-                  { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(139, 92, 246, 0.1)', border: 'rgba(139, 92, 246, 0.2)' },
+                  { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(0, 200, 5, 0.1)', border: 'rgba(0, 200, 5, 0.2)' },
                   { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
                   { label: 'Est. Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
-                  { label: 'Deal Type', value: dealTypeLabels[deal.dealType] || '—', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.1)', border: 'rgba(6, 182, 212, 0.2)' },
+                  { label: 'Deal Type', value: dealTypeLabels[deal.dealType] || '—', color: '#00e5a0', bg: 'rgba(0, 229, 160, 0.1)', border: 'rgba(0, 229, 160, 0.2)' },
                 ].map(({ label, value, color, bg, border }) => (
                   <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-                    <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
+                    <div style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
                       {label.toUpperCase()}
                     </div>
                     <div style={{ color, fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
@@ -303,7 +303,7 @@ export default function DealDetail() {
             />
 
             {/* Property Details */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '16px' }}>Property Details</h3>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))', gap: isMobile ? '14px 12px' : '16px' }}>
                 {[
@@ -317,7 +317,7 @@ export default function DealDetail() {
                   { label: 'Deal Type', value: dealTypeLabels[deal.dealType], icon: '🏷' },
                 ].map(({ label, value, icon }) => (
                   <div key={label}>
-                    <div style={{ color: '#475569', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>{icon} {label}</div>
+                    <div style={{ color: '#5a675f', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>{icon} {label}</div>
                     <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '15px' }}>{value}</div>
                   </div>
                 ))}
@@ -327,8 +327,8 @@ export default function DealDetail() {
             {/* ── Contact the Wholesaler CTA (right under Property Details) ── */}
             {!isOwner && (
               <div style={{
-                background: 'linear-gradient(135deg, rgba(139,92,246,0.10), rgba(6,182,212,0.06))',
-                border: '1px solid rgba(139,92,246,0.30)',
+                background: 'linear-gradient(135deg, rgba(0, 200, 5,0.10), rgba(0, 229, 160,0.06))',
+                border: '1px solid rgba(0, 200, 5,0.30)',
                 borderRadius: 16,
                 padding: isMobile ? '16px' : '20px',
                 marginBottom: 20,
@@ -341,17 +341,17 @@ export default function DealDetail() {
                   style={{
                     width: 52, height: 52, borderRadius: '50%',
                     objectFit: 'cover', flexShrink: 0,
-                    border: '2px solid rgba(139,92,246,0.4)',
+                    border: '2px solid rgba(0, 200, 5,0.4)',
                   }}
                 />
                 <div style={{ flex: 1, minWidth: 160 }}>
-                  <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
+                  <div style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
                     Wholesaler
                   </div>
                   <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16, letterSpacing: '-0.2px' }}>
                     {seller.name || deal.sellerName}
                   </div>
-                  <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>
+                  <div style={{ color: '#95a29b', fontSize: 12, marginTop: 2 }}>
                     Have questions? Reach out for details, access, or an offer.
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export default function DealDetail() {
                     display: 'flex', alignItems: 'center', gap: 6,
                     padding: '11px 18px', borderRadius: 11,
                     color: '#fff', textDecoration: 'none', fontWeight: 800, fontSize: 14,
-                    boxShadow: '0 6px 18px rgba(139,92,246,0.35)',
+                    boxShadow: '0 6px 18px rgba(0, 200, 5,0.35)',
                     flexShrink: 0,
                   }}
                 >
@@ -379,9 +379,9 @@ export default function DealDetail() {
             )}
 
             {/* Description */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '24px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '24px' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
-              <p style={{ color: '#e2e8f0', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
+              <p style={{ color: '#e4eae6', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
             </div>
 
             {/* Similar Deals */}
@@ -399,29 +399,29 @@ export default function DealDetail() {
           <div style={{ position: 'sticky', top: '84px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Price Card */}
             <div style={{
-              background: '#12121e', border: '1px solid #1e1e2e',
+              background: '#131614', border: '1px solid #232925',
               borderRadius: '20px', padding: '24px',
               boxShadow: '0 4px 30px rgba(0,0,0,0.3)',
             }}>
               <div style={{ marginBottom: '16px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '4px' }}>LISTING PRICE</div>
+                <div style={{ color: '#95a29b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '4px' }}>LISTING PRICE</div>
                 <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: '40px', lineHeight: 1 }}>{formatCurrency(deal.price)}</div>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-                  <div style={{ color: '#475569', fontSize: '10px', fontWeight: 700 }}>ARV</div>
+                  <div style={{ color: '#5a675f', fontSize: '10px', fontWeight: 700 }}>ARV</div>
                   <div style={{ color: '#10b981', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.arv)}</div>
                 </div>
                 <div style={{ flex: 1, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-                  <div style={{ color: '#475569', fontSize: '10px', fontWeight: 700 }}>EST. REPAIRS</div>
+                  <div style={{ color: '#5a675f', fontSize: '10px', fontWeight: 700 }}>EST. REPAIRS</div>
                   <div style={{ color: '#f59e0b', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.repairCost)}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                <Calendar size={14} style={{ color: '#475569' }} />
-                <span style={{ color: '#475569', fontSize: '13px' }}>Listed {deal.daysListed} day{deal.daysListed !== 1 ? 's' : ''} ago</span>
+                <Calendar size={14} style={{ color: '#5a675f' }} />
+                <span style={{ color: '#5a675f', fontSize: '13px' }}>Listed {deal.daysListed} day{deal.daysListed !== 1 ? 's' : ''} ago</span>
                 <span style={{
                   marginLeft: 'auto',
                   padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,
@@ -470,7 +470,7 @@ export default function DealDetail() {
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     padding: '13px', borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
                     color: '#f8fafc', textDecoration: 'none', fontWeight: 600, fontSize: '15px',
                     transition: 'all 0.2s',
                   }}
@@ -485,8 +485,8 @@ export default function DealDetail() {
                     style={{
                       flex: 1, padding: '11px', borderRadius: '10px',
                       background: saved ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${saved ? 'rgba(239, 68, 68, 0.3)' : '#1e1e2e'}`,
-                      color: saved ? '#ef4444' : '#94a3b8', cursor: 'pointer',
+                      border: `1px solid ${saved ? 'rgba(239, 68, 68, 0.3)' : '#232925'}`,
+                      color: saved ? '#ef4444' : '#95a29b', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                       fontWeight: 600, fontSize: '13px', transition: 'all 0.2s',
                     }}
@@ -509,8 +509,8 @@ export default function DealDetail() {
                     }}
                     style={{
                       flex: 1, padding: '11px', borderRadius: '10px',
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                      color: '#94a3b8', cursor: 'pointer',
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+                      color: '#95a29b', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                       fontWeight: 600, fontSize: '13px', transition: 'all 0.2s',
                     }}
@@ -523,23 +523,23 @@ export default function DealDetail() {
             </div>
 
             {/* Seller Card */}
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', padding: '24px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', padding: '24px' }}>
               <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px', marginBottom: '16px' }}>About the Seller</h4>
 
               <Link to={`/profile/${deal.sellerId}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
                 <img
                   src={deal.sellerAvatar || seller.avatar}
                   alt={deal.sellerName}
-                  style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #1e1e2e' }}
+                  style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #232925' }}
                 />
                 <div>
                   <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px' }}>{deal.sellerName}</div>
-                  <div style={{ color: '#475569', fontSize: '13px' }}>{seller.location || `${deal.city}, ${deal.state}`}</div>
+                  <div style={{ color: '#5a675f', fontSize: '13px' }}>{seller.location || `${deal.city}, ${deal.state}`}</div>
                   <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
                     {(deal.tags || seller.tags || []).map(tag => (
                       <span key={tag} style={{
-                        background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6',
-                        border: '1px solid rgba(139, 92, 246, 0.2)',
+                        background: 'rgba(0, 200, 5, 0.1)', color: '#00c805',
+                        border: '1px solid rgba(0, 200, 5, 0.2)',
                         borderRadius: '20px', padding: '1px 8px', fontSize: '11px', fontWeight: 600,
                       }}>
                         {tag}
@@ -551,13 +551,13 @@ export default function DealDetail() {
 
               {seller.dealsPosted && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-                    <div style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '22px' }}>{seller.dealsPosted}</div>
-                    <div style={{ color: '#475569', fontSize: '12px' }}>Deals Posted</div>
+                  <div style={{ background: '#1a1f1b', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
+                    <div style={{ color: '#00c805', fontWeight: 800, fontSize: '22px' }}>{seller.dealsPosted}</div>
+                    <div style={{ color: '#5a675f', fontSize: '12px' }}>Deals Posted</div>
                   </div>
-                  <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
+                  <div style={{ background: '#1a1f1b', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
                     <div style={{ color: '#10b981', fontWeight: 800, fontSize: '22px' }}>{seller.dealsClosed}</div>
-                    <div style={{ color: '#475569', fontSize: '12px' }}>Deals Closed</div>
+                    <div style={{ color: '#5a675f', fontSize: '12px' }}>Deals Closed</div>
                   </div>
                 </div>
               )}
@@ -567,8 +567,8 @@ export default function DealDetail() {
                   to={`/profile/${deal.sellerId}`}
                   style={{
                     flex: 1, padding: '10px', borderRadius: '10px', textAlign: 'center',
-                    background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)',
-                    color: '#8b5cf6', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
+                    background: 'rgba(0, 200, 5, 0.1)', border: '1px solid rgba(0, 200, 5, 0.2)',
+                    color: '#00c805', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
                     transition: 'all 0.2s',
                   }}
                 >
@@ -578,8 +578,8 @@ export default function DealDetail() {
                   to="/messages"
                   style={{
                     flex: 1, padding: '10px', borderRadius: '10px', textAlign: 'center',
-                    background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                    color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+                    color: '#95a29b', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
                     transition: 'all 0.2s',
                   }}
                 >
@@ -594,7 +594,7 @@ export default function DealDetail() {
                 <Shield size={18} style={{ color: '#10b981' }} />
                 <span style={{ color: '#10b981', fontWeight: 700, fontSize: '14px' }}>All Street Live Buyer Protection</span>
               </div>
-              <ul style={{ color: '#94a3b8', fontSize: '13px', margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <ul style={{ color: '#95a29b', fontSize: '13px', margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <li>Verified seller profile</li>
                 <li>Community reputation score</li>
                 <li>Dispute resolution support</li>
@@ -674,10 +674,10 @@ export default function DealDetail() {
           background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
         }}>
-          <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '520px' }}>
-            <div style={{ padding: '20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', width: '100%', maxWidth: '520px' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>Share to Feed</h2>
-              <button onClick={() => setShowShare(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}>
+              <button onClick={() => setShowShare(false)} style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
@@ -688,11 +688,11 @@ export default function DealDetail() {
                 rows={6}
                 style={{ width: '100%', padding: '12px', borderRadius: '10px', fontSize: '14px', resize: 'vertical', marginBottom: '12px' }}
               />
-              <div style={{ background: '#1a1a2e', borderRadius: '10px', padding: '12px', marginBottom: '16px', display: 'flex', gap: '10px' }}>
+              <div style={{ background: '#1a1f1b', borderRadius: '10px', padding: '12px', marginBottom: '16px', display: 'flex', gap: '10px' }}>
                 <img src={deal.images[0]} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
                 <div>
                   <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{deal.title}</div>
-                  <div style={{ color: '#94a3b8', fontSize: '12px' }}>{deal.city}, {deal.state}</div>
+                  <div style={{ color: '#95a29b', fontSize: '12px' }}>{deal.city}, {deal.state}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -709,7 +709,7 @@ export default function DealDetail() {
                     try { navigator.clipboard.writeText(url); } catch {}
                     toast('Link copied to clipboard', 'info');
                   }}
-                  style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                  style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', color: '#95a29b', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
                 >
                   Copy Link
                 </button>

@@ -14,10 +14,10 @@ import CyclingText from '../components/CyclingText';
 const SECTION_META = {
   flippers:    { icon: Hammer,    color: '#ef4444' },
   landlords:   { icon: Home,      color: '#10b981' },
-  wholesalers: { icon: Megaphone, color: '#8b5cf6' },
+  wholesalers: { icon: Megaphone, color: '#00c805' },
   lenders:     { icon: GraduationCap, color: '#f59e0b' },
   expand:      { icon: TrendingUp, color: '#f59e0b' },
-  remote:      { icon: Globe2,    color: '#06b6d4' },
+  remote:      { icon: Globe2,    color: '#00e5a0' },
 };
 
 const SECTION_LABEL = {
@@ -44,7 +44,7 @@ export default function HowTo() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       <Hero isMobile={isMobile} />
 
       <div style={{
@@ -77,18 +77,18 @@ export default function HowTo() {
 function Hero({ isMobile }) {
   return (
     <div style={{
-      background: 'radial-gradient(circle at 20% 0%, rgba(139,92,246,0.18), transparent 50%), radial-gradient(circle at 80% 100%, rgba(6,182,212,0.14), transparent 50%), #0d0d1a',
-      borderBottom: '1px solid #1e1e2e',
+      background: 'radial-gradient(circle at 20% 0%, rgba(0, 200, 5,0.18), transparent 50%), radial-gradient(circle at 80% 100%, rgba(0, 229, 160,0.14), transparent 50%), #0e100e',
+      borderBottom: '1px solid #232925',
       padding: isMobile ? '36px 16px 32px' : '56px 24px 48px',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '6px 12px', borderRadius: 999,
-          background: 'rgba(139,92,246,0.12)',
-          border: '1px solid rgba(139,92,246,0.3)',
+          background: 'rgba(0, 200, 5,0.12)',
+          border: '1px solid rgba(0, 200, 5,0.3)',
           marginBottom: 16,
-          color: '#a78bfa', fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+          color: '#4ade80', fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
         }}>
           <GraduationCap size={13} /> REI EDUCATION HUB
         </div>
@@ -110,7 +110,7 @@ function Hero({ isMobile }) {
             ]}
             interval={3000}
             textStyle={{
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -120,7 +120,7 @@ function Hero({ isMobile }) {
         </h1>
 
         <p style={{
-          color: '#94a3b8', fontSize: isMobile ? 14 : 17,
+          color: '#95a29b', fontSize: isMobile ? 14 : 17,
           maxWidth: 640, margin: '14px auto 0', lineHeight: 1.6,
         }}>
           Step-by-step playbooks, vetted lenders, and video walkthroughs from operators actually doing deals.
@@ -156,9 +156,9 @@ function SectionNav({ active, onChange, isMobile }) {
                   padding: '9px 14px', borderRadius: 999,
                   background: isActive
                     ? `linear-gradient(135deg, ${meta.color}, ${meta.color}aa)`
-                    : '#12121e',
-                  border: isActive ? 'none' : '1px solid #1e1e2e',
-                  color: isActive ? '#fff' : '#94a3b8',
+                    : '#131614',
+                  border: isActive ? 'none' : '1px solid #232925',
+                  color: isActive ? '#fff' : '#95a29b',
                   fontWeight: 700, fontSize: 13,
                   flexShrink: 0,
                   cursor: 'pointer',
@@ -179,8 +179,8 @@ function SectionNav({ active, onChange, isMobile }) {
     <aside style={{
       position: 'sticky', top: 80,
       alignSelf: 'start',
-      background: '#12121e',
-      border: '1px solid #1e1e2e',
+      background: '#131614',
+      border: '1px solid #232925',
       borderRadius: 14,
       padding: 8,
     }}>
@@ -197,7 +197,7 @@ function SectionNav({ active, onChange, isMobile }) {
               width: '100%', padding: '10px 12px', borderRadius: 10,
               background: isActive ? `${meta.color}15` : 'transparent',
               border: 'none',
-              color: isActive ? meta.color : '#94a3b8',
+              color: isActive ? meta.color : '#95a29b',
               fontWeight: 700, fontSize: 14, textAlign: 'left',
               cursor: 'pointer', transition: 'background 0.15s',
               marginBottom: 2,
@@ -226,7 +226,7 @@ function ArticleSection({ section, isMobile }) {
     <div>
       {/* Section header */}
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e', borderRadius: 14,
+        background: '#131614', border: '1px solid #232925', borderRadius: 14,
         padding: isMobile ? '18px' : '24px 28px',
         display: 'flex', alignItems: 'center', gap: 14,
         marginBottom: 18,
@@ -243,7 +243,7 @@ function ArticleSection({ section, isMobile }) {
           <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 20 : 24, margin: 0 }}>
             {section.label}
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '2px 0 0', lineHeight: 1.5 }}>
+          <p style={{ color: '#95a29b', fontSize: 13, margin: '2px 0 0', lineHeight: 1.5 }}>
             {section.blurb}
           </p>
         </div>
@@ -271,7 +271,7 @@ function ArticleSection({ section, isMobile }) {
 function ArticleCard({ article, color, open, onToggle }) {
   return (
     <div style={{
-      background: '#12121e', border: `1px solid ${open ? color : '#1e1e2e'}`,
+      background: '#131614', border: `1px solid ${open ? color : '#232925'}`,
       borderRadius: 14, overflow: 'hidden',
       transition: 'border-color 0.2s',
     }}>
@@ -298,18 +298,18 @@ function ArticleCard({ article, color, open, onToggle }) {
             }}>
               {article.readTime?.toUpperCase()}
             </span>
-            <span style={{ color: '#64748b', fontSize: 12 }}>
+            <span style={{ color: '#707d75', fontSize: 12 }}>
               {article.sections?.length || 0} sections
             </span>
           </div>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '10px 0 0', lineHeight: 1.55 }}>
+          <p style={{ color: '#95a29b', fontSize: 13, margin: '10px 0 0', lineHeight: 1.55 }}>
             {article.summary}
           </p>
         </div>
         <ArrowRight
           size={18}
           style={{
-            color: open ? color : '#475569',
+            color: open ? color : '#5a675f',
             transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s, color 0.2s',
             flexShrink: 0,
@@ -318,7 +318,7 @@ function ArticleCard({ article, color, open, onToggle }) {
       </button>
 
       {open && (
-        <div style={{ padding: '0 18px 18px', borderTop: '1px solid #1e1e2e' }}>
+        <div style={{ padding: '0 18px 18px', borderTop: '1px solid #232925' }}>
           {article.sections?.map((s, i) => (
             <div key={i} style={{ marginTop: 16 }}>
               <h4 style={{
@@ -328,7 +328,7 @@ function ArticleCard({ article, color, open, onToggle }) {
                 {s.heading}
               </h4>
               <p style={{
-                color: '#cbd5e1', fontSize: 14, lineHeight: 1.7,
+                color: '#cdd6d0', fontSize: 14, lineHeight: 1.7,
                 margin: 0, whiteSpace: 'pre-wrap',
               }}>
                 {s.body}
@@ -338,11 +338,11 @@ function ArticleCard({ article, color, open, onToggle }) {
 
           <div style={{
             marginTop: 18, padding: '10px 12px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.03)', border: '1px dashed #1e1e2e',
-            color: '#64748b', fontSize: 11, lineHeight: 1.5,
+            background: 'rgba(255,255,255,0.03)', border: '1px dashed #232925',
+            color: '#707d75', fontSize: 11, lineHeight: 1.5,
           }}>
-            <strong style={{ color: '#94a3b8' }}>Template</strong> — replace the placeholder copy by editing
-            <code style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', padding: '1px 5px', borderRadius: 4, margin: '0 4px', fontSize: 11 }}>
+            <strong style={{ color: '#95a29b' }}>Template</strong> — replace the placeholder copy by editing
+            <code style={{ background: 'rgba(0, 200, 5,0.1)', color: '#4ade80', padding: '1px 5px', borderRadius: 4, margin: '0 4px', fontSize: 11 }}>
               src/data/howToArticles.js
             </code>
           </div>
@@ -370,16 +370,16 @@ function VideoSection({ videos = [], color, isMobile }) {
 
       {videos.length === 0 ? (
         <div style={{
-          background: '#12121e', border: '1px dashed #1e1e2e',
+          background: '#131614', border: '1px dashed #232925',
           borderRadius: 14, padding: '28px 20px', textAlign: 'center',
         }}>
-          <PlayCircle size={28} style={{ color: '#475569', marginBottom: 10 }} />
+          <PlayCircle size={28} style={{ color: '#5a675f', marginBottom: 10 }} />
           <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: 15, margin: '0 0 6px' }}>
             Add YouTube videos
           </h4>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 auto', maxWidth: 420, lineHeight: 1.6 }}>
-            Drop video IDs into the <code style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', padding: '1px 5px', borderRadius: 4, fontSize: 12 }}>videos</code> array for this section in
-            <code style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa', padding: '1px 5px', borderRadius: 4, margin: '0 4px', fontSize: 12 }}>
+          <p style={{ color: '#95a29b', fontSize: 13, margin: '0 auto', maxWidth: 420, lineHeight: 1.6 }}>
+            Drop video IDs into the <code style={{ background: 'rgba(0, 200, 5,0.1)', color: '#4ade80', padding: '1px 5px', borderRadius: 4, fontSize: 12 }}>videos</code> array for this section in
+            <code style={{ background: 'rgba(0, 200, 5,0.1)', color: '#4ade80', padding: '1px 5px', borderRadius: 4, margin: '0 4px', fontSize: 12 }}>
               howToArticles.js
             </code>
             and they'll embed here.
@@ -392,7 +392,7 @@ function VideoSection({ videos = [], color, isMobile }) {
         }}>
           {videos.map((v, i) => (
             <div key={i} style={{
-              background: '#12121e', border: '1px solid #1e1e2e',
+              background: '#131614', border: '1px solid #232925',
               borderRadius: 14, overflow: 'hidden',
             }}>
               <div style={{ position: 'relative', paddingBottom: '56.25%' }}>
@@ -473,7 +473,7 @@ function LenderDirectory({ isMobile }) {
   return (
     <div>
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e', borderRadius: 14,
+        background: '#131614', border: '1px solid #232925', borderRadius: 14,
         padding: isMobile ? '18px' : '24px 28px',
         marginBottom: 18,
       }}>
@@ -490,7 +490,7 @@ function LenderDirectory({ isMobile }) {
             <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 20 : 24, margin: 0 }}>
               Verified Lenders
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: 13, margin: '2px 0 0', lineHeight: 1.5 }}>
+            <p style={{ color: '#95a29b', fontSize: 13, margin: '2px 0 0', lineHeight: 1.5 }}>
               Hard-money, fix & flip, DSCR, and bridge lenders that fund deals across the US.
             </p>
           </div>
@@ -498,14 +498,14 @@ function LenderDirectory({ isMobile }) {
 
         {/* Search */}
         <div style={{ position: 'relative', marginBottom: 12 }}>
-          <Search size={15} style={{ position: 'absolute', left: 12, top: 11, color: '#475569' }} />
+          <Search size={15} style={{ position: 'absolute', left: 12, top: 11, color: '#5a675f' }} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name, loan type, or state…"
             style={{
               width: '100%', padding: '10px 14px 10px 36px', borderRadius: 10,
-              background: '#0d0d1a', border: '1px solid #1e1e2e',
+              background: '#0e100e', border: '1px solid #232925',
               color: '#f8fafc', fontSize: 14, outline: 'none',
             }}
           />
@@ -514,7 +514,7 @@ function LenderDirectory({ isMobile }) {
         {/* Multi-select filter chips */}
         <div>
           <div style={{
-            color: '#64748b', fontSize: 11, fontWeight: 800,
+            color: '#707d75', fontSize: 11, fontWeight: 800,
             letterSpacing: 0.8, textTransform: 'uppercase',
             marginBottom: 8,
           }}>
@@ -531,9 +531,9 @@ function LenderDirectory({ isMobile }) {
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '7px 12px', borderRadius: 999,
-                    background: on ? 'rgba(245,158,11,0.18)' : '#0d0d1a',
-                    border: `1px solid ${on ? 'rgba(245,158,11,0.6)' : '#1e1e2e'}`,
-                    color: on ? '#fbbf24' : '#94a3b8',
+                    background: on ? 'rgba(245,158,11,0.18)' : '#0e100e',
+                    border: `1px solid ${on ? 'rgba(245,158,11,0.6)' : '#232925'}`,
+                    color: on ? '#fbbf24' : '#95a29b',
                     fontSize: 12, fontWeight: 700, cursor: 'pointer',
                     transition: 'all 0.15s',
                     WebkitTapHighlightColor: 'transparent',
@@ -541,16 +541,16 @@ function LenderDirectory({ isMobile }) {
                 >
                   <span style={{
                     width: 14, height: 14, borderRadius: 4,
-                    border: `1.5px solid ${on ? '#fbbf24' : '#475569'}`,
+                    border: `1.5px solid ${on ? '#fbbf24' : '#5a675f'}`,
                     background: on ? '#fbbf24' : 'transparent',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
-                    {on && <CheckCircle2 size={10} style={{ color: '#1a1a2e' }} />}
+                    {on && <CheckCircle2 size={10} style={{ color: '#1a1f1b' }} />}
                   </span>
                   {f.label}
                   <span style={{
-                    color: on ? '#fbbf24' : '#475569',
+                    color: on ? '#fbbf24' : '#5a675f',
                     fontSize: 11, fontWeight: 700,
                   }}>
                     ({count})
@@ -563,8 +563,8 @@ function LenderDirectory({ isMobile }) {
                 onClick={() => setActiveFilters([])}
                 style={{
                   padding: '7px 12px', borderRadius: 999,
-                  background: 'transparent', border: '1px dashed #1e1e2e',
-                  color: '#64748b', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                  background: 'transparent', border: '1px dashed #232925',
+                  color: '#707d75', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                 }}
               >
                 Clear
@@ -579,7 +579,7 @@ function LenderDirectory({ isMobile }) {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         marginBottom: 12, padding: '0 2px',
       }}>
-        <span style={{ color: '#94a3b8', fontSize: 13 }}>
+        <span style={{ color: '#95a29b', fontSize: 13 }}>
           Showing <strong style={{ color: '#f8fafc' }}>{filtered.length}</strong> of {lenders.length} lenders
         </span>
         {activeFilters.length > 0 && (
@@ -591,8 +591,8 @@ function LenderDirectory({ isMobile }) {
 
       {filtered.length === 0 ? (
         <div style={{
-          background: '#12121e', border: '1px dashed #1e1e2e', borderRadius: 14,
-          padding: '40px 20px', textAlign: 'center', color: '#94a3b8',
+          background: '#131614', border: '1px dashed #232925', borderRadius: 14,
+          padding: '40px 20px', textAlign: 'center', color: '#95a29b',
         }}>
           <p style={{ margin: 0, fontSize: 14 }}>
             No lenders match the selected filters. Try clearing or selecting fewer.
@@ -630,11 +630,11 @@ function LenderCardWithFooter({ lender }) {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '2px 4px',
-          color: '#64748b', fontSize: 12,
+          color: '#707d75', fontSize: 12,
           textDecoration: 'none', wordBreak: 'break-all',
         }}
-        onMouseEnter={e => { e.currentTarget.style.color = '#a78bfa'; }}
-        onMouseLeave={e => { e.currentTarget.style.color = '#64748b'; }}
+        onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = '#707d75'; }}
       >
         <Globe2 size={11} />
         {prettySite(lender.website)}
@@ -646,7 +646,7 @@ function LenderCardWithFooter({ lender }) {
 function LenderCard({ lender }) {
   return (
     <div style={{
-      background: '#12121e', border: `1px solid ${lender.featured ? 'rgba(245,158,11,0.35)' : '#1e1e2e'}`,
+      background: '#131614', border: `1px solid ${lender.featured ? 'rgba(245,158,11,0.35)' : '#232925'}`,
       borderRadius: 14, padding: 18,
       display: 'flex', flexDirection: 'column', gap: 12,
       position: 'relative',
@@ -656,7 +656,7 @@ function LenderCard({ lender }) {
           position: 'absolute', top: -10, right: 14,
           padding: '3px 10px', borderRadius: 999,
           background: 'linear-gradient(135deg, #f59e0b, #fb923c)',
-          color: '#1a1a2e', fontSize: 10, fontWeight: 900, letterSpacing: 0.6,
+          color: '#1a1f1b', fontSize: 10, fontWeight: 900, letterSpacing: 0.6,
         }}>
           FEATURED
         </span>
@@ -682,14 +682,14 @@ function LenderCard({ lender }) {
             <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: 13 }}>
               {lender.googleRating.toFixed(1)}
             </span>
-            <span style={{ color: '#64748b', fontSize: 12 }}>
+            <span style={{ color: '#707d75', fontSize: 12 }}>
               ({lender.googleReviews.toLocaleString()} reviews)
             </span>
           </div>
         </div>
       </div>
 
-      <p style={{ color: '#cbd5e1', fontSize: 13, margin: 0, lineHeight: 1.55 }}>
+      <p style={{ color: '#cdd6d0', fontSize: 13, margin: 0, lineHeight: 1.55 }}>
         {lender.tagline}
       </p>
 
@@ -697,7 +697,7 @@ function LenderCard({ lender }) {
         {lender.loanTypes.map(lt => (
           <span key={lt} style={{
             padding: '3px 8px', borderRadius: 6,
-            background: 'rgba(139,92,246,0.1)', color: '#a78bfa',
+            background: 'rgba(0, 200, 5,0.1)', color: '#4ade80',
             fontSize: 10, fontWeight: 700, letterSpacing: 0.3,
           }}>
             {lt}
@@ -706,7 +706,7 @@ function LenderCard({ lender }) {
         {lender.financing100pct && (
           <span style={{
             padding: '3px 8px', borderRadius: 6,
-            background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15))',
+            background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(0, 229, 160,0.15))',
             border: '1px solid rgba(16,185,129,0.35)',
             color: '#34d399',
             fontSize: 10, fontWeight: 800, letterSpacing: 0.3,
@@ -718,7 +718,7 @@ function LenderCard({ lender }) {
 
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
-        color: '#64748b', fontSize: 12,
+        color: '#707d75', fontSize: 12,
       }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <MapPin size={12} /> {lender.states}
@@ -738,7 +738,7 @@ function LenderCard({ lender }) {
           <Phone size={14} style={{ color: '#34d399', flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
-              color: '#64748b', fontSize: 10, fontWeight: 800,
+              color: '#707d75', fontSize: 10, fontWeight: 800,
               textTransform: 'uppercase', letterSpacing: 0.7,
               marginBottom: 1,
             }}>
@@ -764,8 +764,8 @@ function LenderCard({ lender }) {
           style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             padding: '10px 12px', borderRadius: 8,
-            background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)',
-            color: '#a78bfa', textDecoration: 'none',
+            background: 'rgba(0, 200, 5,0.15)', border: '1px solid rgba(0, 200, 5,0.3)',
+            color: '#4ade80', textDecoration: 'none',
             fontWeight: 700, fontSize: 13,
           }}
         >

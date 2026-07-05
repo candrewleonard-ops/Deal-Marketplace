@@ -112,14 +112,14 @@ export default function Messages() {
   const allConvs = [...filteredConvs, ...Object.values(acceptedRequests)];
 
   return (
-    <div style={{ background: '#0a0a0f', height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ background: '#0a0b0a', height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* VIP upsell banner */}
       {currentUser?.accountTier === 'Basic' && (
-        <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(6,182,212,0.1))', borderBottom: '1px solid rgba(139,92,246,0.2)', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexShrink: 0 }}>
-          <span style={{ color: '#e2e8f0', fontSize: '13px' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.15), rgba(0, 229, 160,0.1))', borderBottom: '1px solid rgba(0, 200, 5,0.2)', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexShrink: 0 }}>
+          <span style={{ color: '#e4eae6', fontSize: '13px' }}>
             📣 Need to reach more buyers? <strong>Upgrade to VIP Max</strong> for 100 DMs/day
           </span>
-          <Link to="/premium" style={{ padding: '6px 16px', borderRadius: '8px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', color: '#fff', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link to="/premium" style={{ padding: '6px 16px', borderRadius: '8px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', color: '#fff', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0 }}>
             Upgrade
           </Link>
         </div>
@@ -129,32 +129,32 @@ export default function Messages() {
         {/* Conversation List */}
         <div style={{
           width: '340px', flexShrink: 0,
-          background: '#0d0d1a', borderRight: '1px solid #1e1e2e',
+          background: '#0e100e', borderRight: '1px solid #232925',
           display: 'flex', flexDirection: 'column',
           ...(mobileView === 'chat' ? { display: 'none' } : {}),
         }} className="hidden md:flex flex-col">
           {/* Header */}
-          <div style={{ padding: '16px', borderBottom: '1px solid #1e1e2e', flexShrink: 0 }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid #232925', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
               <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>Messages</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: 600 }}>
-                  <strong style={{ color: '#8b5cf6' }}>{dmsUsed}/{dmLimit}</strong> DMs
+                <div style={{ color: '#95a29b', fontSize: '11px', fontWeight: 600 }}>
+                  <strong style={{ color: '#00c805' }}>{dmsUsed}/{dmLimit}</strong> DMs
                 </div>
-                <button style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#8b5cf6', display: 'flex' }}>
+                <button style={{ background: 'rgba(0, 200, 5,0.1)', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#00c805', display: 'flex' }}>
                   <Plus size={16} />
                 </button>
               </div>
             </div>
             {/* Tabs */}
             <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
-              <button onClick={() => setInboxTab('inbox')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'inbox' ? 'rgba(139, 92, 246, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'inbox' ? '#8b5cf6' : '#1e1e2e'}`, color: inboxTab === 'inbox' ? '#8b5cf6' : '#94a3b8', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Inbox</button>
-              <button onClick={() => setInboxTab('requests')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'requests' ? 'rgba(139, 92, 246, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'requests' ? '#8b5cf6' : '#1e1e2e'}`, color: inboxTab === 'requests' ? '#8b5cf6' : '#94a3b8', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+              <button onClick={() => setInboxTab('inbox')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'inbox' ? 'rgba(0, 200, 5, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'inbox' ? '#00c805' : '#232925'}`, color: inboxTab === 'inbox' ? '#00c805' : '#95a29b', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Inbox</button>
+              <button onClick={() => setInboxTab('requests')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'requests' ? 'rgba(0, 200, 5, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'requests' ? '#00c805' : '#232925'}`, color: inboxTab === 'requests' ? '#00c805' : '#95a29b', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                 Requests {requests.length > 0 && `(${requests.length})`}
               </button>
             </div>
             <div style={{ position: 'relative' }}>
-              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
+              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#5a675f' }} />
               <input
                 value={searchVal}
                 onChange={e => setSearchVal(e.target.value)}
@@ -177,7 +177,7 @@ export default function Messages() {
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {inboxTab === 'requests' ? (
               requests.length === 0 ? (
-                <div style={{ padding: '40px 20px', textAlign: 'center', color: '#475569', fontSize: '13px' }}>
+                <div style={{ padding: '40px 20px', textAlign: 'center', color: '#5a675f', fontSize: '13px' }}>
                   No pending message requests
                 </div>
               ) : [...requests].sort((a, b) => {
@@ -192,17 +192,17 @@ export default function Messages() {
                 const u = users.find(u => u.id === req.userId);
                 const tier = u?.accountTier || 'Basic';
                 return (
-                  <div key={req.id} style={{ padding: '12px 14px', borderBottom: '1px solid #1e1e2e', display: 'flex', gap: '10px' }}>
+                  <div key={req.id} style={{ padding: '12px 14px', borderBottom: '1px solid #232925', display: 'flex', gap: '10px' }}>
                     <img src={u?.avatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
                         <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 700 }}>{u?.name}</span>
                         {tier === 'VIP Max' && <Crown size={11} style={{ color: '#f59e0b' }} />}
-                        {tier === 'VIP' && <Crown size={11} style={{ color: '#8b5cf6' }} />}
+                        {tier === 'VIP' && <Crown size={11} style={{ color: '#00c805' }} />}
                       </div>
-                      <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.lastMessage}</p>
+                      <p style={{ color: '#95a29b', fontSize: '12px', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.lastMessage}</p>
                       <div style={{ display: 'flex', gap: '6px' }}>
-                        <button onClick={() => handleAcceptRequest(req)} style={{ padding: '3px 10px', borderRadius: '12px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Accept</button>
+                        <button onClick={() => handleAcceptRequest(req)} style={{ padding: '3px 10px', borderRadius: '12px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', border: 'none', color: '#fff', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Accept</button>
                         <button onClick={() => handleDeclineRequest(req.id)} style={{ padding: '3px 10px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Decline</button>
                       </div>
                     </div>
@@ -210,7 +210,7 @@ export default function Messages() {
                 );
               })
             ) : allConvs.length === 0 ? (
-              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#475569', fontSize: '13px' }}>
+              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#5a675f', fontSize: '13px' }}>
                 No conversations yet. Start connecting with investors!
               </div>
             ) : allConvs.map(conv => {
@@ -223,27 +223,27 @@ export default function Messages() {
                   style={{
                     display: 'flex', gap: '12px', padding: '12px 14px',
                     cursor: 'pointer', transition: 'background 0.15s',
-                    background: isActive ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
-                    borderLeft: isActive ? '3px solid #8b5cf6' : '3px solid transparent',
+                    background: isActive ? 'rgba(0, 200, 5, 0.08)' : 'transparent',
+                    borderLeft: isActive ? '3px solid #00c805' : '3px solid transparent',
                   }}
                 >
                   <UserHoverCard user={user}>
                     <div style={{ position: 'relative', flexShrink: 0 }}>
                       <img src={user?.avatar} alt={user?.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', bottom: '0', right: '0', width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0d0d1a' }} />
+                      <div style={{ position: 'absolute', bottom: '0', right: '0', width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0e100e' }} />
                     </div>
                   </UserHoverCard>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3px' }}>
                       <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{user?.name}</span>
-                      <span style={{ color: '#334155', fontSize: '11px', flexShrink: 0 }}>{conv.time}</span>
+                      <span style={{ color: '#3e4a43', fontSize: '11px', flexShrink: 0 }}>{conv.time}</span>
                     </div>
-                    <p style={{ color: '#94a3b8', fontSize: '12px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ color: '#95a29b', fontSize: '12px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {conv.lastMessage}
                     </p>
                   </div>
                   {conv.unread > 0 && (
-                    <div style={{ minWidth: '18px', height: '18px', borderRadius: '50%', background: '#8b5cf6', color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, alignSelf: 'center', padding: '0 4px' }}>
+                    <div style={{ minWidth: '18px', height: '18px', borderRadius: '50%', background: '#00c805', color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, alignSelf: 'center', padding: '0 4px' }}>
                       {conv.unread}
                     </div>
                   )}
@@ -258,10 +258,10 @@ export default function Messages() {
           {activeConv && activeUser ? (
             <>
               {/* Chat Header */}
-              <div style={{ padding: '14px 20px', borderBottom: '1px solid #1e1e2e', background: '#0d0d1a', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid #232925', background: '#0e100e', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
                 <button
                   onClick={() => setMobileView('list')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'none', padding: '4px' }}
+                  style={{ background: 'none', border: 'none', color: '#95a29b', cursor: 'pointer', display: 'none', padding: '4px' }}
                   className="md:hidden"
                 >
                   <ArrowLeft size={20} />
@@ -269,7 +269,7 @@ export default function Messages() {
                 <Link to={`/profile/${activeUser.id}`} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flex: 1 }}>
                   <div style={{ position: 'relative' }}>
                     <img src={activeUser.avatar} alt={activeUser.name} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover' }} />
-                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0d0d1a' }} />
+                    <div style={{ position: 'absolute', bottom: 0, right: 0, width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0e100e' }} />
                   </div>
                   <div>
                     <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>{activeUser.name}</div>
@@ -278,7 +278,7 @@ export default function Messages() {
                 </Link>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   {[Phone, Video, MoreVertical].map((Icon, i) => (
-                    <button key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', borderRadius: '8px', padding: '7px', color: '#94a3b8', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}>
+                    <button key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '8px', padding: '7px', color: '#95a29b', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}>
                       <Icon size={16} />
                     </button>
                   ))}
@@ -298,7 +298,7 @@ export default function Messages() {
                         <div className={isMe ? 'bubble-sent' : 'bubble-received'} style={{ padding: '10px 14px' }}>
                           <p style={{ color: '#f8fafc', margin: 0, fontSize: '14px', lineHeight: 1.6 }}>{msg.text}</p>
                         </div>
-                        <div style={{ color: '#334155', fontSize: '11px', marginTop: '3px', textAlign: isMe ? 'right' : 'left' }}>{msg.time}</div>
+                        <div style={{ color: '#3e4a43', fontSize: '11px', marginTop: '3px', textAlign: isMe ? 'right' : 'left' }}>{msg.time}</div>
                       </div>
                       {isMe && (
                         <img src={currentUser.avatar || 'https://picsum.photos/seed/user1/100/100'} alt="You" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
@@ -313,7 +313,7 @@ export default function Messages() {
                     <div className="bubble-received" style={{ padding: '10px 16px' }}>
                       <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                         {[0, 1, 2].map(i => (
-                          <div key={i} style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#475569', animation: `pulse-glow 1.4s ease-in-out ${i * 0.2}s infinite` }} />
+                          <div key={i} style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#5a675f', animation: `pulse-glow 1.4s ease-in-out ${i * 0.2}s infinite` }} />
                         ))}
                       </div>
                     </div>
@@ -323,10 +323,10 @@ export default function Messages() {
               </div>
 
               {/* Input */}
-              <div style={{ padding: '14px 20px', borderTop: '1px solid #1e1e2e', background: '#0d0d1a', display: 'flex', gap: '8px', alignItems: 'flex-end', flexShrink: 0 }}>
+              <div style={{ padding: '14px 20px', borderTop: '1px solid #232925', background: '#0e100e', display: 'flex', gap: '8px', alignItems: 'flex-end', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   {[Image, Paperclip].map((Icon, i) => (
-                    <button key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', borderRadius: '10px', padding: '9px', color: '#94a3b8', cursor: 'pointer', transition: 'all 0.2s', display: 'flex' }}>
+                    <button key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '10px', padding: '9px', color: '#95a29b', cursor: 'pointer', transition: 'all 0.2s', display: 'flex' }}>
                       <Icon size={16} />
                     </button>
                   ))}
@@ -350,18 +350,18 @@ export default function Messages() {
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#475569', gap: '16px', padding: '40px' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Send size={36} style={{ color: '#8b5cf6' }} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5a675f', gap: '16px', padding: '40px' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(0, 200, 5, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Send size={36} style={{ color: '#00c805' }} />
               </div>
               <div style={{ textAlign: 'center' }}>
                 <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px', fontSize: '18px' }}>Your Messages</h3>
-                <p style={{ color: '#475569', fontSize: '14px', marginBottom: '20px' }}>Select a conversation to start chatting</p>
-                <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.07))', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '12px', padding: '16px 20px', maxWidth: '320px' }}>
-                  <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 10px' }}>
+                <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '20px' }}>Select a conversation to start chatting</p>
+                <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.1), rgba(0, 229, 160,0.07))', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '12px', padding: '16px 20px', maxWidth: '320px' }}>
+                  <p style={{ color: '#95a29b', fontSize: '13px', margin: '0 0 10px' }}>
                     <strong style={{ color: '#f8fafc' }}>Pro tip:</strong> VIP Max members get 100 DMs/day — close more deals by reaching more buyers.
                   </p>
-                  <Link to="/premium" style={{ color: '#8b5cf6', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>Learn about VIP Max →</Link>
+                  <Link to="/premium" style={{ color: '#00c805', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>Learn about VIP Max →</Link>
                 </div>
               </div>
             </div>

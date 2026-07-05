@@ -17,8 +17,8 @@ const DEAL_TYPE_COLORS = {
   'fix-flip':   { bg: 'rgba(239,68,68,0.95)',   text: '#fff' },
   'rental':     { bg: 'rgba(16,185,129,0.95)',  text: '#fff' },
   'creative':   { bg: 'rgba(245,158,11,0.95)',  text: '#fff' },
-  'commercial': { bg: 'rgba(6,182,212,0.95)',   text: '#fff' },
-  'land':       { bg: 'rgba(139,92,246,0.95)',  text: '#fff' },
+  'commercial': { bg: 'rgba(0, 229, 160,0.95)',   text: '#fff' },
+  'land':       { bg: 'rgba(0, 200, 5,0.95)',  text: '#fff' },
 };
 
 function fmt(n) {
@@ -65,8 +65,8 @@ export default function DealCard({ deal }) {
         onClick={openDeal}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDeal(e); }}
         style={{
-          background: '#12121e',
-          border: '1px solid #1e1e2e',
+          background: '#131614',
+          border: '1px solid #232925',
           borderRadius: 18,
           overflow: 'hidden',
           cursor: 'pointer',
@@ -137,7 +137,7 @@ export default function DealCard({ deal }) {
             <div
               style={{
                 position: 'absolute', bottom: 0, left: 0, right: 0,
-                background: 'linear-gradient(to top, rgba(139,92,246,0.85), rgba(139,92,246,0))',
+                background: 'linear-gradient(to top, rgba(0, 200, 5,0.85), rgba(0, 200, 5,0))',
                 padding: '24px 12px 10px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 pointerEvents: 'none',
@@ -167,24 +167,24 @@ export default function DealCard({ deal }) {
           {/* Price + ARV row */}
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
             <div>
-              <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Ask</div>
+              <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Ask</div>
               <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: 24, lineHeight: 1, letterSpacing: '-0.5px' }}>
                 {fmt(deal.listingPrice || deal.price)}
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV</div>
+              <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV</div>
               <div style={{ color: '#10b981', fontWeight: 800, fontSize: 18, lineHeight: 1 }}>{fmt(deal.arv)}</div>
             </div>
           </div>
 
           {/* Address */}
           <div style={{ marginTop: 10, marginBottom: 12 }}>
-            <div style={{ color: '#64748b', fontSize: 12, fontFamily: 'monospace' }}>
+            <div style={{ color: '#707d75', fontSize: 12, fontFamily: 'monospace' }}>
               {blurStreetNumber(deal.address)}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#cbd5e1', fontSize: 14, fontWeight: 600, marginTop: 2 }}>
-              <MapPin size={12} style={{ color: '#8b5cf6' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#cdd6d0', fontSize: 14, fontWeight: 600, marginTop: 2 }}>
+              <MapPin size={12} style={{ color: '#00c805' }} />
               {deal.city}, {deal.state}
             </div>
           </div>
@@ -201,12 +201,12 @@ export default function DealCard({ deal }) {
             }}>
               <TrendingUp size={18} style={{ color: '#10b981' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV (seller-reported)</div>
+                <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV (seller-reported)</div>
                 <div style={{ color: '#10b981', fontWeight: 900, fontSize: 18, lineHeight: 1.1 }}>{fmt(deal.arv)}</div>
               </div>
               {deal.repairCost > 0 && (
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Est. repairs</div>
+                  <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Est. repairs</div>
                   <div style={{ color: '#f59e0b', fontWeight: 700, fontSize: 13 }}>{fmt(deal.repairCost)}</div>
                 </div>
               )}
@@ -218,7 +218,7 @@ export default function DealCard({ deal }) {
             <div style={{
               display: 'flex',
               background: '#0f0f18', borderRadius: 10,
-              border: '1px solid #1e1e2e',
+              border: '1px solid #232925',
               overflow: 'hidden',
               marginBottom: 12,
             }}>
@@ -231,10 +231,10 @@ export default function DealCard({ deal }) {
                 <div key={i} style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   gap: 5, padding: '9px 4px',
-                  borderRight: i < arr.length - 1 ? '1px solid #1e1e2e' : 'none',
+                  borderRight: i < arr.length - 1 ? '1px solid #232925' : 'none',
                 }}>
-                  <Icon size={12} style={{ color: '#8b5cf6' }} />
-                  <span style={{ color: '#e2e8f0', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>{val}</span>
+                  <Icon size={12} style={{ color: '#00c805' }} />
+                  <span style={{ color: '#e4eae6', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>{val}</span>
                 </div>
               ))}
             </div>
@@ -245,21 +245,21 @@ export default function DealCard({ deal }) {
             <img
               src={deal.sellerAvatar}
               alt={deal.sellerName}
-              style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #1e1e2e' }}
+              style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #232925' }}
             />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ color: '#f8fafc', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {deal.sellerName}
               </div>
-              <div style={{ color: '#64748b', fontSize: 11 }}>
+              <div style={{ color: '#707d75', fontSize: 11 }}>
                 {deal.daysListed}d listed
               </div>
             </div>
             <div style={{
               padding: '8px 16px', borderRadius: 10,
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
               color: '#fff', fontWeight: 800, fontSize: 12,
-              boxShadow: '0 4px 14px rgba(139,92,246,0.35)',
+              boxShadow: '0 4px 14px rgba(0, 200, 5,0.35)',
               display: 'flex', alignItems: 'center', gap: 4,
             }}>
               {isAuthenticated ? <Eye size={12} /> : <Lock size={12} />}
@@ -273,19 +273,19 @@ export default function DealCard({ deal }) {
 
   // ─── Desktop layout (unchanged from before) ───
   const cardStyle = {
-    background: '#12121e',
+    background: '#131614',
     border: deal.isFeatured
       ? 'none'
       : deal.isSponsored
-        ? '1px solid rgba(139,92,246,0.25)'
-        : '1px solid #1e1e2e',
+        ? '1px solid rgba(0, 200, 5,0.25)'
+        : '1px solid #232925',
     borderRadius: '16px',
     overflow: 'hidden',
     cursor: 'pointer',
     transition: 'transform 0.25s cubic-bezier(.2,.9,.3,1), box-shadow 0.25s ease, border-color 0.2s ease',
     transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
     boxShadow: hovered
-      ? '0 16px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(139,92,246,0.18)'
+      ? '0 16px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(0, 200, 5,0.18)'
       : '0 2px 12px rgba(0,0,0,0.25)',
     position: 'relative',
     WebkitTapHighlightColor: 'transparent',
@@ -328,9 +328,9 @@ export default function DealCard({ deal }) {
           >
             <div style={{
               width: 44, height: 44, borderRadius: 12,
-              background: 'rgba(139,92,246,0.95)',
+              background: 'rgba(0, 200, 5,0.95)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 8px 24px rgba(139,92,246,0.5)',
+              boxShadow: '0 8px 24px rgba(0, 200, 5,0.5)',
             }}>
               <Lock size={20} color="#fff" />
             </div>
@@ -357,13 +357,13 @@ export default function DealCard({ deal }) {
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '6px' }}>
           <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', lineHeight: 1, letterSpacing: '-0.5px' }}>{fmt(deal.listingPrice || deal.price)}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ color: '#475569', fontSize: '11px' }}>ARV</span>
+            <span style={{ color: '#5a675f', fontSize: '11px' }}>ARV</span>
             <span style={{ color: '#10b981', fontWeight: 700, fontSize: '13px' }}>{fmt(deal.arv)}</span>
           </div>
         </div>
-        <div style={{ color: '#64748b', fontSize: '12px', fontFamily: 'monospace', marginBottom: '2px' }}>{blurStreetNumber(deal.address)}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#94a3b8', fontSize: '13px', fontWeight: 600, marginBottom: '10px' }}>
-          <MapPin size={11} style={{ color: '#8b5cf6' }} />
+        <div style={{ color: '#707d75', fontSize: '12px', fontFamily: 'monospace', marginBottom: '2px' }}>{blurStreetNumber(deal.address)}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#95a29b', fontSize: '13px', fontWeight: 600, marginBottom: '10px' }}>
+          <MapPin size={11} style={{ color: '#00c805' }} />
           {deal.city}, {deal.state}
         </div>
         {deal.arv > 0 && (
@@ -374,32 +374,32 @@ export default function DealCard({ deal }) {
           }}>
             <TrendingUp size={14} style={{ color: '#10b981' }} />
             <span style={{ color: '#10b981', fontWeight: 800, fontSize: 14 }}>{fmt(deal.arv)} ARV</span>
-            <span style={{ color: '#64748b', fontSize: 12 }}>· seller-reported</span>
+            <span style={{ color: '#707d75', fontSize: 12 }}>· seller-reported</span>
           </div>
         )}
         {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (
-          <div style={{ display: 'flex', gap: '0', marginBottom: '12px', background: '#0f0f18', borderRadius: '8px', overflow: 'hidden', border: '1px solid #1e1e2e' }}>
+          <div style={{ display: 'flex', gap: '0', marginBottom: '12px', background: '#0f0f18', borderRadius: '8px', overflow: 'hidden', border: '1px solid #232925' }}>
             {[
               { icon: Bed, val: `${deal.beds} bd` },
               { icon: Bath, val: `${deal.baths} ba` },
               { icon: Maximize2, val: `${(deal.sqft || 0).toLocaleString()} ft²` },
               ...(deal.yearBuilt ? [{ icon: Calendar, val: `${deal.yearBuilt}` }] : []),
             ].map(({ icon: Icon, val }, i, arr) => (
-              <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '8px 4px', borderRight: i < arr.length - 1 ? '1px solid #1e1e2e' : 'none' }}>
-                <Icon size={11} style={{ color: '#8b5cf6' }} />
-                <span style={{ color: '#cbd5e1', fontSize: '11px', fontWeight: 600 }}>{val}</span>
+              <div key={i} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '8px 4px', borderRight: i < arr.length - 1 ? '1px solid #232925' : 'none' }}>
+                <Icon size={11} style={{ color: '#00c805' }} />
+                <span style={{ color: '#cdd6d0', fontSize: '11px', fontWeight: 600 }}>{val}</span>
               </div>
             ))}
           </div>
         )}
-        <div style={{ height: '1px', background: '#1e1e2e', marginBottom: '12px' }} />
+        <div style={{ height: '1px', background: '#232925', marginBottom: '12px' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={deal.sellerAvatar} alt={deal.sellerName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #1e1e2e' }} />
+          <img src={deal.sellerAvatar} alt={deal.sellerName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #232925' }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{deal.sellerName}</div>
-            <div style={{ color: '#64748b', fontSize: 11 }}>{deal.daysListed}d listed</div>
+            <div style={{ color: '#707d75', fontSize: 11 }}>{deal.daysListed}d listed</div>
           </div>
-          <button onClick={(e) => { e.stopPropagation(); openDeal(e); }} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 14px', borderRadius: '9px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '12px', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(139,92,246,0.35)' }}>
+          <button onClick={(e) => { e.stopPropagation(); openDeal(e); }} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 14px', borderRadius: '9px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '12px', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(0, 200, 5,0.35)' }}>
             {isAuthenticated ? <Eye size={12} /> : <Lock size={12} />}
             {isAuthenticated ? 'View' : 'Sign Up'}
           </button>

@@ -23,7 +23,7 @@ const tiers = [
     monthly: 0,
     perks: ['5 DMs/day', '3 address requests/day', 'Standard listings', 'Access marketplace', 'Join groups'],
     popular: false,
-    color: '#94a3b8',
+    color: '#95a29b',
     cta: 'Current Plan',
   },
   {
@@ -32,7 +32,7 @@ const tiers = [
     monthly: 29,
     perks: ['30 DMs/day', 'Unlimited address requests', 'Sponsored discount 3x', 'Priority support', 'VIP badge', 'Advanced search filters', 'Deal analytics'],
     popular: false,
-    color: '#8b5cf6',
+    color: '#00c805',
     cta: 'Upgrade to VIP',
   },
   {
@@ -104,25 +104,25 @@ export default function Premium() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh', paddingBottom: '60px' }}>
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.08))', padding: '72px 20px 60px', borderBottom: '1px solid #1e1e2e' }}>
+      <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5, 0.12), rgba(0, 229, 160, 0.08))', padding: '72px 20px 60px', borderBottom: '1px solid #232925' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
           <Crown size={52} style={{ color: '#f59e0b', marginBottom: '16px' }} />
           <h1 style={{
-            background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+            background: 'linear-gradient(135deg, #00c805, #00e5a0)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             backgroundClip: 'text', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 52px)',
             margin: '0 0 14px', lineHeight: 1.1,
           }}>
             Close More Deals, Faster
           </h1>
-          <p style={{ color: '#94a3b8', fontSize: '18px', margin: '0 0 20px' }}>
+          <p style={{ color: '#95a29b', fontSize: '18px', margin: '0 0 20px' }}>
             Unlock your full investor potential on All Street Live
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
             {['30 DMs/day instead of 5', 'Priority deal placement', 'Unlimited address requests'].map(p => (
-              <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e2e8f0', fontSize: '15px' }}>
+              <div key={p} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e4eae6', fontSize: '15px' }}>
                 <Check size={16} style={{ color: '#10b981' }} />
                 {p}
               </div>
@@ -137,8 +137,8 @@ export default function Premium() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '64px' }}>
           {tiers.map(t => (
             <div key={t.name} style={{
-              background: t.popular ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(139, 92, 246, 0.08))' : '#12121e',
-              border: t.popular ? '2px solid #f59e0b' : '1px solid #1e1e2e',
+              background: t.popular ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(0, 200, 5, 0.08))' : '#131614',
+              border: t.popular ? '2px solid #f59e0b' : '1px solid #232925',
               borderRadius: '20px', padding: '32px 28px', position: 'relative',
               transition: 'transform 0.2s, box-shadow 0.2s',
               boxShadow: t.popular ? '0 0 40px rgba(245,158,11,0.12)' : 'none',
@@ -147,7 +147,7 @@ export default function Premium() {
               onMouseLeave={e => { if (!t.popular) { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; } }}
             >
               {t.popular && (
-                <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b, #f97316)', color: '#0a0a0f', padding: '5px 18px', borderRadius: '20px', fontSize: '12px', fontWeight: 800, letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+                <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b, #f97316)', color: '#0a0b0a', padding: '5px 18px', borderRadius: '20px', fontSize: '12px', fontWeight: 800, letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
                   MOST POPULAR
                 </div>
               )}
@@ -158,7 +158,7 @@ export default function Premium() {
               <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: '40px', margin: '12px 0 20px', lineHeight: 1 }}>{t.price}</div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {t.perks.map(p => (
-                  <li key={p} style={{ display: 'flex', gap: '10px', color: '#e2e8f0', fontSize: '13px', alignItems: 'flex-start' }}>
+                  <li key={p} style={{ display: 'flex', gap: '10px', color: '#e4eae6', fontSize: '13px', alignItems: 'flex-start' }}>
                     <Check size={15} style={{ color: t.color, marginTop: '2px', flexShrink: 0 }} />
                     <span>{p}</span>
                   </li>
@@ -169,9 +169,9 @@ export default function Premium() {
                 className={t.popular ? 'gradient-btn' : ''}
                 style={{
                   width: '100%', padding: '14px', borderRadius: '12px',
-                  background: t.popular ? undefined : (t.name === 'Basic' ? 'rgba(255,255,255,0.04)' : 'rgba(139, 92, 246, 0.15)'),
-                  border: t.popular ? 'none' : `1px solid ${t.name === 'Basic' ? '#1e1e2e' : 'rgba(139, 92, 246, 0.3)'}`,
-                  color: t.popular ? '#fff' : (t.name === 'Basic' ? '#94a3b8' : '#8b5cf6'),
+                  background: t.popular ? undefined : (t.name === 'Basic' ? 'rgba(255,255,255,0.04)' : 'rgba(0, 200, 5, 0.15)'),
+                  border: t.popular ? 'none' : `1px solid ${t.name === 'Basic' ? '#232925' : 'rgba(0, 200, 5, 0.3)'}`,
+                  color: t.popular ? '#fff' : (t.name === 'Basic' ? '#95a29b' : '#00c805'),
                   fontWeight: 700, fontSize: '15px', cursor: t.name === 'Basic' ? 'default' : 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -179,7 +179,7 @@ export default function Premium() {
                 {t.cta}
               </button>
               {t.name !== 'Basic' && (
-                <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', marginTop: '10px', marginBottom: 0 }}>
+                <p style={{ color: '#5a675f', fontSize: '12px', textAlign: 'center', marginTop: '10px', marginBottom: 0 }}>
                   {t.name === 'VIP' ? '7-day free trial' : '3-day free trial'} • Cancel anytime
                 </p>
               )}
@@ -188,17 +188,17 @@ export default function Premium() {
         </div>
 
         {/* Feature comparison table */}
-        <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', overflow: 'hidden', marginBottom: '64px' }}>
-          <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e' }}>
+        <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', overflow: 'hidden', marginBottom: '64px' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid #232925' }}>
             <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '20px', margin: 0 }}>Feature Comparison</h2>
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#1a1a2e' }}>
-                  <th style={{ textAlign: 'left', padding: '14px 20px', color: '#94a3b8', fontSize: '13px', fontWeight: 700, borderBottom: '1px solid #1e1e2e' }}>Feature</th>
+                <tr style={{ background: '#1a1f1b' }}>
+                  <th style={{ textAlign: 'left', padding: '14px 20px', color: '#95a29b', fontSize: '13px', fontWeight: 700, borderBottom: '1px solid #232925' }}>Feature</th>
                   {['Basic', 'VIP', 'VIP Max'].map(n => (
-                    <th key={n} style={{ textAlign: 'center', padding: '14px 20px', color: n === 'VIP Max' ? '#f59e0b' : n === 'VIP' ? '#8b5cf6' : '#94a3b8', fontSize: '13px', fontWeight: 700, borderBottom: '1px solid #1e1e2e' }}>{n}</th>
+                    <th key={n} style={{ textAlign: 'center', padding: '14px 20px', color: n === 'VIP Max' ? '#f59e0b' : n === 'VIP' ? '#00c805' : '#95a29b', fontSize: '13px', fontWeight: 700, borderBottom: '1px solid #232925' }}>{n}</th>
                   ))}
                 </tr>
               </thead>
@@ -213,11 +213,11 @@ export default function Premium() {
                   { f: 'Sponsored Discount', vals: ['—', '3x', '10x'] },
                   { f: 'Support', vals: ['Community', 'Priority', 'Direct Line'] },
                 ].map((row, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #1e1e2e', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                    <td style={{ padding: '13px 20px', color: '#94a3b8', fontSize: '14px' }}>{row.f}</td>
+                  <tr key={i} style={{ borderBottom: '1px solid #232925', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
+                    <td style={{ padding: '13px 20px', color: '#95a29b', fontSize: '14px' }}>{row.f}</td>
                     {row.vals.map((v, vi) => (
                       <td key={vi} style={{ textAlign: 'center', padding: '13px 20px', color: '#f8fafc', fontSize: '14px', fontWeight: 600 }}>
-                        {v === true ? <Check size={16} style={{ color: '#10b981', margin: '0 auto' }} /> : v === false ? <span style={{ color: '#334155' }}>—</span> : v}
+                        {v === true ? <Check size={16} style={{ color: '#10b981', margin: '0 auto' }} /> : v === false ? <span style={{ color: '#3e4a43' }}>—</span> : v}
                       </td>
                     ))}
                   </tr>
@@ -230,23 +230,23 @@ export default function Premium() {
         {/* Testimonials */}
         <div style={{ marginBottom: '64px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>SOCIAL PROOF</div>
+            <div style={{ color: '#95a29b', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>SOCIAL PROOF</div>
             <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '28px', margin: 0 }}>Investors Love All Street Live Premium</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
             {testimonials.map((t, i) => (
-              <div key={i} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '24px' }}>
+              <div key={i} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', gap: '4px', marginBottom: '14px' }}>
                   {Array.from({ length: t.stars }).map((_, s) => (
                     <Star key={s} size={16} fill="#f59e0b" style={{ color: '#f59e0b' }} />
                   ))}
                 </div>
-                <p style={{ color: '#e2e8f0', fontSize: '14px', lineHeight: 1.7, margin: '0 0 18px', fontStyle: 'italic' }}>"{t.text}"</p>
+                <p style={{ color: '#e4eae6', fontSize: '14px', lineHeight: 1.7, margin: '0 0 18px', fontStyle: 'italic' }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <img src={t.avatar} alt={t.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   <div>
                     <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{t.name}</div>
-                    <div style={{ color: '#475569', fontSize: '12px' }}>{t.role}</div>
+                    <div style={{ color: '#5a675f', fontSize: '12px' }}>{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -261,17 +261,17 @@ export default function Premium() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {faqs.map((faq, i) => (
-              <div key={i} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', overflow: 'hidden' }}>
+              <div key={i} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '12px', overflow: 'hidden' }}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                 >
                   <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '15px' }}>{faq.q}</span>
-                  {openFaq === i ? <ChevronUp size={18} style={{ color: '#8b5cf6', flexShrink: 0 }} /> : <ChevronDown size={18} style={{ color: '#94a3b8', flexShrink: 0 }} />}
+                  {openFaq === i ? <ChevronUp size={18} style={{ color: '#00c805', flexShrink: 0 }} /> : <ChevronDown size={18} style={{ color: '#95a29b', flexShrink: 0 }} />}
                 </button>
                 {openFaq === i && (
                   <div style={{ padding: '0 20px 16px' }}>
-                    <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>{faq.a}</p>
+                    <p style={{ color: '#95a29b', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -280,27 +280,27 @@ export default function Premium() {
         </div>
 
         {/* Guarantee */}
-        <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
+        <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', flexWrap: 'wrap', marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Shield size={28} style={{ color: '#10b981' }} />
               <div style={{ textAlign: 'left' }}>
                 <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>30-Day Guarantee</div>
-                <div style={{ color: '#475569', fontSize: '13px' }}>Full money-back, no questions</div>
+                <div style={{ color: '#5a675f', fontSize: '13px' }}>Full money-back, no questions</div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Zap size={28} style={{ color: '#8b5cf6' }} />
+              <Zap size={28} style={{ color: '#00c805' }} />
               <div style={{ textAlign: 'left' }}>
                 <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>Cancel Anytime</div>
-                <div style={{ color: '#475569', fontSize: '13px' }}>No long-term contracts</div>
+                <div style={{ color: '#5a675f', fontSize: '13px' }}>No long-term contracts</div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Crown size={28} style={{ color: '#f59e0b' }} />
               <div style={{ textAlign: 'left' }}>
                 <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>Free Trials</div>
-                <div style={{ color: '#475569', fontSize: '13px' }}>Try before you commit</div>
+                <div style={{ color: '#5a675f', fontSize: '13px' }}>Try before you commit</div>
               </div>
             </div>
           </div>
@@ -313,19 +313,19 @@ export default function Premium() {
       {/* Payment Modal */}
       {showPayModal && selectedTier && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => { setShowPayModal(false); setPaySuccess(false); }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '440px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', width: '100%', maxWidth: '440px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>
                 {paySuccess ? '🎉 Welcome to ' + selectedTier.name + '!' : `Upgrade to ${selectedTier.name}`}
               </h3>
-              <button onClick={() => { setShowPayModal(false); setPaySuccess(false); }} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={20} /></button>
+              <button onClick={() => { setShowPayModal(false); setPaySuccess(false); }} style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div style={{ padding: '24px' }}>
               {paySuccess ? (
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
                   <div style={{ fontSize: '64px', marginBottom: '16px' }}>🚀</div>
                   <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', marginBottom: '10px' }}>You're now {selectedTier.name}!</h3>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
+                  <p style={{ color: '#95a29b', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
                     Your upgraded features are now active. Start reaching more buyers and closing more deals today.
                   </p>
                   <button onClick={() => { setShowPayModal(false); setPaySuccess(false); }} className="gradient-btn" style={{ padding: '12px 32px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer' }}>
@@ -334,17 +334,17 @@ export default function Premium() {
                 </div>
               ) : (
                 <form onSubmit={handlePay} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '10px', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ background: 'rgba(0, 200, 5,0.08)', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '10px', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>{selectedTier.name} Plan</div>
-                      <div style={{ color: '#94a3b8', fontSize: '13px' }}>Billed monthly</div>
+                      <div style={{ color: '#95a29b', fontSize: '13px' }}>Billed monthly</div>
                     </div>
                     <div style={{ color: selectedTier.color, fontWeight: 900, fontSize: '22px' }}>{selectedTier.price}</div>
                   </div>
                   <div>
-                    <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Card Number</label>
+                    <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Card Number</label>
                     <div style={{ position: 'relative' }}>
-                      <CreditCard size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
+                      <CreditCard size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#5a675f' }} />
                       <input
                         value={cardNum}
                         onChange={e => setCardNum(e.target.value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim())}
@@ -356,7 +356,7 @@ export default function Premium() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
-                      <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Expiry</label>
+                      <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Expiry</label>
                       <input
                         value={cardExp}
                         onChange={e => setCardExp(e.target.value)}
@@ -366,7 +366,7 @@ export default function Premium() {
                       />
                     </div>
                     <div>
-                      <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>CVV</label>
+                      <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>CVV</label>
                       <input
                         value={cardCvv}
                         onChange={e => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
@@ -376,14 +376,14 @@ export default function Premium() {
                       />
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#475569', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#5a675f', fontSize: '12px' }}>
                     <Shield size={14} style={{ color: '#10b981' }} />
                     256-bit SSL encryption. Your card data is never stored.
                   </div>
                   <button type="submit" className="gradient-btn" style={{ padding: '14px', borderRadius: '12px', color: '#fff', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer' }}>
                     Start {selectedTier.name === 'VIP' ? '7' : '3'}-Day Free Trial →
                   </button>
-                  <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', margin: 0 }}>
+                  <p style={{ color: '#5a675f', fontSize: '12px', textAlign: 'center', margin: 0 }}>
                     No charge today. {selectedTier.price} begins after trial. Cancel anytime.
                   </p>
                 </form>

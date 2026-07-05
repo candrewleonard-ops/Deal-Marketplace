@@ -140,12 +140,12 @@ export default function AddressAutocomplete({
         style={{
           position: 'relative',
           // Subtle always-on highlight so users notice the field is "smart"
-          background: 'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(6,182,212,0.35))',
+          background: 'linear-gradient(135deg, rgba(0, 200, 5,0.35), rgba(0, 229, 160,0.35))',
           padding: 1.5,
           borderRadius: 11,
           boxShadow: picked
             ? '0 0 0 3px rgba(16,185,129,0.15)'
-            : '0 0 16px rgba(139,92,246,0.18)',
+            : '0 0 16px rgba(0, 200, 5,0.18)',
           transition: 'box-shadow 0.2s ease',
         }}
       >
@@ -174,7 +174,7 @@ export default function AddressAutocomplete({
             size={15}
             style={{
               position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-              color: '#a78bfa', pointerEvents: 'none',
+              color: '#4ade80', pointerEvents: 'none',
               animation: 'addr-spin 0.8s linear infinite',
             }}
           />
@@ -196,9 +196,9 @@ export default function AddressAutocomplete({
               position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
               fontSize: 9, fontWeight: 800, letterSpacing: 0.6,
               padding: '2px 7px', borderRadius: 999,
-              background: 'rgba(139,92,246,0.15)',
-              border: '1px solid rgba(139,92,246,0.3)',
-              color: '#a78bfa',
+              background: 'rgba(0, 200, 5,0.15)',
+              border: '1px solid rgba(0, 200, 5,0.3)',
+              color: '#4ade80',
               pointerEvents: 'none',
               textTransform: 'uppercase',
             }}
@@ -213,8 +213,8 @@ export default function AddressAutocomplete({
           role="listbox"
           style={{
             position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
-            background: '#161629',
-            border: '1px solid #2a2a3e',
+            background: '#161a17',
+            border: '1px solid #2e352f',
             borderRadius: 12,
             boxShadow: '0 18px 50px rgba(0,0,0,0.55)',
             zIndex: 50,
@@ -223,28 +223,28 @@ export default function AddressAutocomplete({
           }}
         >
           {loading && results.length === 0 && (
-            <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, color: '#94a3b8', fontSize: 13 }}>
-              <Loader2 size={14} style={{ color: '#8b5cf6', animation: 'addr-spin 0.8s linear infinite' }} />
+            <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, color: '#95a29b', fontSize: 13 }}>
+              <Loader2 size={14} style={{ color: '#00c805', animation: 'addr-spin 0.8s linear infinite' }} />
               Searching addresses…
             </div>
           )}
           {!loading && results.length === 0 && (
-            <div style={{ padding: '14px', color: '#94a3b8', fontSize: 13, lineHeight: 1.5 }}>
+            <div style={{ padding: '14px', color: '#95a29b', fontSize: 13, lineHeight: 1.5 }}>
               <div style={{ color: '#f8fafc', fontWeight: 600, marginBottom: 4 }}>No matches found</div>
-              <div style={{ color: '#64748b', fontSize: 12 }}>
-                Try adding the city &amp; state — e.g. <span style={{ color: '#a78bfa' }}>"1216 Wayside Dr Lima OH"</span>.
+              <div style={{ color: '#707d75', fontSize: 12 }}>
+                Try adding the city &amp; state — e.g. <span style={{ color: '#4ade80' }}>"1216 Wayside Dr Lima OH"</span>.
                 You can also type the address manually.
               </div>
               {diag && (
-                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #1e1e2e' }}>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>
+                <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #232925' }}>
+                  <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>
                     Provider status
                   </div>
                   {Object.entries(diag).map(([name, status]) => (
                     <div key={name} style={{
                       display: 'flex', justifyContent: 'space-between', gap: 8,
                       fontSize: 11, padding: '2px 0',
-                      color: status.err ? '#ef4444' : (status.ok > 0 ? '#10b981' : '#64748b'),
+                      color: status.err ? '#ef4444' : (status.ok > 0 ? '#10b981' : '#707d75'),
                     }}>
                       <span style={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>{name}</span>
                       <span style={{
@@ -277,10 +277,10 @@ export default function AddressAutocomplete({
                   display: 'flex', alignItems: 'flex-start', gap: 10,
                   width: '100%', textAlign: 'left',
                   padding: '10px 12px',
-                  background: highlight === i ? 'rgba(139,92,246,0.12)' : 'transparent',
+                  background: highlight === i ? 'rgba(0, 200, 5,0.12)' : 'transparent',
                   border: 'none',
-                  borderBottom: i < results.length - 1 ? '1px solid #1e1e2e' : 'none',
-                  color: '#e2e8f0', cursor: 'pointer',
+                  borderBottom: i < results.length - 1 ? '1px solid #232925' : 'none',
+                  color: '#e4eae6', cursor: 'pointer',
                   transition: 'background 0.1s ease',
                 }}
               >
@@ -288,7 +288,7 @@ export default function AddressAutocomplete({
                   size={14}
                   style={{
                     flexShrink: 0, marginTop: 2,
-                    color: highlight === i ? '#a78bfa' : '#475569',
+                    color: highlight === i ? '#4ade80' : '#5a675f',
                   }}
                 />
                 <div style={{ minWidth: 0, flex: 1 }}>
@@ -299,7 +299,7 @@ export default function AddressAutocomplete({
                     {main}
                   </div>
                   <div style={{
-                    color: '#94a3b8', fontSize: 11, marginTop: 1,
+                    color: '#95a29b', fontSize: 11, marginTop: 1,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {secondary}
@@ -325,9 +325,9 @@ export default function AddressAutocomplete({
             <div style={{
               padding: '6px 12px',
               background: '#0f0f18',
-              borderTop: '1px solid #1e1e2e',
+              borderTop: '1px solid #232925',
               fontSize: 10,
-              color: '#475569',
+              color: '#5a675f',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
               <span>↑↓ to navigate · ↵ to select · esc to close</span>

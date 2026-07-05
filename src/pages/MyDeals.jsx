@@ -82,13 +82,13 @@ export default function MyDeals() {
 
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: '60px' }}>
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '24px 20px' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh', paddingBottom: '60px' }}>
+      <div style={{ background: '#0e100e', borderBottom: '1px solid #232925', padding: '24px 20px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '28px', margin: 0 }}>My Deals</h1>
-              <p style={{ color: '#475569', margin: '4px 0 0', fontSize: '14px' }}>Manage your listings and address requests</p>
+              <p style={{ color: '#5a675f', margin: '4px 0 0', fontSize: '14px' }}>Manage your listings and address requests</p>
             </div>
             <Link
               to="/post-deal"
@@ -105,30 +105,30 @@ export default function MyDeals() {
         {/* Stats Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '20px' }}>
           {[
-            { label: 'Total Deals', value: myDealsList.length, color: '#8b5cf6' },
+            { label: 'Total Deals', value: myDealsList.length, color: '#00c805' },
             { label: 'Active', value: tabsCounts.active, color: '#10b981' },
             { label: 'Under Contract', value: tabsCounts['under contract'], color: '#f59e0b' },
-            { label: 'Total Views', value: totalViews, color: '#06b6d4' },
-            { label: 'Total Inquiries', value: totalInquiries, color: '#ec4899' },
+            { label: 'Total Views', value: totalViews, color: '#00e5a0' },
+            { label: 'Total Inquiries', value: totalInquiries, color: '#f59e0b' },
           ].map(s => (
-            <div key={s.label} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', padding: '16px', transition: 'border-color 0.2s' }}>
-              <div style={{ color: '#475569', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{s.label}</div>
+            <div key={s.label} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '12px', padding: '16px', transition: 'border-color 0.2s' }}>
+              <div style={{ color: '#5a675f', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.3px' }}>{s.label}</div>
               <div style={{ color: s.color, fontWeight: 800, fontSize: '28px', marginTop: '4px' }}>{s.value}</div>
             </div>
           ))}
         </div>
 
         {/* Auto-approve toggle */}
-        <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', padding: '14px 18px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '12px', padding: '14px 18px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>Auto-approve address requests</div>
-            <div style={{ color: '#475569', fontSize: '12px' }}>Instantly grant address to all verified users — great for high-volume wholesalers</div>
+            <div style={{ color: '#5a675f', fontSize: '12px' }}>Instantly grant address to all verified users — great for high-volume wholesalers</div>
           </div>
           <button
             onClick={() => { setAutoApprove(!autoApprove); showToastMsg(autoApprove ? 'Manual approval mode on' : 'Auto-approve enabled!'); }}
             style={{
               width: '46px', height: '26px', borderRadius: '13px',
-              background: autoApprove ? '#8b5cf6' : '#1e1e2e',
+              background: autoApprove ? '#00c805' : '#232925',
               border: 'none', cursor: 'pointer', position: 'relative', transition: 'all 0.2s',
             }}
           >
@@ -140,16 +140,16 @@ export default function MyDeals() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #1e1e2e' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #232925' }}>
           {['active', 'under contract', 'sold', 'drafts'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
                 padding: '10px 16px', background: 'none', border: 'none', cursor: 'pointer',
-                color: activeTab === tab ? '#8b5cf6' : '#94a3b8',
+                color: activeTab === tab ? '#00c805' : '#95a29b',
                 fontWeight: 600, fontSize: '14px', textTransform: 'capitalize',
-                borderBottom: `2px solid ${activeTab === tab ? '#8b5cf6' : 'transparent'}`,
+                borderBottom: `2px solid ${activeTab === tab ? '#00c805' : 'transparent'}`,
                 marginBottom: '-1px',
               }}
             >
@@ -165,7 +165,7 @@ export default function MyDeals() {
             const isExpanded = expanded === deal.id;
             const viewBars = [6, 8, 5, 9, 7, 10, 8];
             return (
-              <div key={deal.id} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', overflow: 'hidden', transition: 'border-color 0.2s' }}>
+              <div key={deal.id} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '12px', overflow: 'hidden', transition: 'border-color 0.2s' }}>
                 <div
                   onClick={() => setExpanded(isExpanded ? null : deal.id)}
                   style={{ padding: '14px', display: 'flex', gap: '14px', cursor: 'pointer', alignItems: 'center' }}
@@ -173,52 +173,52 @@ export default function MyDeals() {
                   <img src={deal.images[0]} alt="" style={{ width: '70px', height: '70px', borderRadius: '8px', objectFit: 'cover' }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>{deal.title}</div>
-                    <div style={{ color: '#94a3b8', fontSize: '13px', marginTop: '2px' }}>{deal.city}, {deal.state}</div>
+                    <div style={{ color: '#95a29b', fontSize: '13px', marginTop: '2px' }}>{deal.city}, {deal.state}</div>
                     {/* Mini sparkline bars */}
                     <div style={{ display: 'flex', gap: '2px', marginTop: '8px', alignItems: 'flex-end', height: '16px' }}>
                       {viewBars.map((h, i) => (
-                        <div key={i} style={{ width: '6px', background: `rgba(139,92,246,${0.3 + (h / 10) * 0.7})`, borderRadius: '2px', height: `${h * 1.5}px` }} />
+                        <div key={i} style={{ width: '6px', background: `rgba(0, 200, 5,${0.3 + (h / 10) * 0.7})`, borderRadius: '2px', height: `${h * 1.5}px` }} />
                       ))}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}>{fmt(deal.listingPrice || deal.price)}</div>
-                      <div style={{ color: '#475569', fontSize: '11px' }}>Listing</div>
+                      <div style={{ color: '#5a675f', fontSize: '11px' }}>Listing</div>
                     </div>
                     <div style={{ textAlign: 'center', minWidth: '50px' }}>
-                      <div style={{ color: '#06b6d4', fontWeight: 700, fontSize: '15px' }}>{deal.views}</div>
-                      <div style={{ color: '#475569', fontSize: '11px' }}>Views</div>
+                      <div style={{ color: '#00e5a0', fontWeight: 700, fontSize: '15px' }}>{deal.views}</div>
+                      <div style={{ color: '#5a675f', fontSize: '11px' }}>Views</div>
                     </div>
                     <div style={{ textAlign: 'center', minWidth: '50px' }}>
-                      <div style={{ color: '#ec4899', fontWeight: 700, fontSize: '15px' }}>{deal.inquiries}</div>
-                      <div style={{ color: '#475569', fontSize: '11px' }}>Inquiries</div>
+                      <div style={{ color: '#f59e0b', fontWeight: 700, fontSize: '15px' }}>{deal.inquiries}</div>
+                      <div style={{ color: '#5a675f', fontSize: '11px' }}>Inquiries</div>
                     </div>
                     <div style={{ textAlign: 'center', minWidth: '60px' }}>
-                      <div style={{ color: '#8b5cf6', fontWeight: 700, fontSize: '15px' }}>{requests.length}</div>
-                      <div style={{ color: '#475569', fontSize: '11px' }}>Requests</div>
+                      <div style={{ color: '#00c805', fontWeight: 700, fontSize: '15px' }}>{requests.length}</div>
+                      <div style={{ color: '#5a675f', fontSize: '11px' }}>Requests</div>
                     </div>
-                    {isExpanded ? <ChevronUp size={18} style={{ color: '#94a3b8' }} /> : <ChevronDown size={18} style={{ color: '#94a3b8' }} />}
+                    {isExpanded ? <ChevronUp size={18} style={{ color: '#95a29b' }} /> : <ChevronDown size={18} style={{ color: '#95a29b' }} />}
                   </div>
                 </div>
                 {isExpanded && (
-                  <div style={{ padding: '16px', borderTop: '1px solid #1e1e2e', background: '#0d0d1a' }}>
+                  <div style={{ padding: '16px', borderTop: '1px solid #232925', background: '#0e100e' }}>
                     <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={14} style={{ color: '#8b5cf6' }} /> Address Requests ({requests.length})
+                      <MapPin size={14} style={{ color: '#00c805' }} /> Address Requests ({requests.length})
                     </h4>
                     {requests.length === 0 ? (
-                      <p style={{ color: '#475569', fontSize: '13px' }}>No requests yet. Promote this deal to get more eyes on it!</p>
+                      <p style={{ color: '#5a675f', fontSize: '13px' }}>No requests yet. Promote this deal to get more eyes on it!</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {requests.map(req => {
                           const u = users.find(u => u.id === req.userId) || {};
                           const action = requestActions[req.id];
                           return (
-                            <div key={req.id} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '10px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div key={req.id} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '10px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                               <img src={u.avatar} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
                               <div style={{ flex: 1 }}>
                                 <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>{u.name}</div>
-                                <div style={{ color: '#94a3b8', fontSize: '11px' }}>
+                                <div style={{ color: '#95a29b', fontSize: '11px' }}>
                                   {u.tags?.slice(0, 2).join(' · ')} · {req.timestamp}
                                 </div>
                               </div>
@@ -252,7 +252,7 @@ export default function MyDeals() {
                       </div>
                     )}
                     <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                      <Link to={`/marketplace/${deal.id}`} style={{ color: '#8b5cf6', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Link to={`/marketplace/${deal.id}`} style={{ color: '#00c805', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         View Public Listing →
                       </Link>
                     </div>
@@ -262,10 +262,10 @@ export default function MyDeals() {
             );
           })}
           {filtered.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 20px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px' }}>
-              <TrendingUp size={48} style={{ color: '#8b5cf6', marginBottom: '16px', opacity: 0.3 }} />
+            <div style={{ textAlign: 'center', padding: '60px 20px', background: '#131614', border: '1px solid #232925', borderRadius: '16px' }}>
+              <TrendingUp size={48} style={{ color: '#00c805', marginBottom: '16px', opacity: 0.3 }} />
               <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>No deals here yet</h3>
-              <p style={{ color: '#475569', fontSize: '14px', marginBottom: '16px' }}>
+              <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '16px' }}>
                 {activeTab === 'active' ? 'Post your first deal and start collecting address requests from buyers.' : `No deals in ${activeTab} status.`}
               </p>
               {activeTab === 'active' && (
@@ -282,7 +282,7 @@ export default function MyDeals() {
       {toast && (
         <div style={{
           position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
-          background: '#12121e', border: '1px solid rgba(16,185,129,0.3)',
+          background: '#131614', border: '1px solid rgba(16,185,129,0.3)',
           borderRadius: '12px', padding: '14px 18px',
           display: 'flex', alignItems: 'center', gap: '10px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',

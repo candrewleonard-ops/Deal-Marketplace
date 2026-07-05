@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, X, Copy, Check } from 'lucide-react';
 
 const tagColors = {
-  'Wholesaler': '#8b5cf6',
+  'Wholesaler': '#00c805',
   'Fix N Flipper': '#ef4444',
-  'Marketer': '#06b6d4',
+  'Marketer': '#00e5a0',
   'Realtor': '#10b981',
   'Cash Buyer': '#f59e0b',
   'Hard Money Lender': '#f59e0b',
-  'Private Lender': '#06b6d4',
-  'Contractor': '#94a3b8',
+  'Private Lender': '#00e5a0',
+  'Contractor': '#95a29b',
   'Property Manager': '#10b981',
   'Agent/Broker': '#10b981',
 };
@@ -52,8 +52,8 @@ export default function PostCard({ post }) {
 
   return (
     <div style={{
-      background: '#12121e',
-      border: '1px solid #1e1e2e',
+      background: '#131614',
+      border: '1px solid #232925',
       borderRadius: '16px',
       overflow: 'hidden',
       transition: 'all 0.2s',
@@ -71,9 +71,9 @@ export default function PostCard({ post }) {
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
               {post.userTags.slice(0, 2).map(tag => (
                 <span key={tag} style={{
-                  background: `${tagColors[tag] || '#8b5cf6'}18`,
-                  color: tagColors[tag] || '#8b5cf6',
-                  border: `1px solid ${tagColors[tag] || '#8b5cf6'}30`,
+                  background: `${tagColors[tag] || '#00c805'}18`,
+                  color: tagColors[tag] || '#00c805',
+                  border: `1px solid ${tagColors[tag] || '#00c805'}30`,
                   borderRadius: '20px', padding: '1px 8px', fontSize: '11px', fontWeight: 600,
                 }}>
                   {tag}
@@ -81,16 +81,16 @@ export default function PostCard({ post }) {
               ))}
             </div>
           </div>
-          <span style={{ color: '#475569', fontSize: '13px' }}>{post.timestamp}</span>
+          <span style={{ color: '#5a675f', fontSize: '13px' }}>{post.timestamp}</span>
         </div>
-        <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: '4px' }}>
+        <button style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', padding: '4px' }}>
           <MoreHorizontal size={18} />
         </button>
       </div>
 
       {/* Content */}
       <div style={{ padding: '0 16px 14px' }}>
-        <p style={{ color: '#e2e8f0', fontSize: '15px', lineHeight: 1.6, margin: 0 }}>
+        <p style={{ color: '#e4eae6', fontSize: '15px', lineHeight: 1.6, margin: 0 }}>
           {post.content}
         </p>
       </div>
@@ -110,32 +110,32 @@ export default function PostCard({ post }) {
       <div style={{
         padding: '10px 16px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        borderTop: post.image ? '1px solid #1e1e2e' : 'none',
+        borderTop: post.image ? '1px solid #232925' : 'none',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ color: '#475569', fontSize: '13px' }}>
+          <span style={{ color: '#5a675f', fontSize: '13px' }}>
             {likeCount.toLocaleString()} likes
           </span>
           <button
             onClick={() => setCommentsOpen(!commentsOpen)}
-            style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '13px', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', fontSize: '13px', padding: 0 }}
           >
             {localComments.length} comments
           </button>
         </div>
-        <span style={{ color: '#475569', fontSize: '13px' }}>{post.shares} shares</span>
+        <span style={{ color: '#5a675f', fontSize: '13px' }}>{post.shares} shares</span>
       </div>
 
       {/* Action buttons */}
       <div style={{
         padding: '4px 8px 8px',
-        display: 'flex', borderTop: '1px solid #1e1e2e',
+        display: 'flex', borderTop: '1px solid #232925',
       }}>
         {[
           { icon: Heart, label: 'Like', action: handleLike, active: liked, activeColor: '#ef4444' },
-          { icon: MessageCircle, label: 'Comment', action: () => setCommentsOpen(!commentsOpen), active: commentsOpen, activeColor: '#8b5cf6' },
+          { icon: MessageCircle, label: 'Comment', action: () => setCommentsOpen(!commentsOpen), active: commentsOpen, activeColor: '#00c805' },
           { icon: Share2, label: 'Share', action: () => setShareOpen(true), active: false },
-          { icon: Bookmark, label: 'Save', action: () => setSaved(!saved), active: saved, activeColor: '#8b5cf6' },
+          { icon: Bookmark, label: 'Save', action: () => setSaved(!saved), active: saved, activeColor: '#00c805' },
         ].map(({ icon: Icon, label, action, active, activeColor }) => (
           <button
             key={label}
@@ -143,12 +143,12 @@ export default function PostCard({ post }) {
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: '6px', padding: '8px', background: 'none', border: 'none',
-              color: active ? (activeColor || '#8b5cf6') : '#475569',
+              color: active ? (activeColor || '#00c805') : '#5a675f',
               cursor: 'pointer', borderRadius: '8px', fontSize: '13px', fontWeight: 500,
               transition: 'all 0.2s',
             }}
           >
-            <Icon size={16} fill={active ? (activeColor || '#8b5cf6') : 'none'} />
+            <Icon size={16} fill={active ? (activeColor || '#00c805') : 'none'} />
             {label}
           </button>
         ))}
@@ -156,7 +156,7 @@ export default function PostCard({ post }) {
 
       {/* Comments Section */}
       {commentsOpen && (
-        <div style={{ borderTop: '1px solid #1e1e2e', padding: '12px 16px' }}>
+        <div style={{ borderTop: '1px solid #232925', padding: '12px 16px' }}>
           {/* Comment input */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
             <img
@@ -176,7 +176,7 @@ export default function PostCard({ post }) {
               <button
                 onClick={handleSendComment}
                 style={{
-                  background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                  background: 'linear-gradient(135deg, #00c805, #00e5a0)',
                   border: 'none', borderRadius: '50%', width: '36px', height: '36px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', flexShrink: 0,
@@ -199,20 +199,20 @@ export default function PostCard({ post }) {
                 />
                 <div style={{ flex: 1 }}>
                   <div style={{
-                    background: '#1a1a2e', borderRadius: '12px', padding: '10px 14px',
-                    border: '1px solid #1e1e2e',
+                    background: '#1a1f1b', borderRadius: '12px', padding: '10px 14px',
+                    border: '1px solid #232925',
                   }}>
                     <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '13px' }}>{comment.userName} </span>
-                    <span style={{ color: '#cbd5e1', fontSize: '14px' }}>{comment.content}</span>
+                    <span style={{ color: '#cdd6d0', fontSize: '14px' }}>{comment.content}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '16px', padding: '4px 8px' }}>
-                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
+                    <button style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
                       Like ({comment.likes})
                     </button>
-                    <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
+                    <button style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', fontSize: '12px', padding: 0, fontWeight: 500 }}>
                       Reply
                     </button>
-                    <span style={{ color: '#334155', fontSize: '12px' }}>{comment.timestamp}</span>
+                    <span style={{ color: '#3e4a43', fontSize: '12px' }}>{comment.timestamp}</span>
                   </div>
                 </div>
               </div>
@@ -229,15 +229,15 @@ export default function PostCard({ post }) {
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '440px', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}
+            style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', width: '100%', maxWidth: '440px', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}
           >
-            <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '18px 20px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '17px', margin: 0 }}>Share Post</h3>
-              <button onClick={() => setShareOpen(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={18} /></button>
+              <button onClick={() => setShareOpen(false)} style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}><X size={18} /></button>
             </div>
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Share to your feed</label>
+                <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>Share to your feed</label>
                 <textarea
                   value={shareText}
                   onChange={e => setShareText(e.target.value)}
@@ -254,12 +254,12 @@ export default function PostCard({ post }) {
               >
                 Share to Feed
               </button>
-              <div style={{ borderTop: '1px solid #1e1e2e', paddingTop: '14px' }}>
-                <div style={{ color: '#475569', fontSize: '12px', fontWeight: 600, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Or share via</div>
+              <div style={{ borderTop: '1px solid #232925', paddingTop: '14px' }}>
+                <div style={{ color: '#5a675f', fontSize: '12px', fontWeight: 600, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Or share via</div>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <button
                     onClick={handleCopyLink}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 16px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : '#1e1e2e'}`, color: copied ? '#10b981' : '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 16px', borderRadius: '10px', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : '#232925'}`, color: copied ? '#10b981' : '#95a29b', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s' }}
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? 'Copied!' : 'Copy Link'}

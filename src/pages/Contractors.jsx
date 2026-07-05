@@ -8,11 +8,11 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { getDealById } from '../data/deals';
 
 const tradeColors = {
-  'HVAC': '#06b6d4',
+  'HVAC': '#00e5a0',
   'Plumbing': '#3b82f6',
   'Electrical': '#f59e0b',
-  'Painting/Cosmetic': '#ec4899',
-  'Flooring': '#8b5cf6',
+  'Painting/Cosmetic': '#f59e0b',
+  'Flooring': '#00c805',
   'Roofing': '#ef4444',
   'Foundation/Structural': '#10b981',
 };
@@ -75,11 +75,11 @@ export default function Contractors() {
   }, [filteredContractors, cityFilter]);
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: isMobile ? 24 : 60 }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh', paddingBottom: isMobile ? 24 : 60 }}>
       {/* ── Hero ── */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(139,92,246,0.18), rgba(6,182,212,0.10)), #0d0d1a',
-        borderBottom: '1px solid #1e1e2e',
+        background: 'linear-gradient(135deg, rgba(0, 200, 5,0.18), rgba(0, 229, 160,0.10)), #0e100e',
+        borderBottom: '1px solid #232925',
         padding: isMobile ? '24px 16px 20px' : '48px 24px 32px',
         position: 'relative', overflow: 'hidden',
       }}>
@@ -87,7 +87,7 @@ export default function Contractors() {
         <div style={{
           position: 'absolute', top: '-30%', right: '-10%',
           width: 360, height: 360, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 200, 5,0.2), transparent 70%)',
           filter: 'blur(40px)', pointerEvents: 'none',
         }} />
 
@@ -97,9 +97,9 @@ export default function Contractors() {
               to="/contractors"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
                 borderRadius: 20, padding: '5px 12px 5px 8px',
-                color: '#94a3b8', textDecoration: 'none', fontSize: 12, fontWeight: 700,
+                color: '#95a29b', textDecoration: 'none', fontSize: 12, fontWeight: 700,
                 marginBottom: 14,
               }}
             >
@@ -110,9 +110,9 @@ export default function Contractors() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
             <div style={{
               width: isMobile ? 44 : 56, height: isMobile ? 44 : 56, borderRadius: 14,
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 12px 28px rgba(139,92,246,0.4)',
+              boxShadow: '0 12px 28px rgba(0, 200, 5,0.4)',
             }}>
               <Wrench size={isMobile ? 22 : 28} color="#fff" />
             </div>
@@ -124,7 +124,7 @@ export default function Contractors() {
               }}>
                 <span className="gradient-text">Contractor</span> Marketplace
               </h1>
-              <p style={{ color: '#94a3b8', margin: '2px 0 0', fontSize: isMobile ? 13 : 14 }}>
+              <p style={{ color: '#95a29b', margin: '2px 0 0', fontSize: isMobile ? 13 : 14 }}>
                 Vetted local contractors — call or message directly.
               </p>
             </div>
@@ -140,12 +140,12 @@ export default function Contractors() {
         background: 'rgba(10,10,15,0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #1e1e2e',
+        borderBottom: '1px solid #232925',
         padding: isMobile ? '12px 14px' : '16px 24px',
       }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ position: 'relative', marginBottom: 10 }}>
-            <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#8b5cf6' }} />
+            <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#00c805' }} />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -167,7 +167,7 @@ export default function Contractors() {
             <Chip
               active={tradeFilter === 'All'}
               onClick={() => setTradeFilter('All')}
-              color="#a78bfa"
+              color="#4ade80"
             >
               All trades
             </Chip>
@@ -176,7 +176,7 @@ export default function Contractors() {
                 key={trade}
                 active={tradeFilter === trade}
                 onClick={() => setTradeFilter(tradeFilter === trade ? 'All' : trade)}
-                color={tradeColors[trade] || '#8b5cf6'}
+                color={tradeColors[trade] || '#00c805'}
               >
                 {trade}
               </Chip>
@@ -187,8 +187,8 @@ export default function Contractors() {
 
       {/* ── Body ── */}
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '16px 14px 0' : '24px 24px 0' }}>
-        <div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 14 }}>
-          <span style={{ color: '#a78bfa', fontWeight: 700 }}>{filteredContractors.length}</span> contractor{filteredContractors.length !== 1 ? 's' : ''}
+        <div style={{ color: '#95a29b', fontSize: 13, marginBottom: 14 }}>
+          <span style={{ color: '#4ade80', fontWeight: 700 }}>{filteredContractors.length}</span> contractor{filteredContractors.length !== 1 ? 's' : ''}
           {cityFilter && <span> in {cityFilter}</span>}
           {tradeFilter !== 'All' && <span> · {tradeFilter}</span>}
         </div>
@@ -232,8 +232,8 @@ function Chip({ active, onClick, color, children }) {
         padding: '7px 14px',
         borderRadius: 999,
         background: active ? `${color}20` : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${active ? color : '#1e1e2e'}`,
-        color: active ? color : '#94a3b8',
+        border: `1px solid ${active ? color : '#232925'}`,
+        color: active ? color : '#95a29b',
         cursor: 'pointer',
         fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
         flexShrink: 0,
@@ -258,10 +258,10 @@ function CitySection({ cityKey, contractors, isMobile, onShowCity }) {
           margin: 0, letterSpacing: '-0.3px',
           display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          <MapPin size={16} style={{ color: '#8b5cf6' }} />
+          <MapPin size={16} style={{ color: '#00c805' }} />
           {cityKey}
           <span style={{
-            background: 'rgba(139,92,246,0.12)', color: '#a78bfa',
+            background: 'rgba(0, 200, 5,0.12)', color: '#4ade80',
             borderRadius: 999, padding: '2px 10px', fontSize: 11, fontWeight: 800,
             letterSpacing: 0.3,
           }}>
@@ -271,7 +271,7 @@ function CitySection({ cityKey, contractors, isMobile, onShowCity }) {
         <button
           onClick={onShowCity}
           style={{
-            background: 'none', border: 'none', color: '#a78bfa',
+            background: 'none', border: 'none', color: '#4ade80',
             cursor: 'pointer', fontWeight: 700, fontSize: 13,
             display: 'flex', alignItems: 'center', gap: 3,
           }}
@@ -293,14 +293,14 @@ function CitySection({ cityKey, contractors, isMobile, onShowCity }) {
 }
 
 function ContractorRow({ c }) {
-  const color = tradeColors[c.trade] || '#8b5cf6';
+  const color = tradeColors[c.trade] || '#00c805';
   const initials = c.company
     ? c.company.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
     : c.name.split(' ').map(w => w[0]).slice(0, 2).join('');
 
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e',
+      background: '#131614', border: '1px solid #232925',
       borderRadius: 14, padding: 14,
       transition: 'border-color 0.15s, transform 0.15s',
       WebkitTapHighlightColor: 'transparent',
@@ -323,7 +323,7 @@ function ContractorRow({ c }) {
             {c.company || c.name}
           </div>
           {c.company && c.name && (
-            <div style={{ color: '#94a3b8', fontSize: 12, marginBottom: 4 }}>{c.name}</div>
+            <div style={{ color: '#95a29b', fontSize: 12, marginBottom: 4 }}>{c.name}</div>
           )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
@@ -332,8 +332,8 @@ function ContractorRow({ c }) {
               borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 700,
             }}>{c.trade}</span>
             <span style={{
-              background: 'rgba(255,255,255,0.04)', color: '#94a3b8',
-              border: '1px solid #1e1e2e', borderRadius: 6,
+              background: 'rgba(255,255,255,0.04)', color: '#95a29b',
+              border: '1px solid #232925', borderRadius: 6,
               padding: '2px 8px', fontSize: 11, fontWeight: 600,
               display: 'flex', alignItems: 'center', gap: 3,
             }}>
@@ -344,17 +344,17 @@ function ContractorRow({ c }) {
           {/* Stats */}
           <div style={{
             display: 'flex', gap: 12, marginTop: 10, alignItems: 'center',
-            color: '#94a3b8', fontSize: 12,
+            color: '#95a29b', fontSize: 12,
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <Star size={11} fill="#f59e0b" style={{ color: '#f59e0b' }} />
               <strong style={{ color: '#f8fafc' }}>{c.rating}</strong> ({c.reviewCount})
             </span>
-            <span style={{ color: '#475569' }}>·</span>
+            <span style={{ color: '#5a675f' }}>·</span>
             <span>{c.yearsExp} yrs exp</span>
             {(c.licensed || c.insured) && (
               <>
-                <span style={{ color: '#475569' }}>·</span>
+                <span style={{ color: '#5a675f' }}>·</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#10b981' }}>
                   <Shield size={11} />
                   {[c.licensed && 'Lic', c.insured && 'Ins'].filter(Boolean).join('/')}
@@ -387,14 +387,14 @@ function ContractorRow({ c }) {
 function EmptyState() {
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e',
+      background: '#131614', border: '1px solid #232925',
       borderRadius: 16, padding: '40px 20px', textAlign: 'center',
     }}>
-      <Wrench size={36} style={{ color: '#475569', opacity: 0.6, marginBottom: 14 }} />
+      <Wrench size={36} style={{ color: '#5a675f', opacity: 0.6, marginBottom: 14 }} />
       <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 16, marginBottom: 6 }}>
         No contractors match those filters
       </div>
-      <div style={{ color: '#64748b', fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ color: '#707d75', fontSize: 13, lineHeight: 1.6 }}>
         Try clearing the trade filter or searching a different city.
       </div>
     </div>

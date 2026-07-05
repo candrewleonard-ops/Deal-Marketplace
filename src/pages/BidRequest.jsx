@@ -46,7 +46,7 @@ export default function BidRequest() {
   // Bid requests need an account — if not signed in, prompt and bounce back
   if (!requireAuth('request bids from local contractors', 'bid-request', `/bid-request${dealId ? `/${dealId}` : ''}`)) {
     // requireAuth() opens the auth modal; render a placeholder
-    return <div style={{ minHeight: '100vh', background: '#0a0a0f' }} />;
+    return <div style={{ minHeight: '100vh', background: '#0a0b0a' }} />;
   }
 
   const deal = dealId ? getDealById(dealId) : null;
@@ -97,14 +97,14 @@ export default function BidRequest() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0f', paddingBottom: 120 }}>
+    <div style={{ minHeight: '100vh', background: '#0a0b0a', paddingBottom: 120 }}>
       {/* Header */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 20,
         background: 'rgba(10,10,15,0.92)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
-        borderBottom: '1px solid #1e1e2e',
+        borderBottom: '1px solid #232925',
         padding: isMobile ? '12px 14px' : '16px 24px',
       }}>
         <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -112,8 +112,8 @@ export default function BidRequest() {
             onClick={back}
             aria-label="Back"
             style={{
-              background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-              borderRadius: 10, padding: 8, cursor: 'pointer', color: '#94a3b8',
+              background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+              borderRadius: 10, padding: 8, cursor: 'pointer', color: '#95a29b',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -123,16 +123,16 @@ export default function BidRequest() {
             <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 17 : 19, margin: 0, letterSpacing: '-0.3px' }}>
               Request Contractor Bids
             </h1>
-            <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>
+            <div style={{ color: '#707d75', fontSize: 12, marginTop: 2 }}>
               Step {step} of {totalSteps} · <span style={{ color: '#10b981', fontWeight: 700 }}>$300 flat fee</span> · No markup on bids
             </div>
           </div>
         </div>
         {/* Progress bar */}
-        <div style={{ maxWidth: 720, margin: '12px auto 0', height: 3, background: '#1e1e2e', borderRadius: 4 }}>
+        <div style={{ maxWidth: 720, margin: '12px auto 0', height: 3, background: '#232925', borderRadius: 4 }}>
           <div style={{
             width: `${(step / totalSteps) * 100}%`, height: '100%',
-            background: 'linear-gradient(90deg, #8b5cf6, #06b6d4)',
+            background: 'linear-gradient(90deg, #00c805, #00e5a0)',
             borderRadius: 4, transition: 'width 0.3s ease',
           }} />
         </div>
@@ -154,7 +154,7 @@ export default function BidRequest() {
           background: 'rgba(10,10,15,0.94)',
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
-          borderTop: '1px solid #1e1e2e',
+          borderTop: '1px solid #232925',
           padding: '14px 16px calc(14px + env(safe-area-inset-bottom))',
           zIndex: 30,
         }}>
@@ -164,8 +164,8 @@ export default function BidRequest() {
                 onClick={back}
                 style={{
                   padding: '14px 18px', borderRadius: 12, flex: '0 0 auto',
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                  color: '#94a3b8', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+                  color: '#95a29b', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 }}
               >
                 Back
@@ -178,8 +178,8 @@ export default function BidRequest() {
               style={{
                 flex: 1, padding: '14px', borderRadius: 12,
                 background: canContinue ? undefined : 'rgba(255,255,255,0.05)',
-                border: canContinue ? 'none' : '1px solid #1e1e2e',
-                color: canContinue ? '#fff' : '#475569',
+                border: canContinue ? 'none' : '1px solid #232925',
+                color: canContinue ? '#fff' : '#5a675f',
                 fontWeight: 800, fontSize: 15, letterSpacing: 0.2,
                 cursor: canContinue ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -197,7 +197,7 @@ export default function BidRequest() {
           position: 'fixed', bottom: 0, left: 0, right: 0,
           background: 'rgba(10,10,15,0.94)',
           backdropFilter: 'blur(18px)',
-          borderTop: '1px solid #1e1e2e',
+          borderTop: '1px solid #232925',
           padding: '14px 16px calc(14px + env(safe-area-inset-bottom))',
           zIndex: 30,
         }}>
@@ -206,8 +206,8 @@ export default function BidRequest() {
               to="/marketplace"
               style={{
                 flex: 1, padding: '14px', borderRadius: 12,
-                background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
-                color: '#e2e8f0', fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+                color: '#e4eae6', fontWeight: 700, fontSize: 14, textDecoration: 'none',
                 textAlign: 'center',
               }}
             >
@@ -239,7 +239,7 @@ function StepProperty({ property, setProperty, isMobile }) {
       <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 22, marginTop: 0, marginBottom: 6, letterSpacing: '-0.3px' }}>
         Confirm the property
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+      <p style={{ color: '#95a29b', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
         Where do contractors need to bid on work?
       </p>
 
@@ -279,7 +279,7 @@ function StepScope({ scopes, toggleScope, isMobile }) {
       <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 22, marginTop: 0, marginBottom: 6, letterSpacing: '-0.3px' }}>
         What do you need bids for?
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+      <p style={{ color: '#95a29b', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
         Pick everything that applies — we'll match contractors for each trade.
       </p>
       <div style={{
@@ -298,22 +298,22 @@ function StepScope({ scopes, toggleScope, isMobile }) {
                 display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
                 padding: '14px 14px', gap: 8,
                 borderRadius: 14,
-                background: active ? 'rgba(139,92,246,0.12)' : '#12121e',
-                border: `1.5px solid ${active ? '#8b5cf6' : '#1e1e2e'}`,
+                background: active ? 'rgba(0, 200, 5,0.12)' : '#131614',
+                border: `1.5px solid ${active ? '#00c805' : '#232925'}`,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
                 textAlign: 'left', minHeight: 86,
               }}
             >
-              <Icon size={20} style={{ color: active ? '#a78bfa' : '#94a3b8' }} />
-              <span style={{ color: active ? '#f8fafc' : '#cbd5e1', fontSize: 13, fontWeight: 700 }}>
+              <Icon size={20} style={{ color: active ? '#4ade80' : '#95a29b' }} />
+              <span style={{ color: active ? '#f8fafc' : '#cdd6d0', fontSize: 13, fontWeight: 700 }}>
                 {label}
               </span>
               {active && (
                 <div style={{
                   position: 'absolute', top: 8, right: 8,
                   width: 20, height: 20, borderRadius: '50%',
-                  background: '#8b5cf6',
+                  background: '#00c805',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <Check size={12} color="#fff" strokeWidth={3} />
@@ -333,7 +333,7 @@ function StepTimeline({ timeline, setTimeline }) {
       <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 22, marginTop: 0, marginBottom: 6, letterSpacing: '-0.3px' }}>
         When do you need the work done?
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+      <p style={{ color: '#95a29b', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
         Sets contractor expectations on response speed.
       </p>
       <div style={{ display: 'grid', gap: 10 }}>
@@ -347,22 +347,22 @@ function StepTimeline({ timeline, setTimeline }) {
               style={{
                 display: 'flex', alignItems: 'center', gap: 14,
                 padding: '16px 16px', borderRadius: 14,
-                background: active ? 'rgba(139,92,246,0.12)' : '#12121e',
-                border: `1.5px solid ${active ? '#8b5cf6' : '#1e1e2e'}`,
+                background: active ? 'rgba(0, 200, 5,0.12)' : '#131614',
+                border: `1.5px solid ${active ? '#00c805' : '#232925'}`,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
                 textAlign: 'left',
               }}
             >
-              <Clock size={20} style={{ color: active ? '#a78bfa' : '#64748b' }} />
+              <Clock size={20} style={{ color: active ? '#4ade80' : '#707d75' }} />
               <div style={{ flex: 1 }}>
-                <div style={{ color: active ? '#f8fafc' : '#cbd5e1', fontSize: 15, fontWeight: 700 }}>{label}</div>
-                <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>{desc}</div>
+                <div style={{ color: active ? '#f8fafc' : '#cdd6d0', fontSize: 15, fontWeight: 700 }}>{label}</div>
+                <div style={{ color: '#707d75', fontSize: 12, marginTop: 2 }}>{desc}</div>
               </div>
               {active && (
                 <div style={{
                   width: 22, height: 22, borderRadius: '50%',
-                  background: '#8b5cf6',
+                  background: '#00c805',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <Check size={13} color="#fff" strokeWidth={3} />
@@ -382,13 +382,13 @@ function StepContact({ contact, setContact }) {
       <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 22, marginTop: 0, marginBottom: 6, letterSpacing: '-0.3px' }}>
         Where should contractors reach you?
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+      <p style={{ color: '#95a29b', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
         We'll send you the contractors' direct contact info — but they may also reach out to you first.
       </p>
       <div style={{ display: 'grid', gap: 12 }}>
         <Field label="YOUR NAME">
           <div style={{ position: 'relative' }}>
-            <User size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <User size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#707d75' }} />
             <input value={contact.name} onChange={e => setContact({ ...contact, name: e.target.value })}
               placeholder="Marcus Johnson" className="input-dark"
               style={{ width: '100%', padding: '12px 14px 12px 34px', borderRadius: 10, fontSize: 14 }} />
@@ -396,7 +396,7 @@ function StepContact({ contact, setContact }) {
         </Field>
         <Field label="PHONE">
           <div style={{ position: 'relative' }}>
-            <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#707d75' }} />
             <input value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })}
               type="tel" placeholder="(404) 555-0100" className="input-dark"
               style={{ width: '100%', padding: '12px 14px 12px 34px', borderRadius: 10, fontSize: 14 }} />
@@ -404,7 +404,7 @@ function StepContact({ contact, setContact }) {
         </Field>
         <Field label="EMAIL">
           <div style={{ position: 'relative' }}>
-            <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#707d75' }} />
             <input value={contact.email} onChange={e => setContact({ ...contact, email: e.target.value })}
               type="email" placeholder="you@example.com" className="input-dark"
               style={{ width: '100%', padding: '12px 14px 12px 34px', borderRadius: 10, fontSize: 14 }} />
@@ -424,7 +424,7 @@ function StepReview({ property, scopes, timeline, contact, agreed, setAgreed }) 
       <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 22, marginTop: 0, marginBottom: 6, letterSpacing: '-0.3px' }}>
         Review & pay
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+      <p style={{ color: '#95a29b', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
         Look good? We'll match contractors and send you their info within 1–2 business days.
       </p>
 
@@ -432,12 +432,12 @@ function StepReview({ property, scopes, timeline, contact, agreed, setAgreed }) 
       <div style={{ display: 'grid', gap: 12, marginBottom: 18 }}>
         <SummaryCard icon={MapPin} title="Property">
           <div>{property.address || 'Address not provided'}</div>
-          <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 2 }}>{[property.city, property.state, property.zip].filter(Boolean).join(', ')}</div>
+          <div style={{ color: '#95a29b', fontSize: 13, marginTop: 2 }}>{[property.city, property.state, property.zip].filter(Boolean).join(', ')}</div>
         </SummaryCard>
         <SummaryCard icon={Hammer} title={`Scope · ${scopeLabels.length} trade${scopeLabels.length === 1 ? '' : 's'}`}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {scopeLabels.map(s => (
-              <span key={s} style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa', borderRadius: 8, padding: '3px 9px', fontSize: 12, fontWeight: 700 }}>{s}</span>
+              <span key={s} style={{ background: 'rgba(0, 200, 5,0.12)', color: '#4ade80', borderRadius: 8, padding: '3px 9px', fontSize: 12, fontWeight: 700 }}>{s}</span>
             ))}
           </div>
         </SummaryCard>
@@ -446,13 +446,13 @@ function StepReview({ property, scopes, timeline, contact, agreed, setAgreed }) 
         </SummaryCard>
         <SummaryCard icon={User} title="Contact">
           <div>{contact.name}</div>
-          <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 2 }}>{contact.phone} · {contact.email}</div>
+          <div style={{ color: '#95a29b', fontSize: 13, marginTop: 2 }}>{contact.phone} · {contact.email}</div>
         </SummaryCard>
       </div>
 
       {/* Price breakdown */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(139,92,246,0.04))',
+        background: 'linear-gradient(135deg, rgba(16,185,129,0.06), rgba(0, 200, 5,0.04))',
         border: '1px solid rgba(16,185,129,0.25)',
         borderRadius: 14, padding: 16, marginBottom: 18,
       }}>
@@ -461,18 +461,18 @@ function StepReview({ property, scopes, timeline, contact, agreed, setAgreed }) 
           <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15 }}>What you're paying</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <span style={{ color: '#94a3b8', fontSize: 14 }}>Contractor bid service</span>
+          <span style={{ color: '#95a29b', fontSize: 14 }}>Contractor bid service</span>
           <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: 14 }}>$300.00</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <span style={{ color: '#94a3b8', fontSize: 14 }}>Markup on contractor bids</span>
+          <span style={{ color: '#95a29b', fontSize: 14 }}>Markup on contractor bids</span>
           <span style={{ color: '#10b981', fontWeight: 700, fontSize: 14 }}>$0.00</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0 0' }}>
           <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15 }}>Total today</span>
           <span style={{ color: '#10b981', fontWeight: 900, fontSize: 22 }}>$300.00</span>
         </div>
-        <div style={{ marginTop: 8, color: '#64748b', fontSize: 12, lineHeight: 1.6 }}>
+        <div style={{ marginTop: 8, color: '#707d75', fontSize: 12, lineHeight: 1.6 }}>
           You get contractor contact info directly. We don't mark up their pricing or take a cut of the job — they're yours to keep for future projects.
         </div>
       </div>
@@ -481,13 +481,13 @@ function StepReview({ property, scopes, timeline, contact, agreed, setAgreed }) 
       <label style={{
         display: 'flex', gap: 12, alignItems: 'flex-start',
         padding: 14, borderRadius: 12,
-        background: agreed ? 'rgba(139,92,246,0.08)' : '#12121e',
-        border: `1.5px solid ${agreed ? '#8b5cf6' : '#1e1e2e'}`,
+        background: agreed ? 'rgba(0, 200, 5,0.08)' : '#131614',
+        border: `1.5px solid ${agreed ? '#00c805' : '#232925'}`,
         cursor: 'pointer',
       }}>
         <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)}
-          style={{ marginTop: 3, accentColor: '#8b5cf6', flexShrink: 0 }} />
-        <span style={{ color: '#e2e8f0', fontSize: 13, lineHeight: 1.6 }}>
+          style={{ marginTop: 3, accentColor: '#00c805', flexShrink: 0 }} />
+        <span style={{ color: '#e4eae6', fontSize: 13, lineHeight: 1.6 }}>
           I authorize a one-time <strong style={{ color: '#f8fafc' }}>$300 charge</strong> for this contractor bid request. I understand AllStreet Live forwards my contact info to local contractors and does not mark up their bids.
         </span>
       </label>
@@ -500,7 +500,7 @@ function StepConfirmation({ confirmationId, property }) {
     <div style={{ textAlign: 'center', padding: '20px 0' }}>
       <div style={{
         width: 80, height: 80, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+        background: 'linear-gradient(135deg, #10b981, #00e5a0)',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         boxShadow: '0 16px 40px rgba(16,185,129,0.4)',
         marginBottom: 18,
@@ -510,28 +510,28 @@ function StepConfirmation({ confirmationId, property }) {
       <h2 style={{ color: '#f8fafc', fontWeight: 900, fontSize: 26, margin: 0, letterSpacing: '-0.5px' }}>
         You're all set!
       </h2>
-      <p style={{ color: '#94a3b8', fontSize: 15, lineHeight: 1.6, maxWidth: 480, margin: '12px auto 24px' }}>
+      <p style={{ color: '#95a29b', fontSize: 15, lineHeight: 1.6, maxWidth: 480, margin: '12px auto 24px' }}>
         Your bid request has been submitted. We'll connect you with local contractors and send their contact info directly within 1–2 business days.
       </p>
 
       <div style={{
-        background: '#12121e', border: '1px solid #1e1e2e',
+        background: '#131614', border: '1px solid #232925',
         borderRadius: 14, padding: 18, textAlign: 'left',
         maxWidth: 480, margin: '0 auto 18px',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <span style={{ color: '#64748b', fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase' }}>Confirmation</span>
-          <span style={{ color: '#a78bfa', fontWeight: 800, fontFamily: 'monospace', fontSize: 13 }}>{confirmationId}</span>
+          <span style={{ color: '#707d75', fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase' }}>Confirmation</span>
+          <span style={{ color: '#4ade80', fontWeight: 800, fontFamily: 'monospace', fontSize: 13 }}>{confirmationId}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0', fontSize: 14 }}>
-          <MapPin size={14} style={{ color: '#8b5cf6' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#e4eae6', fontSize: 14 }}>
+          <MapPin size={14} style={{ color: '#00c805' }} />
           {[property.address, property.city, property.state].filter(Boolean).join(', ')}
         </div>
       </div>
 
       <div style={{
-        background: 'rgba(6,182,212,0.06)', border: '1px solid rgba(6,182,212,0.18)',
-        borderRadius: 12, padding: 14, fontSize: 13, lineHeight: 1.6, color: '#cbd5e1',
+        background: 'rgba(0, 229, 160,0.06)', border: '1px solid rgba(0, 229, 160,0.18)',
+        borderRadius: 12, padding: 14, fontSize: 13, lineHeight: 1.6, color: '#cdd6d0',
         maxWidth: 480, margin: '0 auto',
       }}>
         <strong style={{ color: '#67e8f9' }}>What happens next:</strong> A confirmation email is on its way. While you wait, browse contractors in {property.city || 'your market'} to get a head start.
@@ -546,7 +546,7 @@ function Field({ label, children }) {
   return (
     <div>
       <label style={{
-        display: 'block', color: '#94a3b8', fontSize: 11, fontWeight: 700,
+        display: 'block', color: '#95a29b', fontSize: 11, fontWeight: 700,
         letterSpacing: 0.5, marginBottom: 6, textTransform: 'uppercase',
       }}>{label}</label>
       {children}
@@ -557,19 +557,19 @@ function Field({ label, children }) {
 function SummaryCard({ icon: Icon, title, children }) {
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e',
+      background: '#131614', border: '1px solid #232925',
       borderRadius: 12, padding: 14,
       display: 'flex', gap: 12, alignItems: 'flex-start',
     }}>
       <div style={{
         width: 32, height: 32, borderRadius: 10,
-        background: 'rgba(139,92,246,0.12)',
+        background: 'rgba(0, 200, 5,0.12)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
       }}>
-        <Icon size={16} style={{ color: '#a78bfa' }} />
+        <Icon size={16} style={{ color: '#4ade80' }} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginBottom: 4, textTransform: 'uppercase' }}>{title}</div>
+        <div style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, marginBottom: 4, textTransform: 'uppercase' }}>{title}</div>
         <div style={{ color: '#f8fafc', fontSize: 14, fontWeight: 600 }}>{children}</div>
       </div>
     </div>
@@ -585,7 +585,7 @@ function Reassure() {
       display: 'flex', gap: 12, alignItems: 'flex-start',
     }}>
       <Shield size={18} style={{ color: '#10b981', flexShrink: 0, marginTop: 2 }} />
-      <div style={{ color: '#cbd5e1', fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ color: '#cdd6d0', fontSize: 13, lineHeight: 1.6 }}>
         <strong style={{ color: '#f8fafc' }}>Flat $300 — no contractor markup.</strong> We forward your info to local contractors and send you theirs directly. They're yours to keep for any future projects.
       </div>
     </div>

@@ -70,10 +70,10 @@ export default function GroupDetail() {
 
   if (!group) {
     return (
-      <div style={{ background: '#0a0a0f', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#0a0b0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#f8fafc', fontWeight: 700 }}>Group not found</h2>
-          <Link to="/groups" style={{ color: '#8b5cf6', textDecoration: 'none' }}>← Back to Groups</Link>
+          <Link to="/groups" style={{ color: '#00c805', textDecoration: 'none' }}>← Back to Groups</Link>
         </div>
       </div>
     );
@@ -157,14 +157,14 @@ export default function GroupDetail() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       {/* Banner */}
       <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
         <img
           src={group.bannerImage}
           alt={group.name}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          onError={e => { e.target.style.background = 'linear-gradient(135deg,#1a1a2e,#12121e)'; }}
+          onError={e => { e.target.style.background = 'linear-gradient(135deg,#1a1f1b,#131614)'; }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10,10,15,0.95) 100%)' }} />
         <Link to="/groups" style={{ position: 'absolute', top: '16px', left: '20px', display: 'flex', alignItems: 'center', gap: '6px', color: '#f8fafc', textDecoration: 'none', fontSize: '14px', fontWeight: 600, background: 'rgba(0,0,0,0.5)', borderRadius: '20px', padding: '6px 14px', backdropFilter: 'blur(8px)' }}>
@@ -174,46 +174,46 @@ export default function GroupDetail() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             {group.isPrivate ? <Lock size={14} style={{ color: '#f59e0b' }} /> : <Globe size={14} style={{ color: '#10b981' }} />}
             <span style={{ color: group.isPrivate ? '#f59e0b' : '#10b981', fontSize: '12px', fontWeight: 700 }}>{group.isPrivate ? 'Private Group' : 'Public Group'}</span>
-            <span style={{ color: '#475569', fontSize: '12px' }}>•</span>
-            <span style={{ color: '#94a3b8', fontSize: '12px' }}>{group.category}</span>
+            <span style={{ color: '#5a675f', fontSize: '12px' }}>•</span>
+            <span style={{ color: '#95a29b', fontSize: '12px' }}>{group.category}</span>
           </div>
           <h1 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '26px', margin: '0 0 6px' }}>{group.name}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94a3b8', fontSize: '13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#95a29b', fontSize: '13px' }}>
               <Users size={13} />{group.memberCount.toLocaleString()} members
             </div>
-            <div style={{ color: '#475569', fontSize: '13px' }}>Created {new Date(group.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+            <div style={{ color: '#5a675f', fontSize: '13px' }}>Created {new Date(group.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
           </div>
         </div>
       </div>
 
       {/* Action bar */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '12px 20px' }}>
+      <div style={{ background: '#0e100e', borderBottom: '1px solid #232925', padding: '12px 20px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: '4px' }}>
             {TABS.map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: activeTab === tab ? 'rgba(139,92,246,0.15)' : 'transparent', color: activeTab === tab ? '#8b5cf6' : '#94a3b8', fontWeight: activeTab === tab ? 700 : 500, fontSize: '14px', cursor: 'pointer', borderBottom: activeTab === tab ? '2px solid #8b5cf6' : '2px solid transparent', transition: 'all 0.15s' }}>
+              <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: activeTab === tab ? 'rgba(0, 200, 5,0.15)' : 'transparent', color: activeTab === tab ? '#00c805' : '#95a29b', fontWeight: activeTab === tab ? 700 : 500, fontSize: '14px', cursor: 'pointer', borderBottom: activeTab === tab ? '2px solid #00c805' : '2px solid transparent', transition: 'all 0.15s' }}>
                 {tab}
               </button>
             ))}
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button onClick={() => setMuted(!muted)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e', borderRadius: '8px', color: '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+            <button onClick={() => setMuted(!muted)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid #232925', borderRadius: '8px', color: '#95a29b', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
               {muted ? <BellOff size={14} /> : <Bell size={14} />}
               {muted ? 'Unmute' : 'Mute'}
             </button>
             <div style={{ position: 'relative' }}>
-              <button onClick={() => setShowManageMenu(!showManageMenu)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e', borderRadius: '8px', color: '#94a3b8', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+              <button onClick={() => setShowManageMenu(!showManageMenu)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid #232925', borderRadius: '8px', color: '#95a29b', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
                 <Settings size={14} /> Manage
               </button>
               {showManageMenu && (
                 <>
                   <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowManageMenu(false)} />
-                  <div style={{ position: 'absolute', right: 0, top: '42px', background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '10px', zIndex: 100, minWidth: '160px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
-                    <button onClick={() => { setShowManageMenu(false); setShowHostEvent(true); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '13px', textAlign: 'left' }}>
+                  <div style={{ position: 'absolute', right: 0, top: '42px', background: '#131614', border: '1px solid #232925', borderRadius: '10px', zIndex: 100, minWidth: '160px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
+                    <button onClick={() => { setShowManageMenu(false); setShowHostEvent(true); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'none', border: 'none', color: '#95a29b', cursor: 'pointer', fontSize: '13px', textAlign: 'left' }}>
                       <Calendar size={13} /> Host Event
                     </button>
-                    <button onClick={() => { setShowManageMenu(false); handleLeaveGroup(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '13px', textAlign: 'left', borderTop: '1px solid #1e1e2e' }}>
+                    <button onClick={() => { setShowManageMenu(false); handleLeaveGroup(); }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '13px', textAlign: 'left', borderTop: '1px solid #232925' }}>
                       <LogOut size={13} /> Leave Group
                     </button>
                   </div>
@@ -231,7 +231,7 @@ export default function GroupDetail() {
             {activeTab === 'Feed' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* Post composer */}
-                <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '16px', padding: '18px' }}>
+                <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: '18px' }}>
                   <div style={{ display: 'flex', gap: '12px', marginBottom: '14px' }}>
                     <img src="https://picsum.photos/seed/user1/100/100" alt="You" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <textarea
@@ -246,7 +246,7 @@ export default function GroupDetail() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       {[{ icon: Image, color: '#10b981', label: 'Photo' }, { icon: Video, color: '#ef4444', label: 'Video' }].map(({ icon: Icon, color, label }) => (
-                        <button key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontSize: '12px' }}>
+                        <button key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 10px', borderRadius: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid #232925', color: '#95a29b', cursor: 'pointer', fontSize: '12px' }}>
                           <Icon size={13} style={{ color }} /> {label}
                         </button>
                       ))}
@@ -263,7 +263,7 @@ export default function GroupDetail() {
 
                 {/* Posts */}
                 {feedPosts.map(post => (
-                  <div key={post.id} style={{ background: '#12121e', border: `1px solid ${post.isPinned ? 'rgba(245,158,11,0.3)' : '#1e1e2e'}`, borderRadius: '16px', overflow: 'hidden' }}>
+                  <div key={post.id} style={{ background: '#131614', border: `1px solid ${post.isPinned ? 'rgba(245,158,11,0.3)' : '#232925'}`, borderRadius: '16px', overflow: 'hidden' }}>
                     {post.isPinned && (
                       <div style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)', padding: '5px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Pin size={11} style={{ color: '#f59e0b' }} />
@@ -278,41 +278,41 @@ export default function GroupDetail() {
                             <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{post.userName}</div>
                             <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                               {post.userTags.map(t => (
-                                <span key={t} style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', borderRadius: '20px', padding: '1px 6px', fontSize: '10px', fontWeight: 600 }}>{t}</span>
+                                <span key={t} style={{ background: 'rgba(0, 200, 5,0.1)', color: '#00c805', borderRadius: '20px', padding: '1px 6px', fontSize: '10px', fontWeight: 600 }}>{t}</span>
                               ))}
-                              <span style={{ color: '#475569', fontSize: '11px' }}>• {post.timestamp}</span>
+                              <span style={{ color: '#5a675f', fontSize: '11px' }}>• {post.timestamp}</span>
                             </div>
                           </div>
                         </div>
-                        <button style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><MoreHorizontal size={16} /></button>
+                        <button style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}><MoreHorizontal size={16} /></button>
                       </div>
                       <p style={{ color: '#f8fafc', fontSize: '14px', lineHeight: 1.7, margin: '0 0 12px' }}>{post.content}</p>
                       {post.image && (
                         <img src={post.image} alt="" style={{ width: '100%', borderRadius: '10px', marginBottom: '12px', maxHeight: '320px', objectFit: 'cover' }} />
                       )}
-                      <div style={{ display: 'flex', gap: '16px', paddingTop: '10px', borderTop: '1px solid #1e1e2e' }}>
+                      <div style={{ display: 'flex', gap: '16px', paddingTop: '10px', borderTop: '1px solid #232925' }}>
                         <button
                           onClick={() => toggleLike(post.id)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: likedPosts[post.id] ? '#ef4444' : '#475569', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'color 0.15s' }}
+                          style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: likedPosts[post.id] ? '#ef4444' : '#5a675f', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'color 0.15s' }}
                         >
                           <Heart size={15} fill={likedPosts[post.id] ? '#ef4444' : 'none'} />
                           {post.likes}
                         </button>
                         <button
                           onClick={() => setExpandedComments(prev => ({ ...prev, [post.id]: !prev[post.id] }))}
-                          style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: expandedComments[post.id] ? '#8b5cf6' : '#475569', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+                          style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: expandedComments[post.id] ? '#00c805' : '#5a675f', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
                         >
                           <MessageSquare size={15} />
                           {post.comments} Comment{post.comments !== 1 ? 's' : ''}
                         </button>
-                        <button style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                        <button style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
                           <Share2 size={15} /> Share
                         </button>
                       </div>
 
                       {/* Inline comment box */}
                       {expandedComments[post.id] && (
-                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #1e1e2e', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #232925', display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <img src="https://picsum.photos/seed/user1/100/100" alt="" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                           <input
                             value={commentText[post.id] || ''}
@@ -324,7 +324,7 @@ export default function GroupDetail() {
                           />
                           <button
                             onClick={() => handleSendComment(post.id)}
-                            style={{ padding: '8px 14px', borderRadius: '20px', background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}
+                            style={{ padding: '8px 14px', borderRadius: '20px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}
                           >
                             Post
                           </button>
@@ -345,26 +345,26 @@ export default function GroupDetail() {
                   </button>
                 </div>
                 {localEvents.map(ev => (
-                  <div key={ev.id} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '20px' }}>
+                  <div key={ev.id} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
                       <div style={{ flex: 1 }}>
                         <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px', margin: '0 0 8px' }}>{ev.title}</h4>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '13px', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#00c805', fontSize: '13px', fontWeight: 600 }}>
                             <Calendar size={13} /> {ev.date} at {ev.time}
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8', fontSize: '13px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#95a29b', fontSize: '13px' }}>
                             <Users size={13} /> {ev.attendees} attending
                           </div>
                         </div>
-                        <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.6 }}>{ev.description}</p>
-                        <div style={{ color: '#475569', fontSize: '12px' }}>📍 {ev.location}</div>
+                        <p style={{ color: '#95a29b', fontSize: '13px', margin: '0 0 6px', lineHeight: 1.6 }}>{ev.description}</p>
+                        <div style={{ color: '#5a675f', fontSize: '12px' }}>📍 {ev.location}</div>
                       </div>
                       <button
                         onClick={() => handleRsvp(ev.id)}
                         style={{
                           padding: '10px 20px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer', flexShrink: 0,
-                          background: rsvpEvents[ev.id] ? 'rgba(16,185,129,0.15)' : 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                          background: rsvpEvents[ev.id] ? 'rgba(16,185,129,0.15)' : 'linear-gradient(135deg, #00c805, #00e5a0)',
                           border: rsvpEvents[ev.id] ? '1px solid rgba(16,185,129,0.3)' : 'none',
                           color: rsvpEvents[ev.id] ? '#10b981' : '#fff',
                         }}
@@ -383,9 +383,9 @@ export default function GroupDetail() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
                   {members.map(member => (
                     <Link key={member.id} to={`/profile/${member.id}`} style={{ textDecoration: 'none' }}>
-                      <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'border-color 0.15s' }}
-                        onMouseEnter={e => e.currentTarget.style.borderColor = '#8b5cf6'}
-                        onMouseLeave={e => e.currentTarget.style.borderColor = '#1e1e2e'}
+                      <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'border-color 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = '#00c805'}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = '#232925'}
                       >
                         <img src={member.avatar} alt={member.name} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ minWidth: 0 }}>
@@ -395,7 +395,7 @@ export default function GroupDetail() {
                           </div>
                           <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '2px' }}>
                             {member.tags.slice(0, 2).map(t => (
-                              <span key={t} style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', borderRadius: '20px', padding: '1px 6px', fontSize: '10px', fontWeight: 600 }}>{t}</span>
+                              <span key={t} style={{ background: 'rgba(0, 200, 5,0.1)', color: '#00c805', borderRadius: '20px', padding: '1px 6px', fontSize: '10px', fontWeight: 600 }}>{t}</span>
                             ))}
                           </div>
                         </div>
@@ -408,22 +408,22 @@ export default function GroupDetail() {
 
             {activeTab === 'About' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '20px' }}>
+                <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '20px' }}>
                   <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px', margin: '0 0 10px' }}>About This Group</h4>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>{group.description}</p>
+                  <p style={{ color: '#95a29b', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>{group.description}</p>
                 </div>
-                <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '20px' }}>
+                <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '20px' }}>
                   <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '16px', margin: '0 0 14px' }}>Group Rules</h4>
                   {['No spam, unsolicited DMs, or self-promotion without value.', 'Verify deal numbers before posting — misleading listings will be removed.', 'Be respectful. No personal attacks or discrimination.', 'No off-topic content. Keep discussions real estate focused.', 'Share your wins AND your losses — the community learns from both.'].map((rule, i) => (
                     <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                      <div style={{ background: 'rgba(139,92,246,0.15)', color: '#8b5cf6', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '11px', flexShrink: 0 }}>{i + 1}</div>
-                      <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>{rule}</p>
+                      <div style={{ background: 'rgba(0, 200, 5,0.15)', color: '#00c805', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '11px', flexShrink: 0 }}>{i + 1}</div>
+                      <p style={{ color: '#95a29b', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>{rule}</p>
                     </div>
                   ))}
                 </div>
-                <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,212,0.05))', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '14px', padding: '20px', textAlign: 'center' }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.08), rgba(0, 229, 160,0.05))', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '14px', padding: '20px', textAlign: 'center' }}>
                   <h4 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px' }}>Invite people you know</h4>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '16px' }}>The best deals happen in tight networks. Grow this group with quality investors.</p>
+                  <p style={{ color: '#95a29b', fontSize: '14px', marginBottom: '16px' }}>The best deals happen in tight networks. Grow this group with quality investors.</p>
                   <button className="gradient-btn" style={{ padding: '10px 20px', borderRadius: '8px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
                     Invite Members
                   </button>
@@ -434,7 +434,7 @@ export default function GroupDetail() {
 
           {/* Right sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '18px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '18px' }}>
               <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', margin: '0 0 14px' }}>Group Info</h4>
               {[
                 { label: 'Members', value: group.memberCount.toLocaleString() },
@@ -444,37 +444,37 @@ export default function GroupDetail() {
                 { label: 'Events this month', value: '2' },
                 { label: 'Posts this week', value: feedPosts.length + '' },
               ].map(({ label, value }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #1e1e2e' }}>
-                  <span style={{ color: '#94a3b8', fontSize: '13px' }}>{label}</span>
+                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #232925' }}>
+                  <span style={{ color: '#95a29b', fontSize: '13px' }}>{label}</span>
                   <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '13px' }}>{value}</span>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '18px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '18px' }}>
               <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', margin: '0 0 14px' }}>Members</h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
                 {members.slice(0, 9).map(m => (
-                  <img key={m.id} src={m.avatar} alt={m.name} title={m.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0a0a0f' }} />
+                  <img key={m.id} src={m.avatar} alt={m.name} title={m.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0a0b0a' }} />
                 ))}
               </div>
-              <button onClick={() => setActiveTab('Members')} style={{ color: '#8b5cf6', background: 'none', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+              <button onClick={() => setActiveTab('Members')} style={{ color: '#00c805', background: 'none', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
                 View all {group.memberCount.toLocaleString()} members →
               </button>
             </div>
 
-            <div style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px', padding: '18px' }}>
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '14px', padding: '18px' }}>
               <h4 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', margin: '0 0 14px' }}>Next Event</h4>
               <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{localEvents[0]?.title || 'No upcoming events'}</div>
               {localEvents[0] && (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#00c805', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>
                     <Calendar size={12} /> {localEvents[0].date}
                   </div>
-                  <div style={{ color: '#475569', fontSize: '12px', marginBottom: '12px' }}>{localEvents[0].attendees} attending</div>
+                  <div style={{ color: '#5a675f', fontSize: '12px', marginBottom: '12px' }}>{localEvents[0].attendees} attending</div>
                 </>
               )}
-              <button onClick={() => setActiveTab('Events')} style={{ color: '#8b5cf6', background: 'none', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
+              <button onClick={() => setActiveTab('Events')} style={{ color: '#00c805', background: 'none', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 }}>
                 See all events →
               </button>
             </div>
@@ -485,10 +485,10 @@ export default function GroupDetail() {
       {/* Host Event Modal */}
       {showHostEvent && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowHostEvent(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '20px', width: '100%', maxWidth: '480px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#131614', border: '1px solid #232925', borderRadius: '20px', width: '100%', maxWidth: '480px', boxShadow: '0 25px 60px rgba(0,0,0,0.8)' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: '18px', margin: 0 }}>Host an Event</h2>
-              <button onClick={() => setShowHostEvent(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer' }}><X size={20} /></button>
+              <button onClick={() => setShowHostEvent(false)} style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateEvent} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {[
@@ -498,16 +498,16 @@ export default function GroupDetail() {
                 { label: 'Location', key: 'location', placeholder: 'Dallas, TX (+ Zoom)', type: 'text' },
               ].map(({ label, key, placeholder, type }) => (
                 <div key={key}>
-                  <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{label}</label>
+                  <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>{label}</label>
                   <input type={type} placeholder={placeholder} value={eventForm[key]} onChange={e => setEventForm({ ...eventForm, [key]: e.target.value })} className="input-dark" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px' }} required={label.includes('*')} />
                 </div>
               ))}
               <div>
-                <label style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
+                <label style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, display: 'block', marginBottom: '6px' }}>Description</label>
                 <textarea value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} placeholder="What will happen at this event?" className="input-dark" rows={3} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', fontSize: '14px', resize: 'vertical' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="button" onClick={() => setShowHostEvent(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e', color: '#94a3b8', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="button" onClick={() => setShowHostEvent(false)} style={{ flex: 1, padding: '12px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', color: '#95a29b', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
                 <button type="submit" className="gradient-btn" style={{ flex: 2, padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px', border: 'none', cursor: 'pointer' }}>Create Event</button>
               </div>
             </form>
@@ -516,7 +516,7 @@ export default function GroupDetail() {
       )}
 
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, background: '#12121e', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, background: '#131614', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
           <Check size={16} style={{ color: '#10b981', flexShrink: 0 }} />
           <span style={{ color: '#f8fafc', fontSize: '14px', fontWeight: 500 }}>{toast}</span>
         </div>

@@ -12,7 +12,7 @@ export function useToast() {
 const TYPE_CONFIG = {
   success: { icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.12)',  border: 'rgba(16,185,129,0.35)' },
   error:   { icon: XCircle,     color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.35)' },
-  info:    { icon: Info,        color: '#06b6d4', bg: 'rgba(6,182,212,0.12)',   border: 'rgba(6,182,212,0.35)' },
+  info:    { icon: Info,        color: '#00e5a0', bg: 'rgba(0, 229, 160,0.12)',   border: 'rgba(0, 229, 160,0.35)' },
   warning: { icon: AlertTriangle, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)' },
 };
 
@@ -45,7 +45,7 @@ export function ToastProvider({ children }) {
             <div
               key={t.id}
               style={{
-                background: '#12121e', border: `1px solid ${cfg.border}`,
+                background: '#131614', border: `1px solid ${cfg.border}`,
                 borderLeft: `3px solid ${cfg.color}`,
                 borderRadius: '10px', padding: '12px 14px',
                 display: 'flex', alignItems: 'flex-start', gap: '10px',
@@ -60,7 +60,7 @@ export function ToastProvider({ children }) {
               </div>
               <button
                 onClick={() => dismiss(t.id)}
-                style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', padding: 0, marginTop: '1px' }}
+                style={{ background: 'none', border: 'none', color: '#5a675f', cursor: 'pointer', padding: 0, marginTop: '1px' }}
               >
                 <X size={14} />
               </button>

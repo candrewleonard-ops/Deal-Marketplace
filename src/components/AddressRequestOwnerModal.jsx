@@ -60,29 +60,29 @@ export default function AddressRequestOwnerModal({
         style={{
           width: '100%', maxWidth: 460, maxHeight: '94vh', overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
-          background: 'linear-gradient(180deg,#1a1a2e,#12121e)',
-          border: '1px solid rgba(139,92,246,0.3)', borderRadius: 20,
+          background: 'linear-gradient(180deg,#1a1f1b,#131614)',
+          border: '1px solid rgba(0, 200, 5,0.3)', borderRadius: 20,
           boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
           animation: 'aro-pop 0.24s cubic-bezier(.2,.9,.3,1)',
         }}
       >
         {/* Header */}
-        <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e1e2e', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #232925', display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src={requester?.avatar} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 800, letterSpacing: 0.4 }}>NEW ADDRESS REQUEST</div>
+            <div style={{ color: '#95a29b', fontSize: 11, fontWeight: 800, letterSpacing: 0.4 }}>NEW ADDRESS REQUEST</div>
             <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16 }}>{requester?.name || 'A buyer'}</div>
-            <div style={{ color: '#64748b', fontSize: 12 }}>
+            <div style={{ color: '#707d75', fontSize: 12 }}>
               {(requester?.tags?.[0]) || 'Investor'} · wants the address for “{deal?.title}”
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#95a29b', cursor: 'pointer' }}>
             <X size={18} />
           </button>
         </div>
 
-        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: 12, borderBottom: '1px solid #1e1e2e' }}>
-          <MapPin size={13} style={{ color: '#a78bfa' }} />
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8, color: '#707d75', fontSize: 12, borderBottom: '1px solid #232925' }}>
+          <MapPin size={13} style={{ color: '#4ade80' }} />
           {deal?.city}, {deal?.state} · ${(deal?.listingPrice || deal?.price || 0).toLocaleString()}
         </div>
 
@@ -90,11 +90,11 @@ export default function AddressRequestOwnerModal({
         <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: 16, minHeight: 140, maxHeight: 280 }}>
           {thread.length === 0 ? (
             <div style={{
-              textAlign: 'center', color: '#64748b', fontSize: 13,
+              textAlign: 'center', color: '#707d75', fontSize: 13,
               padding: '28px 12px',
             }}>
-              <MessageSquare size={26} style={{ color: '#475569', marginBottom: 8 }} />
-              <div style={{ color: '#cbd5e1', fontWeight: 700 }}>No DM's yet. Start the party! 🎉</div>
+              <MessageSquare size={26} style={{ color: '#5a675f', marginBottom: 8 }} />
+              <div style={{ color: '#cdd6d0', fontWeight: 700 }}>No DM's yet. Start the party! 🎉</div>
               <div style={{ marginTop: 4 }}>Vet the buyer before you hand over the address.</div>
             </div>
           ) : (
@@ -105,8 +105,8 @@ export default function AddressRequestOwnerModal({
                   <div key={m.id} style={{
                     alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '80%',
                     padding: '8px 12px', borderRadius: 14,
-                    background: mine ? 'linear-gradient(135deg,#8b5cf6,#6d3df5)' : 'rgba(255,255,255,0.06)',
-                    color: mine ? '#fff' : '#e2e8f0', fontSize: 13, lineHeight: 1.45,
+                    background: mine ? 'linear-gradient(135deg,#00c805,#6d3df5)' : 'rgba(255,255,255,0.06)',
+                    color: mine ? '#fff' : '#e4eae6', fontSize: 13, lineHeight: 1.45,
                     borderBottomRightRadius: mine ? 4 : 14,
                     borderBottomLeftRadius: mine ? 14 : 4,
                   }}>
@@ -119,7 +119,7 @@ export default function AddressRequestOwnerModal({
         </div>
 
         {/* DM composer */}
-        <div style={{ padding: 14, borderTop: '1px solid #1e1e2e' }}>
+        <div style={{ padding: 14, borderTop: '1px solid #232925' }}>
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               value={draft}
@@ -128,7 +128,7 @@ export default function AddressRequestOwnerModal({
               placeholder="Message the buyer…"
               style={{
                 flex: 1, resize: 'none', padding: '10px 12px', borderRadius: 10,
-                background: '#0d0d1a', border: '1px solid #1e1e2e', color: '#f8fafc',
+                background: '#0e100e', border: '1px solid #232925', color: '#f8fafc',
                 fontSize: 13, outline: 'none', fontFamily: 'inherit', lineHeight: 1.45,
               }}
             />
@@ -136,7 +136,7 @@ export default function AddressRequestOwnerModal({
               onClick={send}
               style={{
                 width: 42, height: 42, borderRadius: 10, border: 'none', flexShrink: 0,
-                background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)', color: '#fff',
+                background: 'linear-gradient(135deg,#00c805,#00e5a0)', color: '#fff',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
@@ -160,7 +160,7 @@ export default function AddressRequestOwnerModal({
               onClick={onApprove}
               style={{
                 flex: 1.4, padding: '12px', borderRadius: 10, cursor: 'pointer', border: 'none',
-                background: 'linear-gradient(135deg,#10b981,#06b6d4)', color: '#fff',
+                background: 'linear-gradient(135deg,#10b981,#00e5a0)', color: '#fff',
                 fontWeight: 800, fontSize: 14,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
                 boxShadow: '0 8px 22px rgba(16,185,129,0.4)',

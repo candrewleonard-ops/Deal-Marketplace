@@ -36,7 +36,7 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 750,
-        background: 'radial-gradient(circle at 30% 0%, rgba(139,92,246,0.18), transparent 50%), radial-gradient(circle at 70% 100%, rgba(6,182,212,0.16), transparent 50%), rgba(5,5,12,0.92)',
+        background: 'radial-gradient(circle at 30% 0%, rgba(0, 200, 5,0.18), transparent 50%), radial-gradient(circle at 70% 100%, rgba(0, 229, 160,0.16), transparent 50%), rgba(5,5,12,0.92)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -48,8 +48,8 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
         style={{
           width: '100%', maxWidth: 720,
           maxHeight: '94vh', overflowY: 'auto',
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #12121e 100%)',
-          border: '1px solid rgba(139,92,246,0.35)',
+          background: 'linear-gradient(180deg, #1a1f1b 0%, #131614 100%)',
+          border: '1px solid rgba(0, 200, 5,0.35)',
           borderRadius: 24,
           boxShadow: '0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset',
           position: 'relative',
@@ -64,7 +64,7 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
             position: 'absolute', top: 14, right: 14, zIndex: 3,
             background: 'rgba(255,255,255,0.06)', border: 'none',
             borderRadius: '50%', width: 36, height: 36,
-            color: '#94a3b8', cursor: 'pointer',
+            color: '#95a29b', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
@@ -76,9 +76,9 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '5px 11px', borderRadius: 999,
-            background: 'rgba(139,92,246,0.16)',
-            border: '1px solid rgba(139,92,246,0.35)',
-            color: '#a78bfa', fontSize: 11, fontWeight: 800, letterSpacing: 0.6,
+            background: 'rgba(0, 200, 5,0.16)',
+            border: '1px solid rgba(0, 200, 5,0.35)',
+            color: '#4ade80', fontSize: 11, fontWeight: 800, letterSpacing: 0.6,
           }}>
             <Sparkles size={11} /> QUICK TOUR · {step + 1} / {SLIDES.length}
           </div>
@@ -94,7 +94,7 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
             {slide.title}
           </h2>
           <p style={{
-            color: '#94a3b8', fontSize: 14, lineHeight: 1.6,
+            color: '#95a29b', fontSize: 14, lineHeight: 1.6,
             margin: '0 auto', textAlign: 'center', maxWidth: 480,
           }}>
             {slide.body}
@@ -134,8 +134,8 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '12px 16px', borderRadius: 12,
-                background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-                color: '#94a3b8', fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
+                background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
+                color: '#95a29b', fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
               }}
             >
               <ArrowLeft size={15} /> Back
@@ -146,7 +146,7 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
               style={{
                 padding: '12px 16px', borderRadius: 12,
                 background: 'transparent', border: '1px solid transparent',
-                color: '#64748b', fontWeight: 600, fontSize: 12.5, cursor: 'pointer',
+                color: '#707d75', fontWeight: 600, fontSize: 12.5, cursor: 'pointer',
               }}
             >
               Skip tour
@@ -193,8 +193,8 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
           100% { transform: translateX(220%); }
         }
         @keyframes tut-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.6); }
-          50%      { box-shadow: 0 0 0 14px rgba(139,92,246,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 5,0.6); }
+          50%      { box-shadow: 0 0 0 14px rgba(0, 200, 5,0); }
         }
       `}</style>
     </div>,
@@ -207,13 +207,13 @@ export default function MyDealsTutorial({ onClose, onPostDeal }) {
 // ───────────────────────────────────────────────────────────────────────
 const SLIDES = [
   {
-    color: '#8b5cf6', colorAlt: '#06b6d4',
+    color: '#00c805', colorAlt: '#00e5a0',
     title: 'Welcome to My Deals',
     body: "This is your command center — every deal you post lives here. Track views, address requests, and messages in one place.",
     render: () => <DashboardMock />,
   },
   {
-    color: '#06b6d4', colorAlt: '#8b5cf6',
+    color: '#00e5a0', colorAlt: '#00c805',
     title: 'Tap "Post a Deal" to start',
     body: "We made it stupid-simple. Address autocomplete pulls the property info, photos upload in seconds, and you're live in under a minute.",
     render: () => <PostButtonMock />,
@@ -225,13 +225,13 @@ const SLIDES = [
     render: () => <FormMock />,
   },
   {
-    color: '#10b981', colorAlt: '#06b6d4',
+    color: '#10b981', colorAlt: '#00e5a0',
     title: 'Approve address requests fast',
     body: "Buyers tap to request the full address. You approve who you want. Auto-approve verified investors with one toggle.",
     render: () => <RequestsMock />,
   },
   {
-    color: '#8b5cf6', colorAlt: '#ef4444',
+    color: '#00c805', colorAlt: '#ef4444',
     title: 'Ready? Let’s post your first deal',
     body: 'Click below and we’ll open the form for you. Pro tip: have your address, price, and best photo ready — takes less than 60 seconds.',
     render: () => <FinalMock />,
@@ -244,8 +244,8 @@ const SLIDES = [
 function MockCard({ children, accent }) {
   return (
     <div style={{
-      background: '#0d0d1a',
-      border: `1px solid ${accent ? `${accent}30` : '#1e1e2e'}`,
+      background: '#0e100e',
+      border: `1px solid ${accent ? `${accent}30` : '#232925'}`,
       borderRadius: 14,
       overflow: 'hidden',
       boxShadow: '0 18px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset',
@@ -257,7 +257,7 @@ function MockCard({ children, accent }) {
 
 function DashboardMock() {
   return (
-    <MockCard accent="#8b5cf6">
+    <MockCard accent="#00c805">
       <div style={{
         padding: '11px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -265,21 +265,21 @@ function DashboardMock() {
         <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 13 }}>My Deals</span>
         <span style={{
           padding: '4px 10px', borderRadius: 999,
-          background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+          background: 'linear-gradient(135deg,#00c805,#00e5a0)',
           color: '#fff', fontSize: 10, fontWeight: 800,
         }}>+ Post Deal</span>
       </div>
       <div style={{ padding: 12, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
         {[
           { label: 'Active', value: '3', color: '#10b981' },
-          { label: 'Views', value: '1,284', color: '#06b6d4' },
+          { label: 'Views', value: '1,284', color: '#00e5a0' },
           { label: 'Requests', value: '12', color: '#f59e0b' },
         ].map(s => (
           <div key={s.label} style={{
             padding: '10px 12px', borderRadius: 10,
-            background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e2e',
+            background: 'rgba(255,255,255,0.03)', border: '1px solid #232925',
           }}>
-            <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: 0.5 }}>{s.label.toUpperCase()}</div>
+            <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5 }}>{s.label.toUpperCase()}</div>
             <div style={{ color: s.color, fontWeight: 900, fontSize: 19, marginTop: 2 }}>{s.value}</div>
           </div>
         ))}
@@ -301,14 +301,14 @@ function DealRow({ city, price, status, color }) {
     }}>
       <div style={{
         width: 32, height: 32, borderRadius: 8,
-        background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+        background: 'linear-gradient(135deg, #00c805, #00e5a0)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <MapPin size={13} color="#fff" />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 12.5 }}>{city}</div>
-        <div style={{ color: '#64748b', fontSize: 11 }}>3/2 · 1,840 sqft</div>
+        <div style={{ color: '#707d75', fontSize: 11 }}>3/2 · 1,840 sqft</div>
       </div>
       <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 13 }}>{price}</div>
       <span style={{
@@ -321,10 +321,10 @@ function DealRow({ city, price, status, color }) {
 
 function PostButtonMock() {
   return (
-    <MockCard accent="#06b6d4">
+    <MockCard accent="#00e5a0">
       <div style={{ padding: '38px 20px', textAlign: 'center', position: 'relative' }}>
         <div style={{
-          color: '#94a3b8', fontSize: 12, marginBottom: 16,
+          color: '#95a29b', fontSize: 12, marginBottom: 16,
         }}>
           Top right of your dashboard:
         </div>
@@ -333,11 +333,11 @@ function PostButtonMock() {
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <button style={{
             padding: '13px 26px', borderRadius: 12,
-            background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+            background: 'linear-gradient(135deg,#00c805,#00e5a0)',
             color: '#fff', border: 'none',
             fontWeight: 800, fontSize: 14,
             display: 'inline-flex', alignItems: 'center', gap: 7,
-            boxShadow: '0 14px 36px rgba(139,92,246,0.45)',
+            boxShadow: '0 14px 36px rgba(0, 200, 5,0.45)',
             animation: 'tut-pulse 1.6s infinite',
             cursor: 'default',
           }}>
@@ -357,10 +357,10 @@ function PostButtonMock() {
             <div key={text} style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '7px 11px', borderRadius: 8,
-              background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)',
-              color: '#cbd5e1', fontSize: 12, fontWeight: 600,
+              background: 'rgba(0, 200, 5,0.07)', border: '1px solid rgba(0, 200, 5,0.18)',
+              color: '#cdd6d0', fontSize: 12, fontWeight: 600,
             }}>
-              <Icon size={13} style={{ color: '#a78bfa' }} />
+              <Icon size={13} style={{ color: '#4ade80' }} />
               {text}
             </div>
           ))}
@@ -398,16 +398,16 @@ function FormMock() {
           ))}
           <div style={{
             width: 44, height: 44, borderRadius: 8,
-            border: '1.5px dashed #1e1e2e',
+            border: '1.5px dashed #232925',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#475569',
+            color: '#5a675f',
           }}>
             <Plus size={16} />
           </div>
         </div>
         <button style={{
           padding: '11px 16px', borderRadius: 10,
-          background: 'linear-gradient(135deg,#10b981,#06b6d4)',
+          background: 'linear-gradient(135deg,#10b981,#00e5a0)',
           color: '#fff', border: 'none',
           fontWeight: 800, fontSize: 13,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
@@ -424,10 +424,10 @@ function FieldMock({ label, value, icon: Icon }) {
   return (
     <div style={{
       padding: '8px 12px', borderRadius: 8,
-      background: '#1a1a2e', border: '1px solid #1e1e2e',
+      background: '#1a1f1b', border: '1px solid #232925',
     }}>
       <div style={{
-        color: '#64748b', fontSize: 9, fontWeight: 800, letterSpacing: 0.6,
+        color: '#707d75', fontSize: 9, fontWeight: 800, letterSpacing: 0.6,
         marginBottom: 1,
       }}>
         {label.toUpperCase()}
@@ -436,7 +436,7 @@ function FieldMock({ label, value, icon: Icon }) {
         color: '#f8fafc', fontWeight: 700, fontSize: 12,
         display: 'flex', alignItems: 'center', gap: 5,
       }}>
-        {Icon && <Icon size={11} style={{ color: '#a78bfa', flexShrink: 0 }} />}
+        {Icon && <Icon size={11} style={{ color: '#4ade80', flexShrink: 0 }} />}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
       </div>
     </div>
@@ -448,14 +448,14 @@ function RequestsMock() {
     <MockCard accent="#10b981">
       <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
         {[
-          { name: 'Diana Cruz',     time: '5 min ago',  color: '#8b5cf6', verified: true },
-          { name: 'Trevor Banks',   time: '32 min ago', color: '#06b6d4', verified: true },
+          { name: 'Diana Cruz',     time: '5 min ago',  color: '#00c805', verified: true },
+          { name: 'Trevor Banks',   time: '32 min ago', color: '#00e5a0', verified: true },
           { name: 'Sarah Mitchell', time: '2 hours ago', color: '#f59e0b', verified: false },
         ].map(r => (
           <div key={r.name} style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: 10, borderRadius: 10,
-            background: 'rgba(255,255,255,0.03)', border: '1px solid #1e1e2e',
+            background: 'rgba(255,255,255,0.03)', border: '1px solid #232925',
           }}>
             <div style={{
               width: 34, height: 34, borderRadius: '50%',
@@ -474,14 +474,14 @@ function RequestsMock() {
                 {r.verified && (
                   <span style={{
                     width: 13, height: 13, borderRadius: '50%',
-                    background: '#06b6d4',
+                    background: '#00e5a0',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <CheckCircle2 size={9} color="#fff" />
                   </span>
                 )}
               </div>
-              <div style={{ color: '#64748b', fontSize: 10.5 }}>
+              <div style={{ color: '#707d75', fontSize: 10.5 }}>
                 Requested address · {r.time}
               </div>
             </div>
@@ -503,23 +503,23 @@ function FinalMock() {
   return (
     <div style={{
       padding: '32px 16px', borderRadius: 16,
-      background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.18), transparent 60%), #0d0d1a',
-      border: '1px solid rgba(139,92,246,0.3)',
+      background: 'radial-gradient(circle at 50% 0%, rgba(0, 200, 5,0.18), transparent 60%), #0e100e',
+      border: '1px solid rgba(0, 200, 5,0.3)',
       textAlign: 'center', position: 'relative', overflow: 'hidden',
     }}>
       {/* shimmer */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.18), transparent)',
+        background: 'linear-gradient(90deg, transparent, rgba(0, 200, 5,0.18), transparent)',
         animation: 'tut-shimmer 2.5s infinite linear',
         width: '45%',
       }} />
       <div style={{
         position: 'relative',
         width: 64, height: 64, borderRadius: 18,
-        background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+        background: 'linear-gradient(135deg,#00c805,#00e5a0)',
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 14px 40px rgba(139,92,246,0.45)',
+        boxShadow: '0 14px 40px rgba(0, 200, 5,0.45)',
         marginBottom: 12,
       }}>
         <Hammer size={28} color="#fff" />
@@ -532,7 +532,7 @@ function FinalMock() {
       </div>
       <div style={{
         position: 'relative',
-        color: '#94a3b8', fontSize: 12.5, marginTop: 6,
+        color: '#95a29b', fontSize: 12.5, marginTop: 6,
       }}>
         Pro tip: have the address, list price, and best photo ready.
       </div>

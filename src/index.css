@@ -3,17 +3,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @theme {
-  --color-bg: #0a0a0f;
-  --color-card: #12121e;
-  --color-elevated: #1a1a2e;
-  --color-border-custom: #1e1e2e;
-  --color-primary: #8b5cf6;
-  --color-secondary: #06b6d4;
+  --color-bg: #0a0b0a;
+  --color-card: #131614;
+  --color-elevated: #1a1f1b;
+  --color-border-custom: #232925;
+  --color-primary: #00c805;
+  --color-secondary: #00e5a0;
   --color-accent: #f59e0b;
   --color-success: #10b981;
   --color-danger: #ef4444;
   --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
+  --color-text-secondary: #95a29b;
 
   --font-family-sans: 'Inter', system-ui, sans-serif;
 
@@ -38,10 +38,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3), 0 0 30px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 0 15px rgba(0, 200, 5, 0.3), 0 0 30px rgba(0, 200, 5, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(6, 182, 212, 0.3), 0 0 90px rgba(139, 92, 246, 0.2);
+    box-shadow: 0 0 30px rgba(0, 200, 5, 0.6), 0 0 60px rgba(0, 229, 160, 0.3), 0 0 90px rgba(0, 200, 5, 0.2);
   }
 }
 
@@ -93,11 +93,11 @@ html {
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
-  background-color: #0a0a0f;
+  background-color: #0a0b0a;
 }
 
 body {
-  background-color: #0a0a0f;
+  background-color: #0a0b0a;
   color: #f8fafc;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -115,6 +115,14 @@ body {
   width: 100%;
   min-height: 100vh;
   text-align: left;
+}
+
+/* ─── Desktop density ───
+   The UI was designed at a large scale; at 100% browser zoom it overflowed
+   and users had to Ctrl-minus. Render the desktop app at 90% so everything
+   fits a normal laptop screen out of the box. (Mobile keeps native scale.) */
+@media (min-width: 900px) {
+  body { zoom: 0.9; }
 }
 
 /* ─── Mobile-first defaults ─── */
@@ -162,24 +170,24 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #12121e; }
+::-webkit-scrollbar-track { background: #131614; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #1e1e2e, #2a2a3e);
+  background: linear-gradient(180deg, #232925, #2e352f);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #8b5cf6, #06b6d4);
+  background: linear-gradient(180deg, #00c805, #00e5a0);
 }
 
 /* Selection color */
 ::selection {
-  background: rgba(139, 92, 246, 0.35);
+  background: rgba(0, 200, 5, 0.35);
   color: #f8fafc;
 }
 
 /* Focus rings (keyboard only) */
 :focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid #00c805;
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -194,7 +202,7 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
   position: absolute;
   inset: -2px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 25%, #06b6d4 50%, #8b5cf6 75%, #f59e0b 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #00c805 25%, #00e5a0 50%, #00c805 75%, #f59e0b 100%);
   background-size: 300% 300%;
   animation: rotate-gradient 3s linear infinite;
   z-index: 0;
@@ -202,7 +210,7 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 .featured-card-inner {
   position: relative;
   z-index: 2;
-  background: #12121e;
+  background: #131614;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -219,30 +227,33 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 /* Gradient utilities */
 .gradient-text {
-  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  background: linear-gradient(135deg, #00c805, #00e5a0);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-bg { background: linear-gradient(135deg, #8b5cf6, #06b6d4); }
+.gradient-bg { background: linear-gradient(135deg, #00c805, #00e5a0); }
 
+/* Robinhood-style primary action: vivid market green with dark ink text.
+   `!important` wins over the many call sites that inline `color: '#fff'`. */
 .gradient-btn {
-  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  background: linear-gradient(135deg, #00c805, #00e05c);
+  color: #052012 !important;
   transition: transform 0.18s cubic-bezier(.2,.9,.3,1), box-shadow 0.18s ease, filter 0.18s ease;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 200, 5, 0.3);
 }
 .gradient-btn:hover {
-  background: linear-gradient(135deg, #7c3aed, #0891b2);
-  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.5);
+  background: linear-gradient(135deg, #00d806, #2cf07a);
+  box-shadow: 0 8px 28px rgba(0, 200, 5, 0.5);
   transform: translateY(-1px);
 }
 .gradient-btn:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 200, 5, 0.3);
 }
 
 /* Card hover */
@@ -256,53 +267,53 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 /* Hero background */
 .hero-bg {
-  background: radial-gradient(ellipse at 30% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-              radial-gradient(ellipse at 70% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-              #0a0a0f;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0, 200, 5, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(0, 229, 160, 0.1) 0%, transparent 50%),
+              #0a0b0a;
 }
 
 /* Input dark */
 .input-dark {
-  background: #12121e;
-  border: 1px solid #1e1e2e;
+  background: #131614;
+  border: 1px solid #232925;
   color: #f8fafc;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 .input-dark:hover {
-  border-color: #2a2a3e;
+  border-color: #2e352f;
 }
 .input-dark:focus {
   outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  border-color: #00c805;
+  box-shadow: 0 0 0 3px rgba(0, 200, 5, 0.15);
 }
-.input-dark::placeholder { color: #475569; }
+.input-dark::placeholder { color: #5a675f; }
 
 /* Deal type badges */
 .badge-fix-flip { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
 .badge-rental { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
 .badge-creative { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
-.badge-commercial { background: rgba(6, 182, 212, 0.1); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.2); }
-.badge-land { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); }
+.badge-commercial { background: rgba(0, 229, 160, 0.1); color: #00e5a0; border: 1px solid rgba(0, 229, 160, 0.2); }
+.badge-land { background: rgba(0, 200, 5, 0.1); color: #00c805; border: 1px solid rgba(0, 200, 5, 0.2); }
 
 /* Sponsored badge animation */
 .sponsored-badge { animation: sponsored-shimmer 2s ease-in-out infinite; }
 
 /* Chat bubbles */
 .bubble-sent {
-  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  background: linear-gradient(135deg, #008f38, #00b105);
   border-radius: 18px 18px 4px 18px;
 }
 .bubble-received {
-  background: #1a1a2e;
-  border: 1px solid #1e1e2e;
+  background: #1a1f1b;
+  border: 1px solid #232925;
   border-radius: 18px 18px 18px 4px;
 }
 
 /* Tab active */
 .tab-active {
-  border-bottom: 2px solid #8b5cf6;
-  color: #8b5cf6;
+  border-bottom: 2px solid #00c805;
+  color: #00c805;
 }
 
 /* Line clamp */
@@ -327,7 +338,7 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 /* Skeleton shimmer placeholder */
 .skeleton {
-  background: linear-gradient(90deg, #12121e 0%, #1a1a2e 50%, #12121e 100%);
+  background: linear-gradient(90deg, #131614 0%, #1a1f1b 50%, #131614 100%);
   background-size: 800px 100%;
   animation: skeleton-shimmer 1.4s infinite linear;
   border-radius: 8px;
@@ -348,7 +359,7 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 
 /* Avatar — consistent ring */
 .avatar-ring {
-  box-shadow: 0 0 0 2px #0a0a0f, 0 0 0 3.5px rgba(139, 92, 246, 0.45);
+  box-shadow: 0 0 0 2px #0a0b0a, 0 0 0 3.5px rgba(0, 200, 5, 0.45);
 }
 
 /* Buttery transitions for sticky elements */

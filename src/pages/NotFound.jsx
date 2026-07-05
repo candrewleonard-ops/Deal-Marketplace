@@ -6,14 +6,14 @@ export default function NotFound() {
 
   return (
     <div style={{
-      background: '#0a0a0f', minHeight: '100vh',
+      background: '#0a0b0a', minHeight: '100vh',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '40px 20px', position: 'relative', overflow: 'hidden',
     }}>
       {/* Background glow */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 30% 30%, rgba(139,92,246,0.1) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(6,182,212,0.08) 0%, transparent 50%)',
+        background: 'radial-gradient(ellipse at 30% 30%, rgba(0, 200, 5,0.1) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(0, 229, 160,0.08) 0%, transparent 50%)',
       }} />
 
       <div style={{ maxWidth: '520px', width: '100%', textAlign: 'center', position: 'relative' }}>
@@ -26,8 +26,8 @@ export default function NotFound() {
         </div>
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-          <Building2 size={16} style={{ color: '#8b5cf6' }} />
-          <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
+          <Building2 size={16} style={{ color: '#00c805' }} />
+          <span style={{ color: '#95a29b', fontSize: '13px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
             Deal Not Found
           </span>
         </div>
@@ -36,7 +36,7 @@ export default function NotFound() {
           Looks like this property is off-market
         </h1>
 
-        <p style={{ color: '#94a3b8', fontSize: '15px', margin: '0 0 32px', lineHeight: 1.6 }}>
+        <p style={{ color: '#95a29b', fontSize: '15px', margin: '0 0 32px', lineHeight: 1.6 }}>
           The page you're looking for doesn't exist, moved, or the deal's already been snatched up.
           Let's get you back to something that closes.
         </p>
@@ -48,7 +48,7 @@ export default function NotFound() {
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               padding: '12px 20px', borderRadius: '10px',
-              background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e2e',
+              background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
               color: '#f8fafc', cursor: 'pointer', fontWeight: 600, fontSize: '14px',
             }}
           >
@@ -70,10 +70,10 @@ export default function NotFound() {
 
         {/* Popular destinations */}
         <div style={{
-          background: '#12121e', border: '1px solid #1e1e2e', borderRadius: '14px',
+          background: '#131614', border: '1px solid #232925', borderRadius: '14px',
           padding: '20px 24px',
         }}>
-          <div style={{ color: '#475569', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '12px' }}>
+          <div style={{ color: '#5a675f', fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '12px' }}>
             Popular destinations
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -89,15 +89,15 @@ export default function NotFound() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   padding: '10px 12px', borderRadius: '8px',
-                  color: '#cbd5e1', textDecoration: 'none', fontSize: '13px', fontWeight: 500,
+                  color: '#cdd6d0', textDecoration: 'none', fontSize: '13px', fontWeight: 500,
                   transition: 'all 0.15s', textAlign: 'left',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.08)'; e.currentTarget.style.color = '#a78bfa'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#cbd5e1'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0, 200, 5,0.08)'; e.currentTarget.style.color = '#4ade80'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#cdd6d0'; }}
               >
-                <Icon size={14} style={{ color: '#475569' }} />
+                <Icon size={14} style={{ color: '#5a675f' }} />
                 {label}
-                <span style={{ marginLeft: 'auto', color: '#475569' }}>→</span>
+                <span style={{ marginLeft: 'auto', color: '#5a675f' }}>→</span>
               </Link>
             ))}
           </div>

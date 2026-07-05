@@ -116,7 +116,7 @@ export const sections = {
     id: 'wholesalers',
     label: 'For Wholesalers',
     emoji: '📣',
-    color: '#8b5cf6',
+    color: '#00c805',
     blurb: 'How to find motivated sellers, lock up contracts, and assign for a fee.',
     articles: [
       {
@@ -198,7 +198,7 @@ export const sections = {
     id: 'remote',
     label: 'Remote Rehab',
     emoji: '🌎',
-    color: '#06b6d4',
+    color: '#00e5a0',
     blurb: 'Flip and rehab houses in markets you don\'t live in. The systems, the people, and the tech.',
     articles: [
       {

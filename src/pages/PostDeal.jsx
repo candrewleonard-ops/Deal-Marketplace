@@ -18,8 +18,8 @@ const DEAL_TYPES = [
   { value: 'fix-flip',   label: 'Fix & Flip',       color: '#ef4444' },
   { value: 'rental',     label: 'Rental',           color: '#10b981' },
   { value: 'creative',   label: 'Creative Finance', color: '#f59e0b' },
-  { value: 'commercial', label: 'Commercial',       color: '#06b6d4' },
-  { value: 'land',       label: 'Land',             color: '#8b5cf6' },
+  { value: 'commercial', label: 'Commercial',       color: '#00e5a0' },
+  { value: 'land',       label: 'Land',             color: '#00c805' },
 ];
 
 const MAX_PHOTOS = 12;
@@ -27,12 +27,12 @@ const MAX_PHOTOS = 12;
 // Vibrant gradient palette — used for empty photo slots + accents so the
 // gallery feels alive (matches the lively tiles in the onboarding tour).
 const GRADIENTS = [
-  'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+  'linear-gradient(135deg, #00c805, #00e5a0)',
   'linear-gradient(135deg, #ef4444, #f59e0b)',
-  'linear-gradient(135deg, #10b981, #06b6d4)',
-  'linear-gradient(135deg, #f59e0b, #ec4899)',
-  'linear-gradient(135deg, #06b6d4, #8b5cf6)',
-  'linear-gradient(135deg, #ec4899, #8b5cf6)',
+  'linear-gradient(135deg, #10b981, #00e5a0)',
+  'linear-gradient(135deg, #f59e0b, #f59e0b)',
+  'linear-gradient(135deg, #00e5a0, #00c805)',
+  'linear-gradient(135deg, #f59e0b, #00c805)',
 ];
 
 export default function PostDeal() {
@@ -195,10 +195,10 @@ export default function PostDeal() {
   }
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh', paddingBottom: 150 }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh', paddingBottom: 150 }}>
       {/* Top bar */}
       <div style={{
-        background: '#0d0d1a', borderBottom: '1px solid #1e1e2e',
+        background: '#0e100e', borderBottom: '1px solid #232925',
         padding: '14px 16px', position: 'sticky', top: 0, zIndex: 30,
       }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -206,8 +206,8 @@ export default function PostDeal() {
             onClick={() => navigate(-1)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-              borderRadius: 9, padding: '8px 12px', color: '#94a3b8',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
+              borderRadius: 9, padding: '8px 12px', color: '#95a29b',
               cursor: 'pointer', fontSize: 13, fontWeight: 700,
             }}
           >
@@ -217,8 +217,8 @@ export default function PostDeal() {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '4px 10px', borderRadius: 999,
-              background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.3)',
-              color: '#a78bfa', fontSize: 11, fontWeight: 800, letterSpacing: 0.5,
+              background: 'rgba(0, 200, 5,0.14)', border: '1px solid rgba(0, 200, 5,0.3)',
+              color: '#4ade80', fontSize: 11, fontWeight: 800, letterSpacing: 0.5,
             }}>
               <Sparkles size={11} /> FREE TO LIST
             </div>
@@ -257,8 +257,8 @@ export default function PostDeal() {
             }}
           />
           <div style={{
-            borderBottom: '1px solid #1e1e2e', paddingBottom: 12, marginTop: 2,
-            color: '#64748b', fontSize: 13,
+            borderBottom: '1px solid #232925', paddingBottom: 12, marginTop: 2,
+            color: '#707d75', fontSize: 13,
           }}>
             Give your deal a clear, catchy title — this is the first thing buyers see.
           </div>
@@ -294,11 +294,11 @@ export default function PostDeal() {
               ref={addressBoxRef}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                background: '#0d0d1a', border: '1px solid #1e1e2e',
+                background: '#0e100e', border: '1px solid #232925',
                 borderRadius: 10, padding: '4px 12px', marginBottom: 8,
               }}
             >
-              <MapPin size={16} style={{ color: '#a78bfa', flexShrink: 0 }} />
+              <MapPin size={16} style={{ color: '#4ade80', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <AddressAutocomplete
                   value={form.address}
@@ -335,20 +335,20 @@ export default function PostDeal() {
                       onClick={() => update('addressVisibility', opt.v)}
                       style={{
                         textAlign: 'left', cursor: 'pointer',
-                        background: on ? 'rgba(139,92,246,0.12)' : '#0d0d1a',
-                        border: `1.5px solid ${on ? '#8b5cf6' : '#1e1e2e'}`,
+                        background: on ? 'rgba(0, 200, 5,0.12)' : '#0e100e',
+                        border: `1.5px solid ${on ? '#00c805' : '#232925'}`,
                         borderRadius: 10, padding: '10px 12px',
                         display: 'flex', alignItems: 'flex-start', gap: 10,
                       }}
                     >
                       <span style={{
                         width: 16, height: 16, borderRadius: '50%', flexShrink: 0, marginTop: 1,
-                        border: `2px solid ${on ? '#8b5cf6' : '#475569'}`,
-                        background: on ? '#8b5cf6' : 'transparent',
+                        border: `2px solid ${on ? '#00c805' : '#5a675f'}`,
+                        background: on ? '#00c805' : 'transparent',
                       }} />
                       <span>
-                        <span style={{ color: on ? '#a78bfa' : '#f8fafc', fontWeight: 700, fontSize: 13 }}>{opt.t}</span>
-                        <span style={{ display: 'block', color: '#94a3b8', fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{opt.d}</span>
+                        <span style={{ color: on ? '#4ade80' : '#f8fafc', fontWeight: 700, fontSize: 13 }}>{opt.t}</span>
+                        <span style={{ display: 'block', color: '#95a29b', fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>{opt.d}</span>
                       </span>
                     </button>
                   );
@@ -362,11 +362,11 @@ export default function PostDeal() {
                 marginBottom: 16,
                 display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '10px 14px', borderRadius: 10,
-                background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(139,92,246,0.06))',
+                background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(0, 200, 5,0.06))',
                 border: '1px solid rgba(239,68,68,0.18)',
               }}>
                 <Video size={15} style={{ color: '#f87171', flexShrink: 0, marginTop: 2 }} />
-                <span style={{ color: '#cbd5e1', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
+                <span style={{ color: '#cdd6d0', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
                   Deals with a <strong style={{ color: '#f8fafc' }}>video walkthrough</strong> get far
                   more serious buyers. Add a YouTube link below — it embeds right on your listing.
                 </span>
@@ -375,7 +375,7 @@ export default function PostDeal() {
                   onClick={() => setShowVideoNudge(false)}
                   aria-label="Dismiss"
                   style={{
-                    background: 'none', border: 'none', color: '#64748b',
+                    background: 'none', border: 'none', color: '#707d75',
                     cursor: 'pointer', flexShrink: 0, padding: 2, lineHeight: 0,
                   }}
                 >
@@ -393,8 +393,8 @@ export default function PostDeal() {
                   style={{
                     padding: '8px 14px', borderRadius: 8,
                     background: form.dealType === t.value ? `${t.color}20` : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${form.dealType === t.value ? t.color : '#1e1e2e'}`,
-                    color: form.dealType === t.value ? t.color : '#94a3b8',
+                    border: `1px solid ${form.dealType === t.value ? t.color : '#232925'}`,
+                    color: form.dealType === t.value ? t.color : '#95a29b',
                     cursor: 'pointer', fontSize: 12, fontWeight: 700,
                   }}
                 >
@@ -420,12 +420,12 @@ export default function PostDeal() {
           <Card title="The numbers" icon={DollarSign}>
             {/* LIST PRICE — the most important public number */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.14), rgba(6,182,212,0.10))',
-              border: '1px solid rgba(139,92,246,0.4)',
+              background: 'linear-gradient(135deg, rgba(0, 200, 5,0.14), rgba(0, 229, 160,0.10))',
+              border: '1px solid rgba(0, 200, 5,0.4)',
               borderRadius: 14, padding: '16px 18px', marginBottom: 16,
             }}>
               <label style={{
-                color: '#a78bfa', fontSize: 12, fontWeight: 800,
+                color: '#4ade80', fontSize: 12, fontWeight: 800,
                 letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 6,
               }}>
                 <DollarSign size={13} /> LIST PRICE — shown publicly
@@ -442,13 +442,13 @@ export default function PostDeal() {
                   placeholder="90,000"
                   style={{
                     width: '100%', padding: '12px 14px 12px 34px',
-                    borderRadius: 10, background: '#0d0d1a',
-                    border: '1px solid rgba(139,92,246,0.35)',
+                    borderRadius: 10, background: '#0e100e',
+                    border: '1px solid rgba(0, 200, 5,0.35)',
                     color: '#f8fafc', fontSize: 26, fontWeight: 900, outline: 'none',
                   }}
                 />
               </div>
-              <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 8 }}>
+              <div style={{ color: '#95a29b', fontSize: 12, marginTop: 8 }}>
                 This is the headline number buyers see. Your contracted price stays private.
               </div>
             </div>
@@ -461,12 +461,12 @@ export default function PostDeal() {
             <Label>Rehab estimate range</Label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 10, alignItems: 'center' }}>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#707d75', fontSize: 13, fontWeight: 700 }}>$</span>
                 <input value={form.rehabLow} onChange={e => update('rehabLow', e.target.value)} type="number" placeholder="Low (e.g. 40,000)" className="input-dark" style={{ ...inp, paddingLeft: 22 }} />
               </div>
-              <span style={{ color: '#64748b', fontSize: 13, fontWeight: 700 }}>to</span>
+              <span style={{ color: '#707d75', fontSize: 13, fontWeight: 700 }}>to</span>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: 13, fontWeight: 700 }}>$</span>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#707d75', fontSize: 13, fontWeight: 700 }}>$</span>
                 <input value={form.rehabHigh} onChange={e => update('rehabHigh', e.target.value)} type="number" placeholder="High (e.g. 60,000)" className="input-dark" style={{ ...inp, paddingLeft: 22 }} />
               </div>
             </div>
@@ -501,11 +501,11 @@ export default function PostDeal() {
           </Box>
           <div style={{ marginTop: 16 }}>
             <label style={{
-              color: '#94a3b8', fontSize: 13, fontWeight: 700,
+              color: '#95a29b', fontSize: 13, fontWeight: 700,
               display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8,
             }}>
               <Video size={15} style={{ color: '#f87171' }} /> YouTube walkthrough URL
-              <span style={{ color: '#64748b', fontWeight: 600 }}>(optional, but recommended)</span>
+              <span style={{ color: '#707d75', fontWeight: 600 }}>(optional, but recommended)</span>
             </label>
             <input
               value={form.youtubeUrl}
@@ -520,7 +520,7 @@ export default function PostDeal() {
                 fontWeight: 600,
               }}
             />
-            <div style={{ color: '#64748b', fontSize: 12, marginTop: 6 }}>
+            <div style={{ color: '#707d75', fontSize: 12, marginTop: 6 }}>
               Paste any YouTube link — it embeds automatically on your live listing.
             </div>
           </div>
@@ -531,7 +531,7 @@ export default function PostDeal() {
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
         background: 'rgba(13,13,26,0.98)', backdropFilter: 'blur(14px)',
-        borderTop: '1px solid #1e1e2e',
+        borderTop: '1px solid #232925',
         padding: `${isMobile ? 16 : 20}px ${isMobile ? 16 : 24}px calc(${isMobile ? 16 : 20}px + env(safe-area-inset-bottom))`,
         boxShadow: '0 -12px 40px rgba(0,0,0,0.5)',
       }}>
@@ -540,7 +540,7 @@ export default function PostDeal() {
             <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: isMobile ? 15 : 18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {form.title || 'Untitled deal'}
             </div>
-            <div style={{ color: canPost ? '#34d399' : '#64748b', fontSize: isMobile ? 12 : 14, fontWeight: 600, marginTop: 2 }}>
+            <div style={{ color: canPost ? '#34d399' : '#707d75', fontSize: isMobile ? 12 : 14, fontWeight: 600, marginTop: 2 }}>
               {submitting
                 ? 'Uploading photos & saving…'
                 : `${photos.length} photo${photos.length !== 1 ? 's' : ''} · ${canPost ? '✓ Ready to post' : 'Need: name, street address & 1 photo'}`}
@@ -555,13 +555,13 @@ export default function PostDeal() {
             style={{
               padding: isMobile ? '16px 28px' : '18px 44px',
               borderRadius: 14,
-              background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
               border: 'none',
               color: '#fff',
               fontWeight: 900, fontSize: isMobile ? 17 : 20, letterSpacing: 0.2,
               cursor: submitting ? 'wait' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 10,
-              boxShadow: '0 14px 38px rgba(139,92,246,0.5)',
+              boxShadow: '0 14px 38px rgba(0, 200, 5,0.5)',
               opacity: submitting ? 0.7 : (canPost ? 1 : 0.92),
               flexShrink: 0,
               transition: 'transform 0.12s',
@@ -586,12 +586,12 @@ function PhotoGallery({
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ImageIcon size={16} style={{ color: '#a78bfa' }} />
+          <ImageIcon size={16} style={{ color: '#4ade80' }} />
           <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15 }}>Photo gallery</span>
-          <span style={{ color: '#64748b', fontSize: 12 }}>{photos.length}/{MAX_PHOTOS}</span>
+          <span style={{ color: '#707d75', fontSize: 12 }}>{photos.length}/{MAX_PHOTOS}</span>
         </div>
         {photos.length > 0 && (
-          <span style={{ color: '#64748b', fontSize: 12 }}>Drag to reorder · first photo is the cover</span>
+          <span style={{ color: '#707d75', fontSize: 12 }}>Drag to reorder · first photo is the cover</span>
         )}
       </div>
 
@@ -619,8 +619,8 @@ function PhotoGallery({
             style={{
               position: 'relative', aspectRatio: '4 / 3',
               borderRadius: 12, overflow: 'hidden',
-              border: overIndex === i ? '2px solid #8b5cf6' : '1px solid #1e1e2e',
-              background: '#12121e', cursor: 'grab',
+              border: overIndex === i ? '2px solid #00c805' : '1px solid #232925',
+              background: '#131614', cursor: 'grab',
               transition: 'border-color 0.15s, transform 0.15s',
             }}
           >
@@ -632,9 +632,9 @@ function PhotoGallery({
                 position: 'absolute', top: 8, left: 8,
                 display: 'flex', alignItems: 'center', gap: 4,
                 padding: '5px 10px', borderRadius: 999,
-                background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+                background: 'linear-gradient(135deg, #00c805, #00e5a0)',
                 color: '#fff', fontSize: 10, fontWeight: 900, letterSpacing: 0.5,
-                boxShadow: '0 4px 14px rgba(139,92,246,0.6)',
+                boxShadow: '0 4px 14px rgba(0, 200, 5,0.6)',
               }}>
                 <Star size={10} fill="#fff" /> COVER
               </div>
@@ -646,7 +646,7 @@ function PhotoGallery({
               width: 26, height: 26, borderRadius: 7,
               background: 'rgba(10,10,15,0.7)', backdropFilter: 'blur(6px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#cbd5e1',
+              color: '#cdd6d0',
             }}>
               <GripVertical size={14} />
             </div>
@@ -689,7 +689,7 @@ function PhotoGallery({
               color: '#fff', cursor: 'pointer', position: 'relative', overflow: 'hidden',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
               boxShadow: dragOver
-                ? '0 0 0 3px rgba(255,255,255,0.7), 0 12px 30px rgba(139,92,246,0.45)'
+                ? '0 0 0 3px rgba(255,255,255,0.7), 0 12px 30px rgba(0, 200, 5,0.45)'
                 : '0 8px 24px rgba(0,0,0,0.35)',
               transform: dragOver ? 'scale(1.02)' : 'scale(1)',
               transition: 'all 0.15s',
@@ -767,22 +767,22 @@ const inp = { width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13
 function ctrlBtn(disabled) {
   return {
     width: 28, height: 28, borderRadius: 8, border: 'none',
-    background: disabled ? 'rgba(255,255,255,0.08)' : 'rgba(139,92,246,0.85)',
+    background: disabled ? 'rgba(255,255,255,0.08)' : 'rgba(0, 200, 5,0.85)',
     color: disabled ? 'rgba(255,255,255,0.35)' : '#fff',
     cursor: disabled ? 'default' : 'pointer',
     fontWeight: 900, fontSize: 14, lineHeight: 1,
-    boxShadow: disabled ? 'none' : '0 3px 10px rgba(139,92,246,0.5)',
+    boxShadow: disabled ? 'none' : '0 3px 10px rgba(0, 200, 5,0.5)',
   };
 }
 
 function Card({ title, icon: Icon, children, style }) {
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e', borderRadius: 14,
+      background: '#131614', border: '1px solid #232925', borderRadius: 14,
       padding: 18, ...style,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        {Icon && <Icon size={16} style={{ color: '#a78bfa' }} />}
+        {Icon && <Icon size={16} style={{ color: '#4ade80' }} />}
         <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15, margin: 0 }}>{title}</h3>
       </div>
       {children}
@@ -792,7 +792,7 @@ function Card({ title, icon: Icon, children, style }) {
 
 function Label({ children }) {
   return (
-    <label style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 8, letterSpacing: 0.3 }}>
+    <label style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 8, letterSpacing: 0.3 }}>
       {children}
     </label>
   );

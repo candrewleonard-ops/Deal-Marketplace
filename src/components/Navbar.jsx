@@ -93,9 +93,9 @@ export default function Navbar() {
                       display: 'flex', alignItems: 'center', gap: 6,
                       padding: '6px 12px', borderRadius: 8, textDecoration: 'none',
                       fontSize: 14, fontWeight: 600,
-                      color: active ? '#8b5cf6' : '#94a3b8',
-                      background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
-                      borderBottom: active ? '2px solid #8b5cf6' : '2px solid transparent',
+                      color: active ? '#00c805' : '#95a29b',
+                      background: active ? 'rgba(0, 200, 5,0.1)' : 'transparent',
+                      borderBottom: active ? '2px solid #00c805' : '2px solid transparent',
                       transition: 'all 0.2s',
                       paddingBottom: 4,
                     }}
@@ -115,9 +115,9 @@ export default function Navbar() {
                       display: 'flex', alignItems: 'center', gap: 6,
                       padding: '6px 12px', borderRadius: 8, textDecoration: 'none',
                       fontSize: 14, fontWeight: 600,
-                      color: active ? '#a78bfa' : '#94a3b8',
-                      background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
-                      borderBottom: active ? '2px solid #8b5cf6' : '2px solid transparent',
+                      color: active ? '#4ade80' : '#95a29b',
+                      background: active ? 'rgba(0, 200, 5,0.1)' : 'transparent',
+                      borderBottom: active ? '2px solid #00c805' : '2px solid transparent',
                       transition: 'all 0.2s',
                       paddingBottom: 4,
                       whiteSpace: 'nowrap',
@@ -129,7 +129,7 @@ export default function Navbar() {
                       phrases={HOWTO_PHRASES}
                       interval={3000}
                       textStyle={{
-                        background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                        background: 'linear-gradient(135deg,#00c805,#00e5a0)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text',
@@ -146,7 +146,7 @@ export default function Navbar() {
           {/* Search (desktop only) */}
           {!isMobile && (
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-              <Search size={16} style={{ position: 'absolute', left: 12, color: '#475569', pointerEvents: 'none' }} />
+              <Search size={16} style={{ position: 'absolute', left: 12, color: '#5a675f', pointerEvents: 'none' }} />
               <input
                 value={searchVal}
                 onChange={e => setSearchVal(e.target.value)}
@@ -228,7 +228,7 @@ export default function Navbar() {
                   padding: '8px 14px', borderRadius: 8,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#e2e8f0', textDecoration: 'none',
+                  color: '#e4eae6', textDecoration: 'none',
                   fontSize: 14, fontWeight: 600,
                 }}
               >
@@ -247,7 +247,7 @@ export default function Navbar() {
                   borderRadius: 10,
                   padding: isMobile ? 9 : 8,
                   cursor: 'pointer',
-                  color: '#94a3b8',
+                  color: '#95a29b',
                   display: 'flex', alignItems: 'center', position: 'relative',
                   minWidth: 40, minHeight: 40,
                   justifyContent: 'center',
@@ -277,8 +277,8 @@ export default function Navbar() {
                       position: 'fixed',
                       right: 12, left: 12,
                       top: 'calc(56px + env(safe-area-inset-top))',
-                      background: '#12121e',
-                      border: '1px solid #1e1e2e',
+                      background: '#131614',
+                      border: '1px solid #232925',
                       borderRadius: 14,
                       maxHeight: '70vh',
                       overflowY: 'auto',
@@ -293,8 +293,8 @@ export default function Navbar() {
               ) : (
                 <div style={{
                   position: 'absolute', right: 0, top: 48,
-                  background: '#12121e',
-                  border: '1px solid #1e1e2e',
+                  background: '#131614',
+                  border: '1px solid #232925',
                   borderRadius: 14,
                   width: 320,
                   maxHeight: '70vh',
@@ -316,7 +316,7 @@ export default function Navbar() {
                   background: 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: 10, padding: 8,
-                  color: '#94a3b8',
+                  color: '#95a29b',
                   display: 'flex', alignItems: 'center',
                   textDecoration: 'none',
                   minWidth: 40, minHeight: 40, justifyContent: 'center',
@@ -335,7 +335,7 @@ export default function Navbar() {
                   background: 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: 10, padding: 9,
-                  cursor: 'pointer', color: '#94a3b8',
+                  cursor: 'pointer', color: '#95a29b',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   minWidth: 40, minHeight: 40,
                 }}
@@ -358,7 +358,7 @@ export default function Navbar() {
                     alt="avatar"
                     style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
                   />
-                  <ChevronDown size={14} color="#94a3b8" />
+                  <ChevronDown size={14} color="#95a29b" />
                 </button>
                 {userMenuOpen && <UserMenu currentUser={currentUser} onClose={() => setUserMenuOpen(false)} />}
               </div>
@@ -386,8 +386,8 @@ export default function Navbar() {
             style={{
               position: 'fixed', top: 0, right: 0, bottom: 0,
               width: 'min(86vw, 320px)',
-              background: '#0d0d1a',
-              borderLeft: '1px solid #1e1e2e',
+              background: '#0e100e',
+              borderLeft: '1px solid #232925',
               zIndex: 210,
               transform: drawerOpen ? 'translateX(0)' : 'translateX(100%)',
               transition: 'transform 0.3s cubic-bezier(.2,.9,.3,1)',
@@ -397,7 +397,7 @@ export default function Navbar() {
               boxShadow: '-20px 0 60px rgba(0,0,0,0.5)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottom: '1px solid #1e1e2e' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottom: '1px solid #232925' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {isAuthenticated ? (
                   <img
@@ -408,7 +408,7 @@ export default function Navbar() {
                 ) : (
                   <div style={{
                     width: 38, height: 38, borderRadius: '50%',
-                    background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                    background: 'linear-gradient(135deg,#00c805,#00e5a0)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <User size={18} color="#fff" />
@@ -418,7 +418,7 @@ export default function Navbar() {
                   <p style={{ color: '#f8fafc', fontWeight: 700, margin: 0, fontSize: 14 }}>
                     {isAuthenticated ? currentUser?.name : 'Welcome'}
                   </p>
-                  <p style={{ color: '#475569', margin: '2px 0 0', fontSize: 12 }}>
+                  <p style={{ color: '#5a675f', margin: '2px 0 0', fontSize: 12 }}>
                     {isAuthenticated ? `@${currentUser?.username}` : 'Sign in for full access'}
                   </p>
                 </div>
@@ -428,7 +428,7 @@ export default function Navbar() {
                 style={{
                   background: 'rgba(255,255,255,0.05)',
                   border: 'none', borderRadius: 10, padding: 8,
-                  color: '#94a3b8', cursor: 'pointer',
+                  color: '#95a29b', cursor: 'pointer',
                 }}
               >
                 <X size={20} />
@@ -437,7 +437,7 @@ export default function Navbar() {
 
             {/* Guest CTA banner in the drawer */}
             {!isAuthenticated && (
-              <div style={{ padding: '12px 16px', borderBottom: '1px solid #1e1e2e', display: 'flex', gap: 8 }}>
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #232925', display: 'flex', gap: 8 }}>
                 <Link
                   to="/auth?tab=register"
                   onClick={() => setDrawerOpen(false)}
@@ -455,7 +455,7 @@ export default function Navbar() {
                   onClick={() => setDrawerOpen(false)}
                   style={{
                     flex: 1, textAlign: 'center', padding: '11px',
-                    borderRadius: 10, color: '#e2e8f0', textDecoration: 'none',
+                    borderRadius: 10, color: '#e4eae6', textDecoration: 'none',
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.08)',
                     fontWeight: 600, fontSize: 14,
@@ -469,7 +469,7 @@ export default function Navbar() {
             <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 8px' }}>
               <div style={{ padding: '0 8px', marginBottom: 8 }}>
                 <div style={{ position: 'relative' }}>
-                  <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
+                  <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#5a675f' }} />
                   <input
                     placeholder="Search deals, investors..."
                     className="input-dark"
@@ -545,14 +545,14 @@ function UserMenu({ currentUser, onClose }) {
   return (
     <div style={{
       position: 'absolute', right: 0, top: 48,
-      background: '#12121e', border: '1px solid #1e1e2e',
+      background: '#131614', border: '1px solid #232925',
       borderRadius: 12, width: 220, zIndex: 100,
       boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
       overflow: 'hidden',
     }}>
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid #1e1e2e' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid #232925' }}>
         <p style={{ color: '#f8fafc', fontWeight: 600, margin: 0, fontSize: 14 }}>{currentUser?.name}</p>
-        <p style={{ color: '#475569', margin: '2px 0 0', fontSize: 12 }}>@{currentUser?.username}</p>
+        <p style={{ color: '#5a675f', margin: '2px 0 0', fontSize: 12 }}>@{currentUser?.username}</p>
       </div>
       {[
         { icon: User,       label: 'View Profile',       to: `/profile/${currentUser?.id}` },
@@ -568,13 +568,13 @@ function UserMenu({ currentUser, onClose }) {
           onClick={onClose}
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 16px', color: '#94a3b8', textDecoration: 'none', fontSize: 14,
+            padding: '10px 16px', color: '#95a29b', textDecoration: 'none', fontSize: 14,
           }}
         >
           <Icon size={16} /> {label}
         </Link>
       ))}
-      <div style={{ borderTop: '1px solid #1e1e2e' }}>
+      <div style={{ borderTop: '1px solid #232925' }}>
         <Link
           to="/auth"
           onClick={onClose}
@@ -590,7 +590,7 @@ function UserMenu({ currentUser, onClose }) {
 function DrawerSection({ title, children }) {
   return (
     <div style={{ padding: '8px 0' }}>
-      <p style={{ color: '#475569', fontSize: 11, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', padding: '6px 16px', margin: 0 }}>
+      <p style={{ color: '#5a675f', fontSize: 11, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', padding: '6px 16px', margin: 0 }}>
         {title}
       </p>
       <div>{children}</div>
@@ -606,8 +606,8 @@ function DrawerItem({ to, icon: Icon, label, active, danger, onClick }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '11px 16px', textDecoration: 'none', fontSize: 15, fontWeight: 500,
-        color: danger ? '#ef4444' : (active ? '#a78bfa' : '#e2e8f0'),
-        background: active ? 'rgba(139,92,246,0.1)' : 'transparent',
+        color: danger ? '#ef4444' : (active ? '#4ade80' : '#e4eae6'),
+        background: active ? 'rgba(0, 200, 5,0.1)' : 'transparent',
         borderRadius: 10,
         margin: '1px 8px',
         transition: 'background 0.15s',
@@ -622,27 +622,27 @@ function DrawerItem({ to, icon: Icon, label, active, danger, onClick }) {
 function NotifList({ notifications, onCloseAfterNav }) {
   return (
     <>
-      <div style={{ padding: 14, borderBottom: '1px solid #1e1e2e', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: 14, borderBottom: '1px solid #232925', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
-        <button style={{ background: 'none', border: 'none', color: '#8b5cf6', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
+        <button style={{ background: 'none', border: 'none', color: '#00c805', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
       </div>
       {notifications.map(n => (
         <div key={n.id} style={{
           padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start',
-          borderBottom: '1px solid #1e1e2e',
-          background: n.unread ? 'rgba(139,92,246,0.05)' : 'transparent',
+          borderBottom: '1px solid #232925',
+          background: n.unread ? 'rgba(0, 200, 5,0.05)' : 'transparent',
         }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#8b5cf6' : 'transparent', marginTop: 6, flexShrink: 0 }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#00c805' : 'transparent', marginTop: 6, flexShrink: 0 }} />
           <div>
             <p style={{ color: '#f8fafc', fontSize: 13, margin: 0, lineHeight: 1.4 }}>{n.text}</p>
-            <p style={{ color: '#475569', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
+            <p style={{ color: '#5a675f', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
           </div>
         </div>
       ))}
       <Link
         to="/notifications"
         onClick={onCloseAfterNav}
-        style={{ display: 'block', padding: '14px', textAlign: 'center', color: '#8b5cf6', textDecoration: 'none', fontWeight: 700, fontSize: 13 }}
+        style={{ display: 'block', padding: '14px', textAlign: 'center', color: '#00c805', textDecoration: 'none', fontWeight: 700, fontSize: 13 }}
       >
         View all →
       </Link>

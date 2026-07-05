@@ -81,11 +81,11 @@ export default function MobileTabBar() {
                     width: 56,
                     height: 56,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+                    background: 'linear-gradient(135deg,#00c805,#00e5a0)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 10px 28px rgba(139,92,246,0.55), 0 0 0 4px rgba(10,10,15,0.95)',
+                    boxShadow: '0 10px 28px rgba(0, 200, 5,0.55), 0 0 0 4px rgba(10,10,15,0.95)',
                     transform: 'translateY(-18px)',
                   }}
                 >
@@ -93,7 +93,7 @@ export default function MobileTabBar() {
                 </div>
                 <span style={{
                   fontSize: 10, fontWeight: 700, letterSpacing: 0.2,
-                  color: '#a78bfa', marginTop: -8,
+                  color: '#4ade80', marginTop: -8,
                 }}>
                   {t.label}
                 </span>
@@ -121,7 +121,7 @@ export default function MobileTabBar() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '8px 4px 6px',
-                color: active ? '#a78bfa' : '#64748b',
+                color: active ? '#4ade80' : '#707d75',
                 textDecoration: 'none',
                 gap: 3,
                 transition: 'color 0.15s, transform 0.1s',

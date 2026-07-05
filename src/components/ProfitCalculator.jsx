@@ -105,29 +105,29 @@ export default function ProfitCalculator({
 
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e',
+      background: '#131614', border: '1px solid #232925',
       borderRadius: 16, padding: isMobile ? 16 : 24, marginBottom: 20,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg,#8b5cf6,#06b6d4)',
+            background: 'linear-gradient(135deg,#00c805,#00e5a0)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <Calculator size={18} color="#fff" />
           </div>
           <div>
             <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 17, margin: 0 }}>Deal Calculator</h3>
-            <div style={{ color: '#64748b', fontSize: 12 }}>Run your own numbers — estimate only</div>
+            <div style={{ color: '#707d75', fontSize: 12 }}>Run your own numbers — estimate only</div>
           </div>
         </div>
         <button
           onClick={resetAll}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e2e',
-            color: '#94a3b8', borderRadius: 8, padding: '7px 11px',
+            background: 'rgba(255,255,255,0.04)', border: '1px solid #232925',
+            color: '#95a29b', borderRadius: 8, padding: '7px 11px',
             cursor: 'pointer', fontSize: 12, fontWeight: 700,
           }}
         >
@@ -170,24 +170,24 @@ export default function ProfitCalculator({
 
       {/* Cost breakdown */}
       <div style={{
-        marginTop: 18, background: '#0d0d1a', border: '1px solid #1e1e2e',
+        marginTop: 18, background: '#0e100e', border: '1px solid #232925',
         borderRadius: 12, padding: 14,
       }}>
         {[
           ['ARV (sale)', money(num('arv')), '#10b981'],
-          ['– Purchase price', money(num('price')), '#cbd5e1'],
-          ['– Rehab', money(num('rehab')), '#cbd5e1'],
-          [`– Loan interest (${pct(num('rate'))} · ${num('months')}mo)`, money(r.interest), '#cbd5e1'],
-          [`– Points / fees (${pct(num('points'))})`, money(r.pointsCost), '#cbd5e1'],
-          ['– Closing costs (1.5% ARV)', money(r.closing), '#cbd5e1'],
-          ['– Insurance (0.5% ARV)', money(r.insurance), '#cbd5e1'],
-          [`– Realtor (${pct(num('realtor'))} ARV)`, money(r.realtor), '#cbd5e1'],
+          ['– Purchase price', money(num('price')), '#cdd6d0'],
+          ['– Rehab', money(num('rehab')), '#cdd6d0'],
+          [`– Loan interest (${pct(num('rate'))} · ${num('months')}mo)`, money(r.interest), '#cdd6d0'],
+          [`– Points / fees (${pct(num('points'))})`, money(r.pointsCost), '#cdd6d0'],
+          ['– Closing costs (1.5% ARV)', money(r.closing), '#cdd6d0'],
+          ['– Insurance (0.5% ARV)', money(r.insurance), '#cdd6d0'],
+          [`– Realtor (${pct(num('realtor'))} ARV)`, money(r.realtor), '#cdd6d0'],
         ].map(([label, value, color]) => (
           <div key={label} style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: '5px 0', fontSize: 13,
           }}>
-            <span style={{ color: '#94a3b8' }}>{label}</span>
+            <span style={{ color: '#95a29b' }}>{label}</span>
             <span style={{ color, fontWeight: 600 }}>{value}</span>
           </div>
         ))}
@@ -203,22 +203,22 @@ export default function ProfitCalculator({
           border: `1px solid ${positive ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
           borderRadius: 12, padding: 16,
         }}>
-          <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>ESTIMATED NET PROFIT</div>
+          <div style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>ESTIMATED NET PROFIT</div>
           <div style={{ color: positive ? '#10b981' : '#ef4444', fontWeight: 900, fontSize: 28, marginTop: 4 }}>
             {money(r.netProfit)}
           </div>
         </div>
         <div style={{
-          background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.3)',
+          background: 'rgba(0, 200, 5,0.10)', border: '1px solid rgba(0, 200, 5,0.3)',
           borderRadius: 12, padding: 16,
         }}>
-          <div style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 5 }}>
             <TrendingUp size={12} /> TOTAL CASH INVESTED
           </div>
           <div style={{ position: 'relative', marginTop: 4 }}>
             <span style={{
               position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
-              color: '#a78bfa', fontWeight: 900, fontSize: 28, pointerEvents: 'none',
+              color: '#4ade80', fontWeight: 900, fontSize: 28, pointerEvents: 'none',
             }}>$</span>
             <input
               type="number"
@@ -226,23 +226,23 @@ export default function ProfitCalculator({
               onChange={(e) => setCashOverride(e.target.value === '' ? '' : Number(e.target.value))}
               style={{
                 width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                color: '#a78bfa', fontWeight: 900, fontSize: 28,
+                color: '#4ade80', fontWeight: 900, fontSize: 28,
                 padding: '0 0 0 20px',
               }}
             />
           </div>
-          <div style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
+          <div style={{ color: '#707d75', fontSize: 12, marginTop: 4 }}>
             Defaults to the full price + rehab — edit to your real cash in.
-            <span style={{ color: '#94a3b8', fontWeight: 700 }}>
+            <span style={{ color: '#95a29b', fontWeight: 700 }}>
               {' '}Cash-on-cash ≈ {(Number.isFinite(r.coc) ? r.coc : 0).toFixed(1)}%
             </span>
           </div>
         </div>
       </div>
 
-      <div style={{ color: '#475569', fontSize: 11, lineHeight: 1.5, marginTop: 12 }}>
+      <div style={{ color: '#5a675f', fontSize: 11, lineHeight: 1.5, marginTop: 12 }}>
         Purchase + rehab is assumed HML-financed; the down payment is your cash at close
-        (defaults to 10% of price + rehab). <strong style={{ color: '#64748b' }}>Total cash
+        (defaults to 10% of price + rehab). <strong style={{ color: '#707d75' }}>Total cash
         invested</strong> defaults to the full price + rehab (all-cash) so cash-on-cash starts
         conservative — change it to whatever you actually put in. All figures are estimates and
         change with your real financing, timeline, and market.
@@ -255,7 +255,7 @@ function NumberField({ label, value, onChange, prefix, suffix, highlight }) {
   return (
     <div>
       <label style={{
-        color: '#94a3b8', fontSize: 11, fontWeight: 700,
+        color: '#95a29b', fontSize: 11, fontWeight: 700,
         display: 'block', marginBottom: 6, letterSpacing: 0.3,
       }}>
         {label}
@@ -264,7 +264,7 @@ function NumberField({ label, value, onChange, prefix, suffix, highlight }) {
         {prefix && (
           <span style={{
             position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
-            color: '#64748b', fontSize: 13, fontWeight: 700, pointerEvents: 'none',
+            color: '#707d75', fontSize: 13, fontWeight: 700, pointerEvents: 'none',
           }}>{prefix}</span>
         )}
         <input
@@ -275,15 +275,15 @@ function NumberField({ label, value, onChange, prefix, suffix, highlight }) {
             width: '100%',
             padding: `9px ${suffix ? '26px' : '10px'} 9px ${prefix ? '22px' : '10px'}`,
             borderRadius: 9,
-            background: '#0d0d1a',
-            border: `1px solid ${highlight ? 'rgba(16,185,129,0.4)' : '#1e1e2e'}`,
+            background: '#0e100e',
+            border: `1px solid ${highlight ? 'rgba(16,185,129,0.4)' : '#232925'}`,
             color: '#f8fafc', fontSize: 14, fontWeight: 700, outline: 'none',
           }}
         />
         {suffix && (
           <span style={{
             position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-            color: '#64748b', fontSize: 13, fontWeight: 700, pointerEvents: 'none',
+            color: '#707d75', fontSize: 13, fontWeight: 700, pointerEvents: 'none',
           }}>{suffix}</span>
         )}
       </div>

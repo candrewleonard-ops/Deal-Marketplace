@@ -45,9 +45,9 @@ export default function SuperAdmin() {
   if (!isSuperAdmin) return <Navigate to="/" replace />;
 
   return (
-    <div style={{ background: '#0a0a0f', minHeight: '100vh' }}>
+    <div style={{ background: '#0a0b0a', minHeight: '100vh' }}>
       {/* Header */}
-      <div style={{ background: '#0d0d1a', borderBottom: '1px solid #1e1e2e', padding: '22px 20px' }}>
+      <div style={{ background: '#0e100e', borderBottom: '1px solid #232925', padding: '22px 20px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
             width: 40, height: 40, borderRadius: 10,
@@ -58,7 +58,7 @@ export default function SuperAdmin() {
           </div>
           <div style={{ flex: 1 }}>
             <h1 style={{ color: '#f8fafc', fontWeight: 900, fontSize: 22, margin: 0 }}>Super Admin</h1>
-            <div style={{ color: '#64748b', fontSize: 12 }}>God mode · {currentUser?.email}</div>
+            <div style={{ color: '#707d75', fontSize: 12 }}>God mode · {currentUser?.email}</div>
           </div>
           <span style={{
             padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 800,
@@ -82,8 +82,8 @@ export default function SuperAdmin() {
               display: 'flex', alignItems: 'center', gap: 7,
               padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
               background: tab === id ? 'rgba(239,68,68,0.14)' : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${tab === id ? 'rgba(239,68,68,0.4)' : '#1e1e2e'}`,
-              color: tab === id ? '#f87171' : '#94a3b8', fontWeight: 700, fontSize: 13,
+              border: `1px solid ${tab === id ? 'rgba(239,68,68,0.4)' : '#232925'}`,
+              color: tab === id ? '#f87171' : '#95a29b', fontWeight: 700, fontSize: 13,
             }}
           >
             <Icon size={15} /> {label}
@@ -95,13 +95,13 @@ export default function SuperAdmin() {
         {tab === 'users' ? (
           <>
             <div style={{ position: 'relative', marginBottom: 16 }}>
-              <Search size={15} style={{ position: 'absolute', left: 12, top: 12, color: '#475569' }} />
+              <Search size={15} style={{ position: 'absolute', left: 12, top: 12, color: '#5a675f' }} />
               <input
                 value={q} onChange={e => setQ(e.target.value)}
                 placeholder="Search users by name, email, username…"
                 style={{
                   width: '100%', padding: '11px 14px 11px 36px', borderRadius: 10,
-                  background: '#12121e', border: '1px solid #1e1e2e', color: '#f8fafc',
+                  background: '#131614', border: '1px solid #232925', color: '#f8fafc',
                   fontSize: 14, outline: 'none',
                 }}
               />
@@ -137,7 +137,7 @@ function UserRow({ user, by, onOpen }) {
   const [showTimeout, setShowTimeout] = useState(false);
   return (
     <div style={{
-      background: '#12121e', border: '1px solid #1e1e2e', borderRadius: 12,
+      background: '#131614', border: '1px solid #232925', borderRadius: 12,
       padding: 14, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
     }}>
       <img src={user.avatar} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
@@ -147,7 +147,7 @@ function UserRow({ user, by, onOpen }) {
           {s.banned && <Tag color="#ef4444">BANNED</Tag>}
           {s.timedOut && <Tag color="#f59e0b">TIMED OUT</Tag>}
         </div>
-        <div style={{ color: '#94a3b8', fontSize: 12 }}>{user.email} · @{user.username}</div>
+        <div style={{ color: '#95a29b', fontSize: 12 }}>{user.email} · @{user.username}</div>
       </div>
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -167,7 +167,7 @@ function UserRow({ user, by, onOpen }) {
               {showTimeout && (
                 <div style={{
                   position: 'absolute', right: 0, top: '110%', zIndex: 5,
-                  background: '#1a1a2e', border: '1px solid #1e1e2e', borderRadius: 10,
+                  background: '#1a1f1b', border: '1px solid #232925', borderRadius: 10,
                   padding: 6, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 110,
                   boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
                 }}>
@@ -176,7 +176,7 @@ function UserRow({ user, by, onOpen }) {
                       key={d}
                       onClick={() => { timeoutUser(user.id, d, by, ''); setShowTimeout(false); }}
                       style={{
-                        background: 'none', border: 'none', color: '#cbd5e1',
+                        background: 'none', border: 'none', color: '#cdd6d0',
                         textAlign: 'left', padding: '7px 10px', borderRadius: 6,
                         cursor: 'pointer', fontSize: 12, fontWeight: 600,
                       }}
@@ -189,7 +189,7 @@ function UserRow({ user, by, onOpen }) {
             </div>
           </>
         )}
-        <button onClick={onOpen} style={godBtn('#8b5cf6')}>
+        <button onClick={onOpen} style={godBtn('#00c805')}>
           Activity <ChevronRight size={12} />
         </button>
       </div>
@@ -212,7 +212,7 @@ function PublisherControl({ deals, onEdit }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {deals.map(d => (
           <div key={d.id} style={{
-            background: '#12121e', border: '1px solid #1e1e2e', borderRadius: 12,
+            background: '#131614', border: '1px solid #232925', borderRadius: 12,
             padding: 12, display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <img src={d.images?.[0]} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover' }} />
@@ -220,11 +220,11 @@ function PublisherControl({ deals, onEdit }) {
               <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 14 }}>
                 {d.title} {d.isLive && <Tag color="#10b981">LIVE</Tag>}
               </div>
-              <div style={{ color: '#94a3b8', fontSize: 12 }}>
+              <div style={{ color: '#95a29b', fontSize: 12 }}>
                 {d.city}, {d.state} · ${(d.listingPrice || d.price || 0).toLocaleString()} · {d.sellerName || d.sellerId}
               </div>
             </div>
-            <button onClick={() => onEdit(d)} style={godBtn('#8b5cf6')}>
+            <button onClick={() => onEdit(d)} style={godBtn('#00c805')}>
               <Pencil size={12} /> Edit
             </button>
           </div>
@@ -273,12 +273,12 @@ function EditDealModal({ deal, by, onClose, onSaved }) {
       backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
     }}>
       <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: 520, background: '#12121e', border: '1px solid #1e1e2e',
+        width: '100%', maxWidth: 520, background: '#131614', border: '1px solid #232925',
         borderRadius: 18, maxHeight: '92vh', overflowY: 'auto',
       }}>
-        <div style={{ padding: '18px 20px', borderBottom: '1px solid #1e1e2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #232925', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16, margin: 0 }}>Edit listing</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={18} /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#95a29b', cursor: 'pointer' }}><X size={18} /></button>
         </div>
         <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
@@ -286,13 +286,13 @@ function EditDealModal({ deal, by, onClose, onSaved }) {
             ['ARV', 'arv', 'number'], ['City', 'city', 'text'], ['State', 'state', 'text'],
           ].map(([label, key, type]) => (
             <div key={key}>
-              <label style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 5 }}>{label}</label>
+              <label style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 5 }}>{label}</label>
               <input type={type} value={f[key]} onChange={e => up(key, e.target.value)} className="input-dark"
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13 }} />
             </div>
           ))}
           <div>
-            <label style={{ color: '#94a3b8', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 5 }}>Description</label>
+            <label style={{ color: '#95a29b', fontSize: 11, fontWeight: 700, display: 'block', marginBottom: 5 }}>Description</label>
             <textarea value={f.description} onChange={e => up('description', e.target.value)} rows={4} className="input-dark"
               style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13, resize: 'vertical' }} />
           </div>
