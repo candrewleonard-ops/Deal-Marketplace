@@ -45,7 +45,10 @@ export function rowToDeal(r) {
     status: r.status || 'available',
     addressVisibility: r.address_visibility || 'public', // 'public' (instant Get Address) | 'request' | 'dmd'
     scopeOfWork: r.scope_of_work || null,
-    daysListed: 0,
+    // Real listing age — created_at exists on every row, so history backfills.
+    daysListed: r.created_at
+      ? Math.max(0, Math.floor((Date.now() - new Date(r.created_at).getTime()) / 86400000))
+      : 0,
     createdAt: r.created_at,
   };
 }

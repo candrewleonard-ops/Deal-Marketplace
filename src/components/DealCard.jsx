@@ -5,6 +5,7 @@ import { useSavedDeals } from '../hooks/useSavedDeals';
 import { toggleHeart } from '../lib/engagement';
 import { useAuth } from '../context/AuthContext';
 import { dealPath } from '../utils/slug';
+import { listedLabel } from '../utils/time';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 const DEAL_TYPE_LABELS = {
@@ -274,7 +275,7 @@ export default function DealCard({ deal, stats }) {
                 {deal.sellerName}
               </div>
               <div style={{ color: '#707d75', fontSize: 11 }}>
-                {deal.daysListed}d listed
+                {listedLabel(deal)}
               </div>
             </div>
             <div style={{
@@ -438,7 +439,7 @@ export default function DealCard({ deal, stats }) {
           <img src={deal.sellerAvatar} alt={deal.sellerName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #232925' }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{deal.sellerName}</div>
-            <div style={{ color: '#707d75', fontSize: 11 }}>{deal.daysListed}d listed</div>
+            <div style={{ color: '#707d75', fontSize: 11 }}>{listedLabel(deal)}</div>
           </div>
           <button onClick={(e) => { e.stopPropagation(); openDeal(e); }} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '9px 14px', borderRadius: '9px', background: 'linear-gradient(135deg, #0b8a3c, #15a24b)', border: '1px solid rgba(255,255,255,0.14)', color: '#eafff2', fontWeight: 800, fontSize: '12px', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(11, 138, 60, 0.45)', whiteSpace: 'nowrap' }}>
             {isAuthenticated ? <Eye size={12} /> : <Lock size={12} />}

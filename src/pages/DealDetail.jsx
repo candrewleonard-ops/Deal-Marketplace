@@ -20,6 +20,7 @@ import ProfitCalculator from '../components/ProfitCalculator';
 import { getDisplayAddress } from '../utils/address';
 import { recordView, getViewCount, getHeartCount, hasHearted, toggleHeart } from '../lib/engagement';
 import { dealPath, dealUrl, idFromSlug } from '../utils/slug';
+import { listedSentence, timeAgo } from '../utils/time';
 import { visibleScopeEntries } from '../data/scopeOfWork';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -466,7 +467,7 @@ export default function DealDetail() {
                     { label: 'Year Built', value: deal.yearBuilt || 'N/A', icon: '📅' },
                     { label: 'Lot Size', value: deal.lotSize || 'N/A', icon: '🗺' },
                     { label: 'Status', value: deal.status === 'under contract' ? 'Under Contract' : 'Available', icon: '✅' },
-                    { label: 'Days Listed', value: `${deal.daysListed} days`, icon: '⏱' },
+                    { label: 'Listed', value: deal.createdAt ? timeAgo(deal.createdAt) : `${deal.daysListed} days ago`, icon: '⏱' },
                     { label: 'Deal Type', value: dealTypeLabels[deal.dealType], icon: '🏷' },
                   ].map(({ label, value, icon }) => (
                     <div key={label}>
@@ -633,7 +634,7 @@ export default function DealDetail() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
                 <Calendar size={14} style={{ color: '#5a675f' }} />
-                <span style={{ color: '#5a675f', fontSize: '13px' }}>Listed {deal.daysListed} day{deal.daysListed !== 1 ? 's' : ''} ago</span>
+                <span style={{ color: '#5a675f', fontSize: '13px' }}>{listedSentence(deal)}</span>
                 <span style={{
                   marginLeft: 'auto',
                   padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,

@@ -39,7 +39,7 @@ const findUser = (id) => users.find(u => String(u.id) === String(id));
 
 let heartSeq = 0;
 
-export default function LiveRoom() {
+export default function LiveRoom({ broadcast = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,7 +47,8 @@ export default function LiveRoom() {
   const { currentUser, isAuthenticated, requireAuth } = useAuth();
   const isMobile = useIsMobile();
 
-  const isBroadcast = id === 'broadcast';
+  // The /live/broadcast route carries no :id param — the prop is the truth.
+  const isBroadcast = broadcast || id === 'broadcast';
   const session = isBroadcast ? null : getLiveSession(id);
   const broadcastTitle = location.state?.title || 'Live property tour';
   const attachedDeal = isBroadcast

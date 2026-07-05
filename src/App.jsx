@@ -114,7 +114,7 @@ export default function App() {
         <Route path="/bid-request/:dealId" element={<AppLayout hideFooter><BidRequest /></AppLayout>} />
         <Route path="/how-to" element={<AppLayout><HowTo /></AppLayout>} />
         <Route path="/live" element={<AppLayout hideFooter><LiveTours /></AppLayout>} />
-        <Route path="/live/broadcast" element={<AuthGuard reason="go live"><AppLayout hideFooter hideTabBar><LiveRoom /></AppLayout></AuthGuard>} />
+        <Route path="/live/broadcast" element={<AuthGuard reason="go live"><AppLayout hideFooter hideTabBar><LiveRoom broadcast /></AppLayout></AuthGuard>} />
         <Route path="/live/:id" element={<AppLayout hideFooter hideTabBar><LiveRoom /></AppLayout>} />
         <Route path="/post-deal" element={<AuthGuard reason="post a deal"><AppLayout hideFooter hideTabBar><PostDeal /></AppLayout></AuthGuard>} />
         <Route path="/super-admin" element={<AppLayout hideFooter><SuperAdmin /></AppLayout>} />

@@ -32,7 +32,6 @@ const primaryNav = [
   { to: '/my-deals',    label: 'My Deals',    icon: TrendingUp },
   { to: '/groups',      label: 'Groups',      icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
-  { to: '/meetups',     label: 'Meetups',     icon: Calendar },
   { to: '/how-to',      label: 'How Tos - All Industries', icon: GraduationCap },
 ];
 
