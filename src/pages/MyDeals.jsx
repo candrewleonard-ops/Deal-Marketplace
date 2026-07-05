@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, MapPin, ChevronDown, ChevronUp, Check, X as XIcon, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { dealPath } from '../utils/slug';
 import { deals } from '../data/deals';
 import { users } from '../data/users';
 import MyDealsTutorial from '../components/MyDealsTutorial';
@@ -252,7 +253,7 @@ export default function MyDeals() {
                       </div>
                     )}
                     <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                      <Link to={`/marketplace/${deal.id}`} style={{ color: '#00c805', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Link to={dealPath(deal)} style={{ color: '#00c805', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         View Public Listing →
                       </Link>
                     </div>

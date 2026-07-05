@@ -43,7 +43,8 @@ export function rowToDeal(r) {
     tags: [],                  // live deals carry no seller tag badges yet
     lotSize: null,
     status: r.status || 'available',
-    addressVisibility: r.address_visibility || 'request', // 'public' | 'request' | 'dmd'
+    addressVisibility: r.address_visibility || 'public', // 'public' (instant Get Address) | 'request' | 'dmd'
+    scopeOfWork: r.scope_of_work || null,
     daysListed: 0,
     createdAt: r.created_at,
   };
@@ -80,13 +81,21 @@ export async function createDeal(form, photoUrls, seller) {
     seller_id: seller?.id != null ? String(seller.id) : null,
     seller_name: seller?.name || null,
     status: 'available',
-    address_visibility: form.addressVisibility || 'request',
+    address_visibility: form.addressVisibility || 'public',
+    scope_of_work: form.scopeOfWork || null,
   };
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('deals')
     .insert(payload)
     .select()
     .single();
+  // Older databases may not have the scope_of_work column yet — post the
+  // deal anyway rather than failing. (Migration: `alter table deals add
+  // column scope_of_work jsonb;` in the Supabase SQL editor.)
+  if (error && /scope_of_work/i.test(error.message || '')) {
+    const { scope_of_work: _dropped, ...withoutScope } = payload;
+    ({ data, error } = await supabase.from('deals').insert(withoutScope).select().single());
+  }
   if (error) return { ok: false, reason: error.message };
   return { ok: true, deal: rowToDeal(data) };
 }
@@ -129,6 +138,7 @@ export async function updateLiveDeal(namespacedId, patch) {
     listingPrice: 'listing_price', arv: 'arv', rehabLow: 'rehab_low',
     rehabHigh: 'rehab_high', description: 'description', youtubeUrl: 'youtube_url',
     status: 'status', addressVisibility: 'address_visibility',
+    scopeOfWork: 'scope_of_work',
   };
   const row = {};
   for (const [k, col] of Object.entries(map)) {

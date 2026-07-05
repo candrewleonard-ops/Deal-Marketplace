@@ -1,6 +1,7 @@
 export const deals = [
   {
     id: 1,
+    scopeOfWork: { roof: 'no', foundation: 'no', electrical: 'no', plumbing: 'yes', hvac: 'no', floors: 'yes', paint: 'yes', cabinets: 'yes', showerTubs: 'yes', kitchen: 'yes', windows: 'no', doors: 'no', waterHeater: 'na', exterior: 'no', landscaping: 'yes' },
     title: 'Stunning Brick Ranch - Massive ARV Upside',
     address: '2847 Peachtree Rd NE',
     city: 'Atlanta',
@@ -33,6 +34,7 @@ export const deals = [
   },
   {
     id: 2,
+    scopeOfWork: { roof: 'no', foundation: 'no', electrical: 'yes', plumbing: 'no', hvac: 'yes', floors: 'yes', paint: 'yes', cabinets: 'no', showerTubs: 'no', kitchen: 'yes', windows: 'na', doors: 'na', waterHeater: 'yes', exterior: 'yes', landscaping: 'no' },
     title: 'Phoenix Fixer - Hot Market Deal',
     address: '1204 W McDowell Rd',
     city: 'Phoenix',
@@ -64,6 +66,7 @@ export const deals = [
   },
   {
     id: 3,
+    scopeOfWork: { roof: 'yes', foundation: 'no', electrical: 'no', plumbing: 'no', hvac: 'no', floors: 'no', paint: 'yes', cabinets: 'na', showerTubs: 'na', kitchen: 'no', windows: 'no', doors: 'no', waterHeater: 'no', exterior: 'yes', landscaping: 'yes' },
     title: 'Dallas Duplex - Cash Flowing Day One',
     address: '5521 Forest Ln',
     city: 'Dallas',

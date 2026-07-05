@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  ArrowLeft, Heart, Share2, MapPin, Calendar, Home, Maximize2,
-  ChevronLeft, ChevronRight, MessageSquare, TrendingUp, Crown,
-  Shield, CheckCircle, X, Zap, Eye
+  ArrowLeft, Heart, Share2, MapPin, Calendar, CheckCircle, X,
+  MessageSquare, Shield, Hammer, ClipboardList, Sparkles, KeyRound,
 } from 'lucide-react';
 import { getDealById, getSimilarDeals } from '../data/deals';
 import { getLiveDeal, isLiveDealId } from '../lib/deals';
@@ -19,6 +18,8 @@ import { hasDMd } from '../lib/dmHistory';
 import { logActivity } from '../lib/activityLog';
 import ProfitCalculator from '../components/ProfitCalculator';
 import { getDisplayAddress } from '../utils/address';
+import { dealPath, dealUrl, idFromSlug } from '../utils/slug';
+import { visibleScopeEntries } from '../data/scopeOfWork';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSavedDeals } from '../hooks/useSavedDeals';
@@ -49,7 +50,9 @@ function formatCurrency(n) {
 }
 
 export default function DealDetail() {
-  const { id } = useParams();
+  const { id: slugParam } = useParams();
+  const id = idFromSlug(slugParam);
+  const navigate = useNavigate();
   const mockDeal = getDealById(id);
   const [liveDeal, setLiveDeal] = useState(null);
   const [liveChecked, setLiveChecked] = useState(false);
@@ -67,41 +70,51 @@ export default function DealDetail() {
   }, [id, mockDeal]);
 
   const deal = mockDeal || liveDeal;
-  const { currentUser, isLoggedIn, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
+  const { currentUser, isLoggedIn, isAuthenticated, requireAuthForDM } = useAuth();
 
-  // Guests CAN browse the masked listing — they're only gated (with the
-  // animated signup slider) when they try to request the exact address.
+  // Canonical URL: old bare-id links (/marketplace/2) redirect to the SEO
+  // slug (/marketplace/woodlands-texas-fix-n-flip-2) so one URL wins.
+  useEffect(() => {
+    if (!deal) return;
+    const canonical = dealPath(deal);
+    if (canonical.split('/').pop() !== slugParam) {
+      navigate(canonical, { replace: true });
+    }
+  }, [deal, slugParam, navigate]);
+
   const { toast } = useToast();
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const isMobile = useIsMobile();
   const [showAddressReq, setShowAddressReq] = useState(false);
   const [showCarsonNote, setShowCarsonNote] = useState(false);
-
-  // First-time guard: when the user clicks any "Request Address" button,
   const [showShare, setShowShare] = useState(false);
   const [addressGranted, setAddressGranted] = useState(false);
   const [showSignupSlider, setShowSignupSlider] = useState(false);
   const [showOwnerModal, setShowOwnerModal] = useState(false);
+  const [detailsTab, setDetailsTab] = useState('details'); // 'details' | 'scope'
 
-  // Address visibility policy set by the seller on the post page.
-  const addressPolicy = deal?.addressVisibility || 'request';
+  // Address policy set by the seller when posting. Default is "public":
+  // any signed-in buyer can Get Address instantly, unless the seller
+  // explicitly required approval on the post form.
+  const addressPolicy = deal?.addressVisibility || 'public';
 
-  // Kicks off the address flow with the right behaviour for the policy.
   function startAddressRequest() {
-    // Guests can't request — sell them on signing up.
+    // Guests always get the signup sell first.
     if (!isAuthenticated) {
       setShowSignupSlider(true);
       return;
     }
-    if (addressPolicy === 'public') return; // already visible
-
+    if (addressPolicy === 'public') {
+      grantAddress('Address unlocked. Go take a look!');
+      return;
+    }
     const sellerId = deal?.sellerId;
     // "Buyers I've DM'd before" → instant unlock if the seller messaged them.
     if (addressPolicy === 'dmd' && sellerId && hasDMd(sellerId, currentUser?.id)) {
       grantAddress('Auto-shared — you and the seller have messaged before.');
       return;
     }
-    // Otherwise require the request form (Carson note first time).
+    // Approval-required listings keep the request flow (Carson note first time).
     if (!hasSeenCarsonNote()) {
       setShowCarsonNote(true);
     } else {
@@ -122,10 +135,47 @@ export default function DealDetail() {
   const saved = deal ? isSaved(deal.id) : false;
 
   useSEO({
-    title: deal ? `${deal.city || 'Off-market'} ${dealTypeLabels[deal.dealType] || 'deal'} — ${formatCurrency(deal.listingPrice || deal.price)}` : 'Deal',
-    description: deal ? `${deal.beds || 0} bed / ${deal.baths || 0} bath • ${deal.sqft ? deal.sqft.toLocaleString() + ' sqft' : ''} • ARV ${formatCurrency(deal.arv)} • ${deal.city}, ${deal.state}` : '',
+    title: deal
+      ? `${deal.title} — ${deal.city}, ${deal.state} ${dealTypeLabels[deal.dealType] || 'Deal'}`
+      : 'Deal',
+    description: deal
+      ? `${deal.title}: ${deal.beds || 0} bed / ${deal.baths || 0} bath ${dealTypeLabels[deal.dealType] || ''} in ${deal.city}, ${deal.state}. Asking ${formatCurrency(deal.listingPrice || deal.price)}, ARV ${formatCurrency(deal.arv)}. Off-market on AllStreetLive.`
+      : '',
     image: deal?.images?.[0] || deal?.image,
+    url: deal ? dealUrl(deal) : undefined,
   });
+
+  // Structured data so Google understands the listing (name, price, geo).
+  useEffect(() => {
+    if (!deal) return;
+    const el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id = 'deal-jsonld';
+    el.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'RealEstateListing',
+      name: deal.title,
+      url: dealUrl(deal),
+      image: deal.images?.[0],
+      description: deal.description,
+      offers: {
+        '@type': 'Offer',
+        price: deal.listingPrice || deal.price,
+        priceCurrency: 'USD',
+        availability: deal.status === 'available' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
+      },
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: deal.city,
+        addressRegion: deal.state,
+        postalCode: deal.zip,
+        addressCountry: 'US',
+      },
+    });
+    document.head.querySelector('#deal-jsonld')?.remove();
+    document.head.appendChild(el);
+    return () => { document.head.querySelector('#deal-jsonld')?.remove(); };
+  }, [deal]);
 
   if (!deal) {
     return (
@@ -144,12 +194,27 @@ export default function DealDetail() {
 
   const seller = getUserById(deal.sellerId) || {};
   const similar = getSimilarDeals(deal, 3);
-  // Only the deal owner sees edit tools
   const isOwner = isLoggedIn && currentUser && String(currentUser.id) === String(deal.sellerId);
 
-  // The exact address is visible to: the owner, anyone once approved, or
-  // everyone if the seller chose the "public" policy.
-  const addressVisible = isOwner || addressGranted || addressPolicy === 'public';
+  // Address is shown to: the owner, or anyone who unlocked it. Even on
+  // "public" listings buyers click Get Address once (instant) — that keeps
+  // guests converting and gives sellers an interest signal in the activity log.
+  const addressVisible = isOwner || addressGranted;
+  const messageSellerPath = `/messages?to=${deal.sellerId}`;
+
+  const scopeEntries = visibleScopeEntries(deal.scopeOfWork);
+  const needsWorkCount = scopeEntries.filter(e => e.needsWork).length;
+
+  // The four headline numbers. Rehab reads gold — it's a projected number on
+  // the deal, not a red flag.
+  const numberTiles = [
+    { label: 'List Price',      value: formatCurrency(deal.listingPrice || deal.price), color: '#f8fafc', accent: '#00c805' },
+    { label: 'ARV',             value: formatCurrency(deal.arv),                        color: '#10b981', accent: '#10b981' },
+    { label: 'Projected Rehab', value: deal.rehabLow && deal.rehabHigh
+        ? `${formatCurrency(deal.rehabLow)}–${formatCurrency(deal.rehabHigh)}`
+        : formatCurrency(deal.repairCost),                                              color: '#fbbf24', accent: '#f59e0b' },
+    { label: 'Deal Type',       value: dealTypeLabels[deal.dealType] || '—',            color: '#00e5a0', accent: '#00e5a0' },
+  ];
 
   return (
     <div className="page-enter" style={{ background: '#0a0b0a', minHeight: '100vh' }}>
@@ -191,16 +256,20 @@ export default function DealDetail() {
               gap: 32px;
             }
           }
+          @keyframes sow-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+            50% { box-shadow: 0 0 18px 2px rgba(245,158,11,0.25); }
+          }
         `}</style>
         <div className="deal-detail-grid">
-          {/* Left column */}
+          {/* ── Left column ── */}
           <div>
-            {/* Image Gallery with YouTube support */}
+            {/* Photos + video */}
             <div style={{ marginBottom: '16px' }}>
               <ImageCarousel images={deal.images} youtubeId={deal.youtubeId} height={isMobile ? 320 : 480} />
             </div>
 
-            {/* Street View — directly under photos, lazy-loaded (no tokens used until tapped) */}
+            {/* Street View — lazy, only once the address is unlocked */}
             {addressVisible && (
               <StreetView
                 address={deal.address}
@@ -226,16 +295,18 @@ export default function DealDetail() {
                     style={{
                       marginLeft: '8px', padding: '4px 12px', borderRadius: '16px',
                       background: 'rgba(0, 200, 5, 0.15)', border: '1px solid rgba(0, 200, 5, 0.4)',
-                      color: '#00c805', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                      color: '#4ade80', cursor: 'pointer', fontSize: '12px', fontWeight: 700,
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
                     }}
                   >
-                    Request Address
+                    <KeyRound size={12} />
+                    {addressPolicy === 'public' ? 'Get Address' : 'Request Address'}
                   </button>
                 )}
               </div>
             </div>
 
-            {/* ── Deal Numbers Card (mobile: compact 2x2; desktop: 4 in a row) ── */}
+            {/* ── The numbers (projected figures — nothing here is "bad") ── */}
             {isMobile ? (
               <div style={{
                 background: '#131614',
@@ -246,27 +317,20 @@ export default function DealDetail() {
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
               }}>
-                {[
-                  { label: 'List Price', value: formatCurrency(deal.price),      color: '#f8fafc', accent: '#00c805' },
-                  { label: 'ARV',        value: formatCurrency(deal.arv),         color: '#10b981', accent: '#10b981' },
-                  { label: 'Est. Repairs', value: formatCurrency(deal.repairCost), color: '#f59e0b', accent: '#ef4444' },
-                  { label: 'Deal Type',  value: dealTypeLabels[deal.dealType] || '—', color: '#00e5a0', accent: '#00e5a0' },
-                ].map(({ label, value, color, accent }, i) => (
+                {numberTiles.map(({ label, value, color, accent }, i) => (
                   <div key={label} style={{
                     padding: '14px 14px',
                     borderRight: i % 2 === 0 ? '1px solid #232925' : 'none',
                     borderBottom: i < 2 ? '1px solid #232925' : 'none',
                   }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4,
-                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
                       <div style={{ width: 4, height: 4, borderRadius: '50%', background: accent }} />
                       <span style={{
                         color: '#95a29b', fontSize: 10, fontWeight: 700,
                         letterSpacing: 0.5, textTransform: 'uppercase',
                       }}>{label}</span>
                     </div>
-                    <div style={{ color, fontWeight: 800, fontSize: 19, lineHeight: 1.1, letterSpacing: '-0.3px' }}>
+                    <div style={{ color, fontWeight: 800, fontSize: 18, lineHeight: 1.1, letterSpacing: '-0.3px' }}>
                       {value}
                     </div>
                   </div>
@@ -274,61 +338,139 @@ export default function DealDetail() {
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-                {[
-                  { label: 'Listing Price', value: formatCurrency(deal.price), color: '#f8fafc', bg: 'rgba(0, 200, 5, 0.1)', border: 'rgba(0, 200, 5, 0.2)' },
-                  { label: 'After Repair Value', value: formatCurrency(deal.arv), color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)' },
-                  { label: 'Est. Repair Cost', value: formatCurrency(deal.repairCost), color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)' },
-                  { label: 'Deal Type', value: dealTypeLabels[deal.dealType] || '—', color: '#00e5a0', bg: 'rgba(0, 229, 160, 0.1)', border: 'rgba(0, 229, 160, 0.2)' },
-                ].map(({ label, value, color, bg, border }) => (
-                  <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                {numberTiles.map(({ label, value, color, accent }) => (
+                  <div key={label} style={{
+                    background: `${accent}14`, border: `1px solid ${accent}33`,
+                    borderRadius: '12px', padding: '16px', textAlign: 'center',
+                  }}>
                     <div style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, marginBottom: '6px', letterSpacing: '0.5px' }}>
                       {label.toUpperCase()}
                     </div>
-                    <div style={{ color, fontWeight: 800, fontSize: '22px', lineHeight: 1 }}>{value}</div>
+                    <div style={{ color, fontWeight: 800, fontSize: '20px', lineHeight: 1.1 }}>{value}</div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* ── Deal Calculator (replaces any static profit figure) ── */}
-            <ProfitCalculator
-              listingPrice={deal.price || deal.listingPrice || 0}
-              arv={deal.arv || 0}
-              rehabDefault={
-                deal.rehabLow != null && deal.rehabHigh != null
-                  ? Math.round((deal.rehabLow + deal.rehabHigh) / 2)
-                  : (deal.repairCost || 0)
-              }
-              isMobile={isMobile}
-            />
-
-            {/* Property Details */}
+            {/* ── Property Details + Scope of Work (tabs) — ABOVE the calculator ── */}
             <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
-              <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '16px' }}>Property Details</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))', gap: isMobile ? '14px 12px' : '16px' }}>
-                {[
-                  { label: 'Bedrooms', value: deal.beds || 'N/A', icon: '🛏' },
-                  { label: 'Bathrooms', value: deal.baths || 'N/A', icon: '🛁' },
-                  { label: 'Square Feet', value: deal.sqft ? deal.sqft.toLocaleString() : 'N/A', icon: '📐' },
-                  { label: 'Year Built', value: deal.yearBuilt || 'N/A', icon: '📅' },
-                  { label: 'Lot Size', value: deal.lotSize || 'N/A', icon: '🗺' },
-                  { label: 'Status', value: deal.status === 'under contract' ? 'Under Contract' : 'Available', icon: '✅' },
-                  { label: 'Days Listed', value: `${deal.daysListed} days`, icon: '⏱' },
-                  { label: 'Deal Type', value: dealTypeLabels[deal.dealType], icon: '🏷' },
-                ].map(({ label, value, icon }) => (
-                  <div key={label}>
-                    <div style={{ color: '#5a675f', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>{icon} {label}</div>
-                    <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '15px' }}>{value}</div>
-                  </div>
-                ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setDetailsTab('details')}
+                  style={{
+                    padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
+                    background: detailsTab === 'details' ? 'rgba(0, 200, 5, 0.14)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${detailsTab === 'details' ? '#00c805' : '#232925'}`,
+                    color: detailsTab === 'details' ? '#4ade80' : '#95a29b',
+                    fontWeight: 800, fontSize: 13.5,
+                    display: 'flex', alignItems: 'center', gap: 7,
+                  }}
+                >
+                  Property Details
+                </button>
+                {/* Highlighted engagement tab — the lister's own condition report */}
+                <button
+                  onClick={() => setDetailsTab('scope')}
+                  style={{
+                    padding: '9px 16px', borderRadius: 10, cursor: 'pointer',
+                    background: detailsTab === 'scope'
+                      ? 'rgba(245,158,11,0.18)'
+                      : 'linear-gradient(135deg, rgba(245,158,11,0.10), rgba(245,158,11,0.04))',
+                    border: `1px solid ${detailsTab === 'scope' ? '#f59e0b' : 'rgba(245,158,11,0.45)'}`,
+                    color: '#fbbf24',
+                    fontWeight: 800, fontSize: 13.5,
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    animation: detailsTab === 'scope' ? 'none' : 'sow-glow 2.6s ease-in-out infinite',
+                  }}
+                >
+                  <Sparkles size={14} />
+                  Scope of Work
+                  {scopeEntries.length > 0 && (
+                    <span style={{
+                      background: '#f59e0b', color: '#161a17', borderRadius: 999,
+                      padding: '1px 8px', fontSize: 11, fontWeight: 900,
+                    }}>
+                      {needsWorkCount} item{needsWorkCount === 1 ? '' : 's'}
+                    </span>
+                  )}
+                </button>
               </div>
+
+              {detailsTab === 'details' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))', gap: isMobile ? '14px 12px' : '16px' }}>
+                  {[
+                    { label: 'Bedrooms', value: deal.beds || 'N/A', icon: '🛏' },
+                    { label: 'Bathrooms', value: deal.baths || 'N/A', icon: '🛁' },
+                    { label: 'Square Feet', value: deal.sqft ? deal.sqft.toLocaleString() : 'N/A', icon: '📐' },
+                    { label: 'Year Built', value: deal.yearBuilt || 'N/A', icon: '📅' },
+                    { label: 'Lot Size', value: deal.lotSize || 'N/A', icon: '🗺' },
+                    { label: 'Status', value: deal.status === 'under contract' ? 'Under Contract' : 'Available', icon: '✅' },
+                    { label: 'Days Listed', value: `${deal.daysListed} days`, icon: '⏱' },
+                    { label: 'Deal Type', value: dealTypeLabels[deal.dealType], icon: '🏷' },
+                  ].map(({ label, value, icon }) => (
+                    <div key={label}>
+                      <div style={{ color: '#5a675f', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>{icon} {label}</div>
+                      <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '15px' }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  {scopeEntries.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '26px 14px' }}>
+                      <ClipboardList size={30} style={{ color: '#5a675f', marginBottom: 10 }} />
+                      <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 15, marginBottom: 4 }}>
+                        No scope of work yet
+                      </div>
+                      <div style={{ color: '#95a29b', fontSize: 13, lineHeight: 1.6, maxWidth: 420, margin: '0 auto' }}>
+                        The lister hasn't filled out the condition report for this property.
+                        Message them — they can answer the 15 scope questions in a minute.
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p style={{ color: '#95a29b', fontSize: 13, margin: '0 0 14px', lineHeight: 1.55 }}>
+                        Straight from {deal.sellerName || 'the lister'} — what this property needs
+                        and what's already in good shape. Projected work, not problems.
+                      </p>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
+                        {scopeEntries.map(({ key, label, needsWork }) => (
+                          <div key={key} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '10px 14px', borderRadius: 10,
+                            background: needsWork ? 'rgba(245,158,11,0.07)' : 'rgba(16,185,129,0.06)',
+                            border: `1px solid ${needsWork ? 'rgba(245,158,11,0.25)' : 'rgba(16,185,129,0.2)'}`,
+                          }}>
+                            <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: 13.5 }}>{label}</span>
+                            {needsWork ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#fbbf24', fontWeight: 800, fontSize: 12 }}>
+                                <Hammer size={13} /> In the rehab
+                              </span>
+                            ) : (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#10b981', fontWeight: 800, fontSize: 12 }}>
+                                <CheckCircle size={13} /> Good to go
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* ── Contact the Wholesaler CTA (right under Property Details) ── */}
+            {/* ── Description — above the calculator ── */}
+            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '20px' }}>
+              <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
+              <p style={{ color: '#e4eae6', lineHeight: 1.8, fontSize: '15px', margin: 0, whiteSpace: 'pre-wrap' }}>{deal.description}</p>
+            </div>
+
+            {/* ── Contact the Wholesaler CTA ── */}
             {!isOwner && (
               <div style={{
-                background: 'linear-gradient(135deg, rgba(0, 200, 5,0.10), rgba(0, 229, 160,0.06))',
-                border: '1px solid rgba(0, 200, 5,0.30)',
+                background: 'linear-gradient(135deg, rgba(0, 200, 5, 0.10), rgba(0, 229, 160, 0.06))',
+                border: '1px solid rgba(0, 200, 5, 0.30)',
                 borderRadius: 16,
                 padding: isMobile ? '16px' : '20px',
                 marginBottom: 20,
@@ -341,7 +483,7 @@ export default function DealDetail() {
                   style={{
                     width: 52, height: 52, borderRadius: '50%',
                     objectFit: 'cover', flexShrink: 0,
-                    border: '2px solid rgba(0, 200, 5,0.4)',
+                    border: '2px solid rgba(0, 200, 5, 0.4)',
                   }}
                 />
                 <div style={{ flex: 1, minWidth: 160 }}>
@@ -356,7 +498,7 @@ export default function DealDetail() {
                   </div>
                 </div>
                 <Link
-                  to="/messages"
+                  to={messageSellerPath}
                   onClick={(e) => {
                     if (!isLoggedIn) {
                       e.preventDefault();
@@ -367,27 +509,32 @@ export default function DealDetail() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     padding: '11px 18px', borderRadius: 11,
-                    color: '#fff', textDecoration: 'none', fontWeight: 800, fontSize: 14,
-                    boxShadow: '0 6px 18px rgba(0, 200, 5,0.35)',
+                    textDecoration: 'none', fontWeight: 800, fontSize: 14,
                     flexShrink: 0,
                   }}
                 >
                   <MessageSquare size={15} />
-                  Send Message
+                  Message Seller
                 </Link>
               </div>
             )}
 
-            {/* Description */}
-            <div style={{ background: '#131614', border: '1px solid #232925', borderRadius: '16px', padding: isMobile ? '18px' : '24px', marginBottom: '24px' }}>
-              <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '18px', marginBottom: '14px' }}>Deal Description</h3>
-              <p style={{ color: '#e4eae6', lineHeight: 1.8, fontSize: '15px', margin: 0 }}>{deal.description}</p>
-            </div>
+            {/* ── Deal Calculator — after details & description ── */}
+            <ProfitCalculator
+              listingPrice={deal.price || deal.listingPrice || 0}
+              arv={deal.arv || 0}
+              rehabDefault={
+                deal.rehabLow != null && deal.rehabHigh != null
+                  ? Math.round((deal.rehabLow + deal.rehabHigh) / 2)
+                  : (deal.repairCost || 0)
+              }
+              isMobile={isMobile}
+            />
 
             {/* Similar Deals */}
             {similar.length > 0 && (
               <div>
-                <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '20px', marginBottom: '20px' }}>Similar Deals</h3>
+                <h3 style={{ color: '#f8fafc', fontWeight: 700, fontSize: '20px', margin: '24px 0 20px' }}>Similar Deals</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
                   {similar.map(d => <DealCard key={d.id} deal={d} />)}
                 </div>
@@ -395,7 +542,7 @@ export default function DealDetail() {
             )}
           </div>
 
-          {/* Right sidebar */}
+          {/* ── Right sidebar ── */}
           <div style={{ position: 'sticky', top: '84px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Price Card */}
             <div style={{
@@ -405,7 +552,7 @@ export default function DealDetail() {
             }}>
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ color: '#95a29b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '4px' }}>LISTING PRICE</div>
-                <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: '40px', lineHeight: 1 }}>{formatCurrency(deal.price)}</div>
+                <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: '40px', lineHeight: 1 }}>{formatCurrency(deal.listingPrice || deal.price)}</div>
               </div>
 
               <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
@@ -413,9 +560,9 @@ export default function DealDetail() {
                   <div style={{ color: '#5a675f', fontSize: '10px', fontWeight: 700 }}>ARV</div>
                   <div style={{ color: '#10b981', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.arv)}</div>
                 </div>
-                <div style={{ flex: 1, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-                  <div style={{ color: '#5a675f', fontSize: '10px', fontWeight: 700 }}>EST. REPAIRS</div>
-                  <div style={{ color: '#f59e0b', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.repairCost)}</div>
+                <div style={{ flex: 1, background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
+                  <div style={{ color: '#5a675f', fontSize: '10px', fontWeight: 700 }}>PROJECTED REHAB</div>
+                  <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '16px' }}>{formatCurrency(deal.repairCost)}</div>
                 </div>
               </div>
 
@@ -442,7 +589,7 @@ export default function DealDetail() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   }}>
                     <CheckCircle size={18} />
-                    {addressPolicy === 'public' && !addressGranted && !isOwner ? 'Address Visible' : 'Address Unlocked'}
+                    Address Unlocked
                   </div>
                 ) : (
                   <button
@@ -450,17 +597,17 @@ export default function DealDetail() {
                     className="gradient-btn"
                     style={{
                       width: '100%', padding: '14px', borderRadius: '12px',
-                      color: '#fff', fontWeight: 800, fontSize: '16px',
+                      fontWeight: 800, fontSize: '16px',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     }}
                   >
-                    <CheckCircle size={18} />
-                    Send Address Request
+                    <KeyRound size={18} />
+                    {addressPolicy === 'public' ? 'Get Address' : 'Request Address'}
                   </button>
                 )}
 
                 <Link
-                  to="/messages"
+                  to={messageSellerPath}
                   onClick={(e) => {
                     if (!isLoggedIn) {
                       e.preventDefault();
@@ -496,7 +643,7 @@ export default function DealDetail() {
                   </button>
                   <button
                     onClick={async () => {
-                      const url = `${window.location.origin}/marketplace/${deal.id}`;
+                      const url = `${window.location.origin}${dealPath(deal)}`;
                       const shareData = {
                         title: deal.title || `${deal.city}, ${deal.state} deal`,
                         text: `${deal.title} — ${formatCurrency(deal.listingPrice || deal.price)} in ${deal.city}, ${deal.state}`,
@@ -538,7 +685,7 @@ export default function DealDetail() {
                   <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
                     {(deal.tags || seller.tags || []).map(tag => (
                       <span key={tag} style={{
-                        background: 'rgba(0, 200, 5, 0.1)', color: '#00c805',
+                        background: 'rgba(0, 200, 5, 0.1)', color: '#4ade80',
                         border: '1px solid rgba(0, 200, 5, 0.2)',
                         borderRadius: '20px', padding: '1px 8px', fontSize: '11px', fontWeight: 600,
                       }}>
@@ -568,14 +715,20 @@ export default function DealDetail() {
                   style={{
                     flex: 1, padding: '10px', borderRadius: '10px', textAlign: 'center',
                     background: 'rgba(0, 200, 5, 0.1)', border: '1px solid rgba(0, 200, 5, 0.2)',
-                    color: '#00c805', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
+                    color: '#4ade80', textDecoration: 'none', fontWeight: 600, fontSize: '13px',
                     transition: 'all 0.2s',
                   }}
                 >
                   View Profile
                 </Link>
                 <Link
-                  to="/messages"
+                  to={messageSellerPath}
+                  onClick={(e) => {
+                    if (!isLoggedIn) {
+                      e.preventDefault();
+                      requireAuthForDM('deal-detail-seller-sidebar');
+                    }
+                  }}
                   style={{
                     flex: 1, padding: '10px', borderRadius: '10px', textAlign: 'center',
                     background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
@@ -616,7 +769,7 @@ export default function DealDetail() {
         }}
       />
 
-      {/* Buyer fills the request — no longer auto-grants. */}
+      {/* Buyer fills the request — approval-required listings only. */}
       {showAddressReq && (
         <AddressRequestModal
           deal={deal}
@@ -631,17 +784,16 @@ export default function DealDetail() {
               targetId: deal.sellerId,
             });
             toast(`Request sent to ${deal.sellerName}. They'll review it.`, 'success', 3500);
-            // Surface the seller's side so the approve/deny/DM flow is usable.
             setShowOwnerModal(true);
           }}
         />
       )}
 
-      {/* Guest hits "Request Address" → animated signup sell. */}
+      {/* Guest hits "Get Address" → animated signup sell. */}
       <AddressSignupSlider
         open={showSignupSlider}
         onClose={() => setShowSignupSlider(false)}
-        redirectTo={`/marketplace/${deal.id}`}
+        redirectTo={dealPath(deal)}
       />
 
       {/* Seller-side: approve / deny / DM the requester. */}
@@ -683,7 +835,7 @@ export default function DealDetail() {
             </div>
             <div style={{ padding: '20px' }}>
               <textarea
-                defaultValue={`Check out this deal in ${deal.city}, ${deal.state}!\n\n${deal.title}\n\nListing Price: ${formatCurrency(deal.listingPrice || deal.price)}\nARV: ${formatCurrency(deal.arv)}\n\nhttps://allstreetlive.com/marketplace/${deal.id}`}
+                defaultValue={`Check out this deal in ${deal.city}, ${deal.state}!\n\n${deal.title}\n\nListing Price: ${formatCurrency(deal.listingPrice || deal.price)}\nARV: ${formatCurrency(deal.arv)}\n\n${dealUrl(deal)}`}
                 className="input-dark"
                 rows={6}
                 style={{ width: '100%', padding: '12px', borderRadius: '10px', fontSize: '14px', resize: 'vertical', marginBottom: '12px' }}
@@ -699,14 +851,14 @@ export default function DealDetail() {
                 <button
                   onClick={() => { setShowShare(false); toast('Posted to your feed!', 'success'); }}
                   className="gradient-btn"
-                  style={{ flex: 1, padding: '12px', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '14px' }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '10px', fontWeight: 700, fontSize: '14px' }}
                 >
                   Post to Feed
                 </button>
                 <button
                   onClick={() => {
-                    const url = `${window.location.origin}/marketplace/${deal.id}`;
-                    try { navigator.clipboard.writeText(url); } catch {}
+                    const url = `${window.location.origin}${dealPath(deal)}`;
+                    try { navigator.clipboard.writeText(url); } catch { /* clipboard unavailable */ }
                     toast('Link copied to clipboard', 'info');
                   }}
                   style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', color: '#95a29b', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}

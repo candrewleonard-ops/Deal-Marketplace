@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar, Lock, MapPin, TrendingUp } from 'lucide-react';
 import { useSavedDeals } from '../hooks/useSavedDeals';
 import { useAuth } from '../context/AuthContext';
+import { dealPath } from '../utils/slug';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 const DEAL_TYPE_LABELS = {
@@ -44,15 +45,15 @@ export default function DealCard({ deal }) {
 
   function openDeal(e) {
     if (e) e.preventDefault();
-    if (!requireAuth(`view this property in ${deal.city || 'the marketplace'}`, 'open-deal', `/marketplace/${deal.id}`)) {
+    if (!requireAuth(`view this property in ${deal.city || 'the marketplace'}`, 'open-deal', dealPath(deal))) {
       return;
     }
-    navigate(`/marketplace/${deal.id}`);
+    navigate(dealPath(deal));
   }
 
   function handleSaveClick(e) {
     e.stopPropagation();
-    if (!requireAuth('save deals to your collection', 'save', `/marketplace/${deal.id}`)) return;
+    if (!requireAuth('save deals to your collection', 'save', dealPath(deal))) return;
     toggleSaved(deal.id);
   }
 
