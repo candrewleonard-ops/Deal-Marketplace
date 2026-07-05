@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   DollarSign, Home, MapPin, Camera, Video, Tag, ArrowLeft, Upload,
   X, GripVertical, Star, Image as ImageIcon, Sparkles, CheckCircle2,
+  Hammer,
 } from 'lucide-react';
+import { SOW_ITEMS } from '../data/scopeOfWork';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useSEO } from '../hooks/useSEO';
@@ -24,17 +26,6 @@ const DEAL_TYPES = [
 
 const MAX_PHOTOS = 12;
 
-// Vibrant gradient palette — used for empty photo slots + accents so the
-// gallery feels alive (matches the lively tiles in the onboarding tour).
-const GRADIENTS = [
-  'linear-gradient(135deg, #00c805, #00e5a0)',
-  'linear-gradient(135deg, #ef4444, #f59e0b)',
-  'linear-gradient(135deg, #10b981, #00e5a0)',
-  'linear-gradient(135deg, #f59e0b, #f59e0b)',
-  'linear-gradient(135deg, #00e5a0, #00c805)',
-  'linear-gradient(135deg, #f59e0b, #00c805)',
-];
-
 export default function PostDeal() {
   useSEO({ title: 'Post a Deal', description: 'List your off-market deal in under a minute.' });
   const { toast } = useToast();
@@ -52,7 +43,8 @@ export default function PostDeal() {
     contractedPrice: '', listingPrice: '',
     arv: '', rehabLow: '', rehabHigh: '',
     description: '', youtubeUrl: '',
-    addressVisibility: 'request', // 'public' | 'request' | 'dmd'
+    addressVisibility: 'public', // 'public' (default — buyers get it instantly) | 'request'
+    scopeOfWork: {},             // { roof: 'yes'|'no'|'na', ... } — see data/scopeOfWork.js
   });
   const [showVideoNudge, setShowVideoNudge] = useState(true);
   const [photos, setPhotos] = useState([]); // { id, url, name }
@@ -319,14 +311,13 @@ export default function PostDeal() {
                 />
               </div>
             </div>
-            {/* Address visibility policy */}
+            {/* Address policy — a simple yes/no. Default: buyers get it instantly. */}
             <div style={{ marginBottom: 14 }}>
-              <Label>Who can see the exact address?</Label>
+              <Label>Can buyers get the address instantly?</Label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
                 {[
-                  { v: 'public', t: 'Anyone can see it', d: 'Address shown to any signed-in buyer — no request needed.' },
-                  { v: 'request', t: 'Require my approval', d: "Buyers must request it; you approve or deny each one." },
-                  { v: 'dmd', t: "Auto-share with buyers I've DM'd", d: "If you've messaged them before they get it instantly; everyone else still requests." },
+                  { v: 'public', t: 'Yes — instant (recommended)', d: 'Any signed-in buyer taps "Get Address" and sees it right away. You still see who grabbed it.' },
+                  { v: 'request', t: 'No — I approve each request', d: 'Buyers must send a request; you approve or deny each one.' },
                 ].map(opt => {
                   const on = form.addressVisibility === opt.v;
                   return (
@@ -481,6 +472,59 @@ export default function PostDeal() {
           </Card>
         </div>
 
+        {/* ── Scope of Work — 15 quick condition questions ── */}
+        <Card title="Scope of work" icon={Hammer} style={{ marginTop: 18 }}>
+          <p style={{ color: '#95a29b', fontSize: 13, margin: '0 0 14px', lineHeight: 1.55 }}>
+            15 quick questions about what the property needs. Buyers see your answers in a
+            <strong style={{ color: '#fbbf24' }}> Scope of Work</strong> tab on the listing — deals
+            with a filled-out scope get far more serious offers. Pick <strong style={{ color: '#e4eae6' }}>N/A</strong> to
+            leave one off the listing.
+          </p>
+          <div style={{
+            display: 'grid', gap: 8,
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          }}>
+            {SOW_ITEMS.map(({ key, question }) => {
+              const val = form.scopeOfWork?.[key] || null;
+              const setVal = (v) => update('scopeOfWork', { ...form.scopeOfWork, [key]: v });
+              const pill = (v, label, onColor, onBg, onBorder) => {
+                const on = val === v;
+                return (
+                  <button
+                    key={v} type="button"
+                    onClick={() => setVal(on ? null : v)}
+                    style={{
+                      padding: '7px 0', width: 46, borderRadius: 8, cursor: 'pointer',
+                      background: on ? onBg : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${on ? onBorder : '#232925'}`,
+                      color: on ? onColor : '#707d75',
+                      fontSize: 11.5, fontWeight: 800,
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              };
+              return (
+                <div key={key} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                  padding: '9px 12px', borderRadius: 10,
+                  background: '#0e100e', border: '1px solid #232925',
+                }}>
+                  <span style={{ color: '#e4eae6', fontWeight: 600, fontSize: 13, lineHeight: 1.3 }}>
+                    {question}
+                  </span>
+                  <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+                    {pill('yes', 'Yes', '#fbbf24', 'rgba(245,158,11,0.16)', '#f59e0b')}
+                    {pill('no', 'No', '#4ade80', 'rgba(0,200,5,0.14)', '#00c805')}
+                    {pill('na', 'N/A', '#95a29b', 'rgba(255,255,255,0.10)', '#38403a')}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
         {/* Description + video — larger on desktop */}
         <Card title="Description & video" icon={Video} style={{ marginTop: 18 }}>
           <Box label="Deal description">
@@ -555,9 +599,9 @@ export default function PostDeal() {
             style={{
               padding: isMobile ? '16px 28px' : '18px 44px',
               borderRadius: 14,
-              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
+              background: 'linear-gradient(135deg,#00c805,#00e05c)',
               border: 'none',
-              color: '#fff',
+              color: '#052012',
               fontWeight: 900, fontSize: isMobile ? 17 : 20, letterSpacing: 0.2,
               cursor: submitting ? 'wait' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 10,
@@ -675,7 +719,7 @@ function PhotoGallery({
           </div>
         ))}
 
-        {/* Upload tile — vibrant, lively */}
+        {/* Upload tile — the one loud element in an otherwise calm gallery */}
         {photos.length < MAX_PHOTOS && (
           <button
             type="button"
@@ -685,39 +729,32 @@ function PhotoGallery({
             onDrop={onDrop}
             style={{
               aspectRatio: '4 / 3', borderRadius: 12, border: 'none',
-              background: GRADIENTS[photos.length % GRADIENTS.length],
-              color: '#fff', cursor: 'pointer', position: 'relative', overflow: 'hidden',
+              background: 'linear-gradient(135deg, #00c805, #00e05c)',
+              color: '#052012', cursor: 'pointer', position: 'relative', overflow: 'hidden',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
               boxShadow: dragOver
                 ? '0 0 0 3px rgba(255,255,255,0.7), 0 12px 30px rgba(0, 200, 5,0.45)'
-                : '0 8px 24px rgba(0,0,0,0.35)',
+                : '0 8px 24px rgba(0, 200, 5, 0.25)',
               transform: dragOver ? 'scale(1.02)' : 'scale(1)',
               transition: 'all 0.15s',
             }}
           >
-            {/* sheen */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.28), transparent 55%)',
-              pointerEvents: 'none',
-            }} />
             <div style={{
               width: 46, height: 46, borderRadius: 12,
-              background: 'rgba(255,255,255,0.22)',
-              border: '1px solid rgba(255,255,255,0.4)',
+              background: 'rgba(255,255,255,0.30)',
+              border: '1px solid rgba(255,255,255,0.45)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(4px)',
             }}>
-              {photos.length === 0 ? <Camera size={20} color="#fff" /> : <Upload size={20} color="#fff" />}
+              {photos.length === 0 ? <Camera size={20} color="#052012" /> : <Upload size={20} color="#052012" />}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 900, textShadow: '0 1px 6px rgba(0,0,0,0.35)' }}>
+            <div style={{ fontSize: 13, fontWeight: 900 }}>
               {photos.length === 0 ? 'Add photos' : 'Add more'}
             </div>
-            <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.9 }}>Drop or click · JPG · PNG · HEIC</div>
+            <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.75 }}>Drop or click · JPG · PNG · HEIC</div>
           </button>
         )}
 
-        {/* Colorful empty slots so the gallery looks alive while you fill it */}
+        {/* Quiet placeholder slots — clean dashed tiles, not a rainbow */}
         {Array.from({ length: Math.max(0, Math.min(6, MAX_PHOTOS) - photos.length - 1) }).map((_, k) => {
           const slot = photos.length + 1 + k;
           return (
@@ -726,22 +763,18 @@ function PhotoGallery({
               type="button"
               onClick={onPick}
               style={{
-                aspectRatio: '4 / 3', borderRadius: 12, border: 'none',
-                background: GRADIENTS[(photos.length + 1 + k) % GRADIENTS.length],
-                position: 'relative', overflow: 'hidden', cursor: 'pointer',
+                aspectRatio: '4 / 3', borderRadius: 12,
+                border: '1.5px dashed #2e352f',
+                background: '#0e100e',
+                cursor: 'pointer',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
-                opacity: 0.45, transition: 'opacity 0.15s, transform 0.15s',
+                transition: 'border-color 0.15s, background 0.15s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'scale(1.02)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.45; e.currentTarget.style.transform = 'scale(1)'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#00c805'; e.currentTarget.style.background = '#10140f'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#2e352f'; e.currentTarget.style.background = '#0e100e'; }}
             >
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'radial-gradient(circle at 70% 80%, rgba(255,255,255,0.22), transparent 55%)',
-                pointerEvents: 'none',
-              }} />
-              <Camera size={18} color="rgba(255,255,255,0.85)" />
-              <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 11, fontWeight: 800 }}>
+              <Camera size={18} color="#5a675f" />
+              <span style={{ color: '#5a675f', fontSize: 11, fontWeight: 700 }}>
                 Photo {slot}
               </span>
             </button>
