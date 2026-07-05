@@ -319,7 +319,7 @@ function MeetupCard({ meetup, featured, onToast }) {
     >
       <div style={{ position: 'relative', height: '180px' }}>
         <img src={meetup.image} alt={meetup.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.9) 0%, transparent 60%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10, 11, 10,0.9) 0%, transparent 60%)' }} />
         <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
           <span style={{ background: `${color}E0`, color: '#fff', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', fontWeight: 700 }}>{meetup.category}</span>
         </div>

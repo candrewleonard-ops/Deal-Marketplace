@@ -178,7 +178,7 @@ export default function StreetView({ address, city, state, zip }) {
           />
           <div style={{
             position: 'absolute', bottom: 10, right: 10,
-            background: 'rgba(10,10,15,0.78)',
+            background: 'rgba(10, 11, 10,0.78)',
             backdropFilter: 'blur(8px)',
             color: '#fff', fontSize: 10, fontWeight: 800, letterSpacing: 0.5,
             padding: '5px 9px', borderRadius: 999,

@@ -574,7 +574,7 @@ export default function PostDeal() {
       {/* Sticky submit bar — large + prominent */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
-        background: 'rgba(13,13,26,0.98)', backdropFilter: 'blur(14px)',
+        background: 'rgba(13, 16, 13,0.98)', backdropFilter: 'blur(14px)',
         borderTop: '1px solid #232925',
         padding: `${isMobile ? 16 : 20}px ${isMobile ? 16 : 24}px calc(${isMobile ? 16 : 20}px + env(safe-area-inset-bottom))`,
         boxShadow: '0 -12px 40px rgba(0,0,0,0.5)',
@@ -688,7 +688,7 @@ function PhotoGallery({
             <div style={{
               position: 'absolute', top: 8, right: 8,
               width: 26, height: 26, borderRadius: 7,
-              background: 'rgba(10,10,15,0.7)', backdropFilter: 'blur(6px)',
+              background: 'rgba(10, 11, 10,0.7)', backdropFilter: 'blur(6px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#cdd6d0',
             }}>

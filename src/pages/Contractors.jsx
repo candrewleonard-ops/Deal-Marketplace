@@ -137,7 +137,7 @@ export default function Contractors() {
         position: 'sticky',
         top: isMobile ? 56 : 64,
         zIndex: 20,
-        background: 'rgba(10,10,15,0.92)',
+        background: 'rgba(10, 11, 10,0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: '1px solid #232925',

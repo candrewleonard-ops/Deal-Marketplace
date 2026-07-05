@@ -125,7 +125,7 @@ export default function DealCard({ deal }) {
             style={{
               position: 'absolute', top: 10, right: 10,
               width: 42, height: 42, borderRadius: '50%',
-              background: 'rgba(10,10,15,0.7)', border: 'none',
+              background: 'rgba(10, 11, 10,0.7)', border: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', backdropFilter: 'blur(8px)',
             }}
@@ -315,14 +315,14 @@ export default function DealCard({ deal }) {
           }}
           onError={e => { e.target.src = `https://picsum.photos/seed/fb${deal.id}/800/600`; }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.78) 0%, transparent 55%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10, 11, 10,0.78) 0%, transparent 55%)', pointerEvents: 'none' }} />
         {!isAuthenticated && hovered && (
           <div
             style={{
               position: 'absolute', inset: 0,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               gap: 8,
-              background: 'linear-gradient(180deg, rgba(10,10,15,0.55) 0%, rgba(10,10,15,0.75) 100%)',
+              background: 'linear-gradient(180deg, rgba(10, 11, 10,0.55) 0%, rgba(10, 11, 10,0.75) 100%)',
               backdropFilter: 'blur(2px)',
               pointerEvents: 'none',
             }}
@@ -347,7 +347,7 @@ export default function DealCard({ deal }) {
             <span className="shimmer-badge" style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px' }}>FEATURED</span>
           </div>
         )}
-        <button onClick={handleSaveClick} style={{ position: 'absolute', top: '10px', right: '10px', width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(10,10,15,0.7)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backdropFilter: 'blur(6px)' }}>
+        <button onClick={handleSaveClick} style={{ position: 'absolute', top: '10px', right: '10px', width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(10, 11, 10,0.7)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backdropFilter: 'blur(6px)' }}>
           <Heart size={16} fill={saved ? '#ef4444' : 'none'} style={{ color: saved ? '#ef4444' : '#f8fafc' }} />
         </button>
         {deal.status === 'under contract' && (

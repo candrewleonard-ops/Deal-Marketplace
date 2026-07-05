@@ -1,34 +1,46 @@
-import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Send, Image, Paperclip, MoreVertical, Phone, Video, ArrowLeft, Crown, Plus, X, Check } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import {
+  Search, Send, Image, Paperclip, MoreVertical, Phone, Video, ArrowLeft,
+  Crown, Plus, MessageSquare, Sparkles, UserPlus, Briefcase,
+} from 'lucide-react';
 import { users } from '../data/users';
+import { deals } from '../data/deals';
 import { useAuth } from '../context/AuthContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import UserHoverCard from '../components/UserHoverCard';
+import CallOverlay from '../components/CallOverlay';
+import { recordDM, getThread } from '../lib/dmHistory';
+import {
+  getUnreadMap, markConversationRead, getStartedThreads, ensureThread,
+  getFollowing, newBuyerCount, markBuyersSeen, subscribeInbox,
+} from '../lib/inbox';
+import { dealPath } from '../utils/slug';
 
-const conversations = [
-  { id: 1, userId: 2, lastMessage: "Hey! I saw your deal in Atlanta - very interested. What's the closing timeline?", time: '2m ago', unread: 3 },
-  { id: 2, userId: 4, lastMessage: 'The subject-to deal I mentioned is still available. Can we hop on a call?', time: '15m ago', unread: 1 },
-  { id: 3, userId: 7, lastMessage: 'Sent you the comps for the KC deal. Let me know what you think.', time: '1h ago', unread: 0 },
-  { id: 4, userId: 5, lastMessage: "Thanks for connecting! Memphis is on fire right now. I'll have 3 new deals next week.", time: '3h ago', unread: 0 },
-  { id: 5, userId: 8, lastMessage: 'Can you add me to your buyers list? Cash buyer, can close in 7 days.', time: '1d ago', unread: 0 },
-  { id: 6, userId: 9, lastMessage: 'Great meeting you at the Jacksonville meetup! Congrats on the deal.', time: '2d ago', unread: 0 },
+const seedConversations = [
+  { id: 1, userId: 2, lastMessage: "Hey! I saw your deal in Atlanta - very interested. What's the closing timeline?", time: '2m ago' },
+  { id: 2, userId: 4, lastMessage: 'The subject-to deal I mentioned is still available. Can we hop on a call?', time: '15m ago' },
+  { id: 3, userId: 7, lastMessage: 'Sent you the comps for the KC deal. Let me know what you think.', time: '1h ago' },
+  { id: 4, userId: 5, lastMessage: "Thanks for connecting! Memphis is on fire right now. I'll have 3 new deals next week.", time: '3h ago' },
+  { id: 5, userId: 8, lastMessage: 'Can you add me to your buyers list? Cash buyer, can close in 7 days.', time: '1d ago' },
+  { id: 6, userId: 9, lastMessage: 'Great meeting you at the Jacksonville meetup! Congrats on the deal.', time: '2d ago' },
 ];
 
 const initialMessageHistory = {
   1: [
-    { id: 1, from: 2, text: "Hey Marcus! I saw your Atlanta deal on All Street Live.", time: '10:32 AM', type: 'text' },
-    { id: 2, from: 1, text: "Hey Diana! Yes, great deal - 3/2 brick ranch, ARV $320k. Can close in 10 days.", time: '10:35 AM', type: 'text' },
-    { id: 3, from: 2, text: "Very interested! Is the assignment fee negotiable?", time: '10:36 AM', type: 'text' },
-    { id: 4, from: 1, text: "It's firm at $25k - we have another buyer interested and the numbers are solid. ARV supported by 3 comps.", time: '10:40 AM', type: 'text' },
-    { id: 5, from: 2, text: "Understood. Can you send me the inspection report and the comps? I'll have my partner review tonight.", time: '10:41 AM', type: 'text' },
-    { id: 6, from: 1, text: "Absolutely! Sending the due diligence package now. Full comps, inspection report, title search.", time: '10:45 AM', type: 'text' },
-    { id: 7, from: 2, text: "Hey! I saw your deal in Atlanta - very interested. What's the closing timeline?", time: '11:02 AM', type: 'text' },
+    { id: 1, from: 'them', text: "Hey Marcus! I saw your Atlanta deal on All Street Live.", time: '10:32 AM' },
+    { id: 2, from: 'me', text: "Hey Diana! Yes, great deal - 3/2 brick ranch, ARV $320k. Can close in 10 days.", time: '10:35 AM' },
+    { id: 3, from: 'them', text: "Very interested! Is the assignment fee negotiable?", time: '10:36 AM' },
+    { id: 4, from: 'me', text: "It's firm at $25k - we have another buyer interested and the numbers are solid. ARV supported by 3 comps.", time: '10:40 AM' },
+    { id: 5, from: 'them', text: "Understood. Can you send me the inspection report and the comps? I'll have my partner review tonight.", time: '10:41 AM' },
+    { id: 6, from: 'me', text: "Absolutely! Sending the due diligence package now. Full comps, inspection report, title search.", time: '10:45 AM' },
+    { id: 7, from: 'them', text: "Hey! I saw your deal in Atlanta - very interested. What's the closing timeline?", time: '11:02 AM' },
   ],
   2: [
-    { id: 1, from: 4, text: "Marcus! The Houston subject-to deal is still available. 3.25% rate locked in.", time: 'Yesterday', type: 'text' },
-    { id: 2, from: 1, text: "Sarah I know, I'm seriously considering it. What's the existing loan balance?", time: 'Yesterday', type: 'text' },
-    { id: 3, from: 4, text: "$85k at 3.25%. House will appraise at $220k. You're picking up $135k in equity day 1.", time: 'Yesterday', type: 'text' },
-    { id: 4, from: 4, text: 'The subject-to deal I mentioned is still available. Can we hop on a call?', time: 'Today', type: 'text' },
+    { id: 1, from: 'them', text: "Marcus! The Houston subject-to deal is still available. 3.25% rate locked in.", time: 'Yesterday' },
+    { id: 2, from: 'me', text: "Sarah I know, I'm seriously considering it. What's the existing loan balance?", time: 'Yesterday' },
+    { id: 3, from: 'them', text: "$85k at 3.25%. House will appraise at $220k. You're picking up $135k in equity day 1.", time: 'Yesterday' },
+    { id: 4, from: 'them', text: 'The subject-to deal I mentioned is still available. Can we hop on a call?', time: 'Today' },
   ],
 };
 
@@ -38,31 +50,120 @@ const messageRequests = [
   { id: 103, userId: 9, lastMessage: 'Hey, interested in lending on your next flip!', time: '2d ago' },
 ];
 
+// Buyers who raised their hand on your listings (drives the My Buyers tab).
+const buyerLeads = [
+  { userId: 8, note: 'Cash buyer · closes in 7 days', source: 'Got the address on “Stunning Brick Ranch”' },
+  { userId: 5, note: 'Buys in TN & GA · proof of funds on file', source: 'Saved 2 of your deals' },
+  { userId: 6, note: 'Flipper · 12 projects/yr', source: 'Requested the address on “Phoenix Fixer”' },
+];
+
 const DM_LIMITS = { Basic: 5, VIP: 30, 'VIP Max': 100 };
+
+const findUser = (id) => users.find(u => String(u.id) === String(id));
+
+function suggestedOpeners(user) {
+  return [
+    `Hey ${user?.name?.split(' ')[0] || 'there'}! Saw your listings — what markets are you focused on right now?`,
+    'Do you have anything under contract right now that fits a fix & flip?',
+    'Add me to your buyers list? I can move fast on the right numbers.',
+  ];
+}
 
 export default function Messages() {
   const { currentUser } = useAuth();
+  const isMobile = useIsMobile();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeConv, setActiveConv] = useState(null);
   const [message, setMessage] = useState('');
-  const [inboxTab, setInboxTab] = useState('inbox');
-  const [requestSort, setRequestSort] = useState('recent');
+  const [inboxTab, setInboxTab] = useState('inbox'); // inbox | requests | buyers
   const [searchVal, setSearchVal] = useState('');
-  const [messages, setMessages] = useState(initialMessageHistory);
+  const [sessionMessages, setSessionMessages] = useState({}); // convKey → extra msgs this session
   const [typing, setTyping] = useState(false);
   const [mobileView, setMobileView] = useState('list');
   const [requests, setRequests] = useState(messageRequests);
   const [acceptedRequests, setAcceptedRequests] = useState({});
+  const [call, setCall] = useState(null); // { mode: 'video' | 'audio' }
+  const [, forceInbox] = useState(0);
   const messagesEndRef = useRef(null);
+
+  // Re-render on inbox changes (unread counts, follows) from anywhere.
+  useEffect(() => subscribeInbox(() => forceInbox(x => x + 1)), []);
+
+  const unreadMap = getUnreadMap();
+  const following = getFollowing();
+  const isWholesaler = (currentUser?.tags || []).includes('Wholesaler');
 
   const dmLimit = DM_LIMITS[currentUser?.accountTier] || 5;
   const dmsUsed = 2;
 
-  const activeUser = activeConv ? users.find(u => u.id === activeConv.userId) : null;
-  const activeMessages = activeConv ? (messages[activeConv.id] || []) : [];
+  /* ── Conversation list = seeded demo convs + threads the user started ── */
+  const startedThreads = getStartedThreads();
+  const allConversations = useMemo(() => {
+    const started = startedThreads
+      .filter(t => !seedConversations.some(c => String(c.userId) === String(t.userId)))
+      .map(t => {
+        const dm = getThread(currentUser?.id, t.userId);
+        const last = dm[dm.length - 1];
+        return {
+          id: `u${t.userId}`,
+          userId: t.userId,
+          lastMessage: last ? last.text : 'New conversation — say hello!',
+          time: last ? 'Recent' : 'Now',
+          isNew: !last,
+        };
+      });
+    return [...started, ...seedConversations];
+  }, [startedThreads, currentUser?.id, sessionMessages]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filteredConvs = conversations.filter(c => {
+  /* ── Deep link: /messages?to=<userId> opens (or starts) that thread ── */
+  const toParam = searchParams.get('to');
+  const openConversationWith = useCallback((userId) => {
+    const existing = [...allConversations, ...Object.values(acceptedRequests)]
+      .find(c => String(c.userId) === String(userId));
+    if (existing) {
+      setActiveConv(existing);
+      markConversationRead(existing.id);
+    } else {
+      ensureThread(userId);
+      setActiveConv({
+        id: `u${userId}`, userId,
+        lastMessage: 'New conversation — say hello!',
+        time: 'Now', isNew: true,
+      });
+    }
+    setInboxTab('inbox');
+    setMobileView('chat');
+  }, [allConversations, acceptedRequests]);
+
+  useEffect(() => {
+    if (toParam && findUser(toParam)) {
+      openConversationWith(toParam);
+      // keep the param out of history so Back doesn't reopen it forever
+      setSearchParams({}, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toParam]);
+
+  const activeUser = activeConv ? findUser(activeConv.userId) : null;
+
+  /* ── Messages for the open thread: seed + persisted DMs + this session ── */
+  const activeMessages = useMemo(() => {
+    if (!activeConv) return [];
+    const seed = (initialMessageHistory[activeConv.id] || []).map(m => ({
+      ...m, isMe: m.from === 'me',
+    }));
+    const persisted = getThread(currentUser?.id, activeConv.userId).map(m => ({
+      id: m.id, text: m.text,
+      time: new Date(m.ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+      isMe: String(m.fromId) === String(currentUser?.id),
+    }));
+    const session = sessionMessages[activeConv.id] || [];
+    return [...seed, ...persisted, ...session];
+  }, [activeConv, currentUser?.id, sessionMessages]);
+
+  const filteredConvs = allConversations.filter(c => {
     if (!searchVal) return true;
-    const u = users.find(u => u.id === c.userId);
+    const u = findUser(c.userId);
     return u?.name.toLowerCase().includes(searchVal.toLowerCase());
   });
 
@@ -70,19 +171,33 @@ export default function Messages() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeMessages, typing]);
 
+  function openConv(conv) {
+    setActiveConv(conv);
+    setMobileView('chat');
+    markConversationRead(conv.id);
+  }
+
   function sendMessage() {
     if (!message.trim() || !activeConv) return;
-    const newMsg = { id: Date.now(), from: 1, text: message, time: 'Now', type: 'text' };
-    setMessages(prev => ({
-      ...prev,
-      [activeConv.id]: [...(prev[activeConv.id] || []), newMsg],
-    }));
+    const text = message.trim();
+    // Persist through DM history (also powers "buyers I've DM'd" unlocks).
+    recordDM({
+      fromId: currentUser?.id, fromName: currentUser?.name,
+      toId: activeConv.userId, toName: activeUser?.name, text,
+    });
     setMessage('');
+    // Demo users type back.
     setTyping(true);
     setTimeout(() => {
       setTyping(false);
-      const reply = { id: Date.now() + 1, from: activeConv.userId, text: 'Got it! I\'ll take a look and get back to you shortly.', time: 'Now', type: 'text' };
-      setMessages(prev => ({
+      const reply = {
+        id: Date.now() + 1,
+        text: activeConv.isNew
+          ? `Hey! Thanks for reaching out — always happy to talk deals. What are you looking for?`
+          : 'Got it! I\'ll take a look and get back to you shortly.',
+        time: 'Now', isMe: false,
+      };
+      setSessionMessages(prev => ({
         ...prev,
         [activeConv.id]: [...(prev[activeConv.id] || []), reply],
       }));
@@ -97,7 +212,7 @@ export default function Messages() {
   }
 
   function handleAcceptRequest(req) {
-    const newConv = { id: req.id, userId: req.userId, lastMessage: req.lastMessage, time: req.time, unread: 1 };
+    const newConv = { id: req.id, userId: req.userId, lastMessage: req.lastMessage, time: req.time };
     setAcceptedRequests(prev => ({ ...prev, [req.id]: newConv }));
     setRequests(prev => prev.filter(r => r.id !== req.id));
     setActiveConv(newConv);
@@ -111,27 +226,68 @@ export default function Messages() {
 
   const allConvs = [...filteredConvs, ...Object.values(acceptedRequests)];
 
+  /* ── Hub extras: people you follow / featured wholesalers ── */
+  const followedUsers = following
+    .map(findUser)
+    .filter(u => u && String(u.id) !== String(currentUser?.id));
+
+  // Top 5 listings by views → their sellers, suggested as people to message.
+  const featuredDeals = useMemo(() => (
+    [...deals]
+      .sort((a, b) => (b.views || 0) - (a.views || 0) || a.daysListed - b.daysListed)
+      .slice(0, 5)
+  ), []);
+
+  const buyerLeadIds = buyerLeads.map(l => l.userId);
+  const newBuyers = newBuyerCount(buyerLeadIds);
+
+  function openBuyersTab() {
+    setInboxTab('buyers');
+    markBuyersSeen(buyerLeadIds);
+  }
+
+  const fmtPrice = (n) => n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`;
+
+  const tabBtn = (on) => ({
+    padding: '5px 12px', borderRadius: '16px',
+    background: on ? 'rgba(0, 200, 5, 0.2)' : 'transparent',
+    border: `1px solid ${on ? '#00c805' : '#232925'}`,
+    color: on ? '#4ade80' : '#95a29b',
+    fontSize: '11px', fontWeight: 700, cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', gap: 5,
+  });
+
+  const badge = (n, color = '#ef4444') => n > 0 && (
+    <span style={{
+      minWidth: 16, height: 16, borderRadius: 999, padding: '0 4px',
+      background: color, color: '#fff', fontSize: 10, fontWeight: 900,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 1,
+    }}>
+      !{n}
+    </span>
+  );
+
   return (
     <div style={{ background: '#0a0b0a', height: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       {/* VIP upsell banner */}
       {currentUser?.accountTier === 'Basic' && (
-        <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.15), rgba(0, 229, 160,0.1))', borderBottom: '1px solid rgba(0, 200, 5,0.2)', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexShrink: 0 }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.12), rgba(0, 229, 160,0.08))', borderBottom: '1px solid rgba(0, 200, 5,0.2)', padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexShrink: 0 }}>
           <span style={{ color: '#e4eae6', fontSize: '13px' }}>
             📣 Need to reach more buyers? <strong>Upgrade to VIP Max</strong> for 100 DMs/day
           </span>
-          <Link to="/premium" style={{ padding: '6px 16px', borderRadius: '8px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', color: '#fff', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link to="/premium" className="gradient-btn" style={{ padding: '6px 16px', borderRadius: '8px', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0 }}>
             Upgrade
           </Link>
         </div>
       )}
 
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Conversation List */}
+        {/* ── LEFT HUB: conversations, follows, featured wholesalers ── */}
         <div style={{
           width: '340px', flexShrink: 0,
           background: '#0e100e', borderRight: '1px solid #232925',
           display: 'flex', flexDirection: 'column',
-          ...(mobileView === 'chat' ? { display: 'none' } : {}),
+          ...(isMobile && mobileView === 'chat' ? { display: 'none' } : {}),
         }} className="hidden md:flex flex-col">
           {/* Header */}
           <div style={{ padding: '16px', borderBottom: '1px solid #232925', flexShrink: 0 }}>
@@ -141,17 +297,24 @@ export default function Messages() {
                 <div style={{ color: '#95a29b', fontSize: '11px', fontWeight: 600 }}>
                   <strong style={{ color: '#00c805' }}>{dmsUsed}/{dmLimit}</strong> DMs
                 </div>
-                <button style={{ background: 'rgba(0, 200, 5,0.1)', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#00c805', display: 'flex' }}>
+                <button style={{ background: 'rgba(0, 200, 5, 0.1)', border: '1px solid rgba(0, 200, 5, 0.2)', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#00c805', display: 'flex' }}>
                   <Plus size={16} />
                 </button>
               </div>
             </div>
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
-              <button onClick={() => setInboxTab('inbox')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'inbox' ? 'rgba(0, 200, 5, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'inbox' ? '#00c805' : '#232925'}`, color: inboxTab === 'inbox' ? '#00c805' : '#95a29b', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>Inbox</button>
-              <button onClick={() => setInboxTab('requests')} style={{ padding: '5px 12px', borderRadius: '16px', background: inboxTab === 'requests' ? 'rgba(0, 200, 5, 0.2)' : 'transparent', border: `1px solid ${inboxTab === 'requests' ? '#00c805' : '#232925'}`, color: inboxTab === 'requests' ? '#00c805' : '#95a29b', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
-                Requests {requests.length > 0 && `(${requests.length})`}
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '10px', flexWrap: 'wrap' }}>
+              <button onClick={() => setInboxTab('inbox')} style={tabBtn(inboxTab === 'inbox')}>
+                Inbox {badge(Object.values(unreadMap).reduce((a, b) => a + b, 0), '#00c805')}
               </button>
+              <button onClick={() => setInboxTab('requests')} style={tabBtn(inboxTab === 'requests')}>
+                Requests {badge(requests.length)}
+              </button>
+              {isWholesaler && (
+                <button onClick={openBuyersTab} style={tabBtn(inboxTab === 'buyers')}>
+                  <Briefcase size={11} /> My Buyers {badge(newBuyers)}
+                </button>
+              )}
             </div>
             <div style={{ position: 'relative' }}>
               <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#5a675f' }} />
@@ -163,33 +326,17 @@ export default function Messages() {
                 style={{ width: '100%', padding: '8px 12px 8px 32px', borderRadius: '10px', fontSize: '13px' }}
               />
             </div>
-            {inboxTab === 'requests' && (
-              <div style={{ marginTop: '8px' }}>
-                <select value={requestSort} onChange={e => setRequestSort(e.target.value)} className="input-dark" style={{ width: '100%', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer' }}>
-                  <option value="recent">Sort: Most Recent</option>
-                  <option value="vip">Sort: VIP Status First</option>
-                </select>
-              </div>
-            )}
           </div>
 
-          {/* Convs */}
+          {/* Scrollable hub body */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {inboxTab === 'requests' ? (
               requests.length === 0 ? (
                 <div style={{ padding: '40px 20px', textAlign: 'center', color: '#5a675f', fontSize: '13px' }}>
                   No pending message requests
                 </div>
-              ) : [...requests].sort((a, b) => {
-                if (requestSort === 'vip') {
-                  const tierRank = { 'VIP Max': 3, 'VIP': 2, 'Basic': 1 };
-                  const ua = users.find(u => u.id === a.userId);
-                  const ub = users.find(u => u.id === b.userId);
-                  return (tierRank[ub?.accountTier] || 1) - (tierRank[ua?.accountTier] || 1);
-                }
-                return 0;
-              }).map(req => {
-                const u = users.find(u => u.id === req.userId);
+              ) : requests.map(req => {
+                const u = findUser(req.userId);
                 const tier = u?.accountTier || 'Basic';
                 return (
                   <div key={req.id} style={{ padding: '12px 14px', borderBottom: '1px solid #232925', display: 'flex', gap: '10px' }}>
@@ -202,59 +349,163 @@ export default function Messages() {
                       </div>
                       <p style={{ color: '#95a29b', fontSize: '12px', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{req.lastMessage}</p>
                       <div style={{ display: 'flex', gap: '6px' }}>
-                        <button onClick={() => handleAcceptRequest(req)} style={{ padding: '3px 10px', borderRadius: '12px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', border: 'none', color: '#fff', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Accept</button>
+                        <button onClick={() => handleAcceptRequest(req)} className="gradient-btn" style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '10px', fontWeight: 700 }}>Accept</button>
                         <button onClick={() => handleDeclineRequest(req.id)} style={{ padding: '3px 10px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>Decline</button>
                       </div>
                     </div>
                   </div>
                 );
               })
-            ) : allConvs.length === 0 ? (
-              <div style={{ padding: '40px 20px', textAlign: 'center', color: '#5a675f', fontSize: '13px' }}>
-                No conversations yet. Start connecting with investors!
-              </div>
-            ) : allConvs.map(conv => {
-              const user = users.find(u => u.id === conv.userId);
-              const isActive = activeConv?.id === conv.id;
-              return (
-                <div
-                  key={conv.id}
-                  onClick={() => { setActiveConv(conv); setMobileView('chat'); }}
-                  style={{
-                    display: 'flex', gap: '12px', padding: '12px 14px',
-                    cursor: 'pointer', transition: 'background 0.15s',
-                    background: isActive ? 'rgba(0, 200, 5, 0.08)' : 'transparent',
-                    borderLeft: isActive ? '3px solid #00c805' : '3px solid transparent',
-                  }}
-                >
-                  <UserHoverCard user={user}>
-                    <div style={{ position: 'relative', flexShrink: 0 }}>
-                      <img src={user?.avatar} alt={user?.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', bottom: '0', right: '0', width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0e100e' }} />
-                    </div>
-                  </UserHoverCard>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3px' }}>
-                      <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px' }}>{user?.name}</span>
-                      <span style={{ color: '#3e4a43', fontSize: '11px', flexShrink: 0 }}>{conv.time}</span>
-                    </div>
-                    <p style={{ color: '#95a29b', fontSize: '12px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {conv.lastMessage}
-                    </p>
-                  </div>
-                  {conv.unread > 0 && (
-                    <div style={{ minWidth: '18px', height: '18px', borderRadius: '50%', background: '#00c805', color: '#fff', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, alignSelf: 'center', padding: '0 4px' }}>
-                      {conv.unread}
-                    </div>
-                  )}
+            ) : inboxTab === 'buyers' ? (
+              <div>
+                <div style={{ padding: '12px 14px 6px', color: '#95a29b', fontSize: 12, lineHeight: 1.5 }}>
+                  Buyers who engaged with <strong style={{ color: '#f8fafc' }}>your listings</strong>. Follow up while they're hot.
                 </div>
-              );
-            })}
+                {buyerLeads.map(lead => {
+                  const u = findUser(lead.userId);
+                  return (
+                    <div key={lead.userId} style={{ padding: '12px 14px', borderBottom: '1px solid #232925', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                      <img src={u?.avatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ color: '#f8fafc', fontSize: '13px', fontWeight: 700 }}>{u?.name}</span>
+                        <div style={{ color: '#4ade80', fontSize: '11px', fontWeight: 700, margin: '2px 0' }}>{lead.note}</div>
+                        <div style={{ color: '#707d75', fontSize: '11px' }}>{lead.source}</div>
+                      </div>
+                      <button
+                        onClick={() => openConversationWith(lead.userId)}
+                        className="gradient-btn"
+                        style={{ padding: '6px 12px', borderRadius: '9px', fontSize: '11px', fontWeight: 800, flexShrink: 0 }}
+                      >
+                        Message
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                {/* Recent conversations */}
+                {allConvs.length === 0 && (
+                  <div style={{ padding: '30px 20px', textAlign: 'center', color: '#5a675f', fontSize: '13px' }}>
+                    No conversations yet. Start with someone below 👇
+                  </div>
+                )}
+                {allConvs.map(conv => {
+                  const user = findUser(conv.userId);
+                  const isActive = activeConv?.id === conv.id;
+                  const unread = unreadMap[conv.id] || 0;
+                  return (
+                    <div
+                      key={conv.id}
+                      onClick={() => openConv(conv)}
+                      style={{
+                        display: 'flex', gap: '12px', padding: '12px 14px',
+                        cursor: 'pointer', transition: 'background 0.15s',
+                        background: isActive ? 'rgba(0, 200, 5, 0.08)' : 'transparent',
+                        borderLeft: isActive ? '3px solid #00c805' : '3px solid transparent',
+                      }}
+                    >
+                      <UserHoverCard user={user}>
+                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                          <img src={user?.avatar} alt={user?.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }} />
+                          <div style={{ position: 'absolute', bottom: '0', right: '0', width: '11px', height: '11px', borderRadius: '50%', background: '#10b981', border: '2px solid #0e100e' }} />
+                        </div>
+                      </UserHoverCard>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3px' }}>
+                          <span style={{ color: '#f8fafc', fontWeight: unread ? 800 : 700, fontSize: '14px' }}>{user?.name}</span>
+                          <span style={{ color: '#3e4a43', fontSize: '11px', flexShrink: 0 }}>{conv.time}</span>
+                        </div>
+                        <p style={{ color: unread ? '#e4eae6' : '#95a29b', fontSize: '12px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: unread ? 600 : 400 }}>
+                          {conv.lastMessage}
+                        </p>
+                      </div>
+                      {unread > 0 && (
+                        <div style={{ minWidth: '18px', height: '18px', borderRadius: '50%', background: '#00c805', color: '#052012', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, alignSelf: 'center', padding: '0 4px' }}>
+                          {unread}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* People you follow / featured wholesalers */}
+                <div style={{ padding: '16px 14px 8px', borderTop: '1px solid #232925', marginTop: 8 }}>
+                  {followedUsers.length > 0 && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#4ade80', fontSize: 11, fontWeight: 800, letterSpacing: 0.6, marginBottom: 10 }}>
+                        <UserPlus size={12} /> PEOPLE YOU FOLLOW
+                      </div>
+                      {followedUsers.map(u => (
+                        <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0' }}>
+                          <img src={u.avatar} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ color: '#f8fafc', fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.name}</div>
+                            <div style={{ color: '#707d75', fontSize: 11 }}>{u.location}</div>
+                          </div>
+                          <button
+                            onClick={() => openConversationWith(u.id)}
+                            style={{
+                              padding: '5px 11px', borderRadius: 9, cursor: 'pointer',
+                              background: 'rgba(0, 200, 5, 0.12)', border: '1px solid rgba(0, 200, 5, 0.3)',
+                              color: '#4ade80', fontSize: 11, fontWeight: 800, flexShrink: 0,
+                            }}
+                          >
+                            Message
+                          </button>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Featured wholesalers — top 5 listings by views */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#fbbf24', fontSize: 11, fontWeight: 800, letterSpacing: 0.6, margin: followedUsers.length > 0 ? '14px 0 10px' : '0 0 10px' }}>
+                    <Sparkles size={12} /> FEATURED WHOLESALERS
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 16 }}>
+                    {featuredDeals.map(d => (
+                      <div key={d.id} style={{
+                        borderRadius: 12, overflow: 'hidden',
+                        background: '#131614', border: '1px solid #232925',
+                      }}>
+                        <Link to={dealPath(d)} style={{ textDecoration: 'none', display: 'block' }}>
+                          <img src={d.images?.[0]} alt="" style={{ width: '100%', height: 64, objectFit: 'cover', display: 'block', background: '#1a1f1b' }} />
+                        </Link>
+                        <div style={{ padding: '8px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ color: '#f8fafc', fontSize: 12, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {d.title}
+                            </div>
+                            <div style={{ fontSize: 11, marginTop: 1 }}>
+                              <span style={{ color: '#00c805', fontWeight: 900 }}>{fmtPrice(d.listingPrice || d.price)}</span>
+                              <span style={{ color: '#707d75' }}> · {d.sellerName}</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => openConversationWith(d.sellerId)}
+                            style={{
+                              padding: '5px 10px', borderRadius: 8, cursor: 'pointer',
+                              background: 'rgba(0, 200, 5, 0.12)', border: '1px solid rgba(0, 200, 5, 0.3)',
+                              color: '#4ade80', fontSize: 11, fontWeight: 800, flexShrink: 0,
+                            }}
+                          >
+                            Message
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Chat Panel */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* ── Chat panel ── */}
+        <div style={{
+          flex: 1, display: (isMobile && mobileView === 'list') ? 'none' : 'flex',
+          flexDirection: 'column', overflow: 'hidden',
+        }}>
           {activeConv && activeUser ? (
             <>
               {/* Chat Header */}
@@ -277,18 +528,59 @@ export default function Messages() {
                   </div>
                 </Link>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  {[Phone, Video, MoreVertical].map((Icon, i) => (
-                    <button key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '8px', padding: '7px', color: '#95a29b', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}>
-                      <Icon size={16} />
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => setCall({ mode: 'audio' })}
+                    aria-label="Voice call"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '8px', padding: '7px', color: '#95a29b', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}
+                  >
+                    <Phone size={16} />
+                  </button>
+                  <button
+                    onClick={() => setCall({ mode: 'video' })}
+                    aria-label="Video call"
+                    style={{ background: 'rgba(0, 200, 5, 0.10)', border: '1px solid rgba(0, 200, 5, 0.3)', borderRadius: '8px', padding: '7px', color: '#4ade80', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}
+                  >
+                    <Video size={16} />
+                  </button>
+                  <button style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #232925', borderRadius: '8px', padding: '7px', color: '#95a29b', cursor: 'pointer', display: 'flex', transition: 'all 0.2s' }}>
+                    <MoreVertical size={16} />
+                  </button>
                 </div>
               </div>
 
               {/* Messages */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {activeMessages.map(msg => {
-                  const isMe = msg.from === 1;
+                {activeMessages.length === 0 ? (
+                  /* ── Engaging fresh-thread screen ── */
+                  <div style={{ margin: 'auto', textAlign: 'center', maxWidth: 420, padding: '10px 16px' }}>
+                    <img src={activeUser.avatar} alt="" style={{ width: 76, height: 76, borderRadius: '50%', objectFit: 'cover', border: '2px solid #00c805', marginBottom: 12 }} />
+                    <div style={{ color: '#f8fafc', fontWeight: 900, fontSize: 19, letterSpacing: '-0.3px' }}>
+                      Start the conversation with {activeUser.name.split(' ')[0]}
+                    </div>
+                    <div style={{ color: '#95a29b', fontSize: 13, lineHeight: 1.6, margin: '8px 0 16px' }}>
+                      {activeUser.bio ? activeUser.bio.slice(0, 110) : 'Active investor on AllStreet Live.'}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {suggestedOpeners(activeUser).map((s, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setMessage(s)}
+                          style={{
+                            padding: '10px 14px', borderRadius: 12, cursor: 'pointer',
+                            background: 'rgba(0, 200, 5, 0.07)', border: '1px solid rgba(0, 200, 5, 0.25)',
+                            color: '#e4eae6', fontSize: 13, textAlign: 'left', lineHeight: 1.45,
+                          }}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ color: '#707d75', fontSize: 12, marginTop: 14 }}>
+                      …or check <button onClick={() => { setActiveConv(null); setMobileView('list'); }} style={{ background: 'none', border: 'none', color: '#4ade80', fontWeight: 700, cursor: 'pointer', fontSize: 12, padding: 0 }}>Featured Wholesalers</button> for more people moving deals right now.
+                    </div>
+                  </div>
+                ) : activeMessages.map(msg => {
+                  const isMe = msg.isMe;
                   return (
                     <div key={msg.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start', gap: '8px', alignItems: 'flex-end' }}>
                       {!isMe && (
@@ -345,18 +637,18 @@ export default function Messages() {
                   className="gradient-btn"
                   style={{ padding: '10px 14px', borderRadius: '12px', display: 'flex', alignItems: 'center', opacity: message.trim() ? 1 : 0.5, flexShrink: 0 }}
                 >
-                  <Send size={16} style={{ color: '#fff' }} />
+                  <Send size={16} />
                 </button>
               </div>
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5a675f', gap: '16px', padding: '40px' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(0, 200, 5, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Send size={36} style={{ color: '#00c805' }} />
+                <MessageSquare size={36} style={{ color: '#00c805' }} />
               </div>
               <div style={{ textAlign: 'center' }}>
                 <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '8px', fontSize: '18px' }}>Your Messages</h3>
-                <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '20px' }}>Select a conversation to start chatting</p>
+                <p style={{ color: '#5a675f', fontSize: '14px', marginBottom: '20px' }}>Select a conversation, or message a featured wholesaler</p>
                 <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 5,0.1), rgba(0, 229, 160,0.07))', border: '1px solid rgba(0, 200, 5,0.2)', borderRadius: '12px', padding: '16px 20px', maxWidth: '320px' }}>
                   <p style={{ color: '#95a29b', fontSize: '13px', margin: '0 0 10px' }}>
                     <strong style={{ color: '#f8fafc' }}>Pro tip:</strong> VIP Max members get 100 DMs/day — close more deals by reaching more buyers.
@@ -368,6 +660,11 @@ export default function Messages() {
           )}
         </div>
       </div>
+
+      {/* In-app calls (device camera/mic) */}
+      {call && activeUser && (
+        <CallOverlay user={activeUser} mode={call.mode} onClose={() => setCall(null)} />
+      )}
     </div>
   );
 }

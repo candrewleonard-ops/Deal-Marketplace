@@ -126,7 +126,7 @@ export default function Profile() {
         backgroundSize: 'cover', backgroundPosition: 'center',
         overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10,10,15,0.85))' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10, 11, 10,0.85))' }} />
         {/* subtle animated glow over cover */}
         <div style={{
           position: 'absolute', top: '-30%', right: '-10%',

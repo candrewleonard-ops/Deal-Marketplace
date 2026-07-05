@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ShoppingBag, Users, Wrench, Calendar, Bell, MessageSquare,
   Plus, Search, ChevronDown, Menu, X, LogOut, User, Settings, TrendingUp,
-  Crown, Shield, UsersRound, Heart, GraduationCap
+  Crown, Shield, UsersRound, Heart, GraduationCap, Radio
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useIsMobile } from '../hooks/useIsMobile';
 import CyclingText from './CyclingText';
+import { totalUnread, subscribeInbox } from '../lib/inbox';
+import { liveNow, notifiableLiveSessions } from '../data/liveTours';
+import { getFollowing } from '../lib/inbox';
 import Logo from './Logo';
 
 const HOWTO_PHRASES = [
@@ -24,6 +27,7 @@ const HOWTO_PHRASES = [
 // accessible from the drawer / More menu, just no longer a top-level tab).
 const primaryNav = [
   { to: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
+  { to: '/live',        label: 'Live',        icon: Radio, isLive: true },
   { to: '/my-deals',    label: 'My Deals',    icon: TrendingUp },
   { to: '/groups',      label: 'Groups',      icon: UsersRound },
   { to: '/contractors', label: 'Contractors', icon: Wrench },
@@ -50,11 +54,28 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchVal, setSearchVal] = useState('');
+  const [unreadDMs, setUnreadDMs] = useState(0);
 
+  // Live unread-DM badge — refreshes whenever any conversation is read or bumped.
+  useEffect(() => {
+    const refresh = () => setUnreadDMs(totalUnread());
+    refresh();
+    return subscribeInbox(refresh);
+  }, []);
+
+  // Live-tour alerts for wholesalers you follow (default on; managed on /live)
+  const liveAlerts = notifiableLiveSessions(getFollowing()).map(s => ({
+    id: `live-${s.id}`,
+    text: `🔴 ${s.hostName} is LIVE — ${s.title}`,
+    time: `${s.startedMinutesAgo}m ago`,
+    unread: true,
+    to: `/live/${s.id}`,
+  }));
   const notifications = [
+    ...liveAlerts,
     { id: 1, text: 'Marcus Johnson liked your post', time: '2m ago', unread: true },
     { id: 2, text: 'New deal in Atlanta matches your saved search', time: '15m ago', unread: true },
-    { id: 3, text: 'Diana Cruz sent you a message', time: '1h ago', unread: true },
+    { id: 3, text: 'Diana Cruz sent you a message', time: '1h ago', unread: true, to: '/messages?to=2' },
     { id: 4, text: 'Your deal "Phoenix Fixer" got 12 views today', time: '2h ago', unread: false },
     { id: 5, text: 'Kevin Washington started following you', time: '3h ago', unread: false },
   ];
@@ -63,7 +84,7 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: 'rgba(13,13,26,0.92)',
+        background: 'rgba(13, 16, 13,0.92)',
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -83,8 +104,9 @@ export default function Navbar() {
           {/* DESKTOP: inline nav links */}
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
-              {primaryNav.filter(n => n.to !== '/how-to').map(({ to, label, icon: Icon }) => {
+              {primaryNav.filter(n => n.to !== '/how-to').map(({ to, label, icon: Icon, isLive }) => {
                 const active = location.pathname === to || (to === '/marketplace' && location.pathname === '/');
+                const liveCount = isLive ? liveNow.length : 0;
                 return (
                   <Link
                     key={to}
@@ -93,15 +115,27 @@ export default function Navbar() {
                       display: 'flex', alignItems: 'center', gap: 6,
                       padding: '6px 12px', borderRadius: 8, textDecoration: 'none',
                       fontSize: 14, fontWeight: 600,
-                      color: active ? '#00c805' : '#95a29b',
+                      color: active ? '#00c805' : (isLive ? '#f87171' : '#95a29b'),
                       background: active ? 'rgba(0, 200, 5,0.1)' : 'transparent',
                       borderBottom: active ? '2px solid #00c805' : '2px solid transparent',
                       transition: 'all 0.2s',
                       paddingBottom: 4,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     <Icon size={16} />
                     {label}
+                    {liveCount > 0 && (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        background: 'rgba(239,68,68,0.14)', border: '1px solid rgba(239,68,68,0.4)',
+                        color: '#f87171', borderRadius: 999, padding: '1px 7px',
+                        fontSize: 10, fontWeight: 900, letterSpacing: 0.4,
+                      }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'sponsored-shimmer 1.6s ease-in-out infinite' }} />
+                        {liveCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -320,9 +354,21 @@ export default function Navbar() {
                   display: 'flex', alignItems: 'center',
                   textDecoration: 'none',
                   minWidth: 40, minHeight: 40, justifyContent: 'center',
+                  position: 'relative',
                 }}
               >
                 <MessageSquare size={18} />
+                {unreadDMs > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -4, right: -4,
+                    background: '#ef4444', color: '#fff', borderRadius: 999,
+                    minWidth: 18, height: 18, padding: '0 4px',
+                    fontSize: 10, fontWeight: 900,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    !{unreadDMs}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -500,6 +546,7 @@ export default function Navbar() {
                     label={label}
                     active={location.pathname.startsWith(to)}
                     onClick={() => setDrawerOpen(false)}
+                    badgeCount={to === '/messages' ? unreadDMs : 0}
                   />
                 ))}
                 <DrawerItem to={currentUser ? `/profile/${currentUser.id}` : '/auth'} icon={User} label="View Profile" onClick={() => setDrawerOpen(false)} />
@@ -598,7 +645,7 @@ function DrawerSection({ title, children }) {
   );
 }
 
-function DrawerItem({ to, icon: Icon, label, active, danger, onClick }) {
+function DrawerItem({ to, icon: Icon, label, active, danger, onClick, badgeCount = 0 }) {
   return (
     <Link
       to={to}
@@ -614,7 +661,17 @@ function DrawerItem({ to, icon: Icon, label, active, danger, onClick }) {
       }}
     >
       <Icon size={18} />
-      {label}
+      <span style={{ flex: 1 }}>{label}</span>
+      {badgeCount > 0 && (
+        <span style={{
+          background: '#ef4444', color: '#fff', borderRadius: 999,
+          minWidth: 19, height: 19, padding: '0 5px',
+          fontSize: 11, fontWeight: 900,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          !{badgeCount}
+        </span>
+      )}
     </Link>
   );
 }
@@ -626,19 +683,28 @@ function NotifList({ notifications, onCloseAfterNav }) {
         <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
         <button style={{ background: 'none', border: 'none', color: '#00c805', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
       </div>
-      {notifications.map(n => (
-        <div key={n.id} style={{
+      {notifications.map(n => {
+        const inner = (
+          <>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#00c805' : 'transparent', marginTop: 6, flexShrink: 0 }} />
+            <div>
+              <p style={{ color: '#f8fafc', fontSize: 13, margin: 0, lineHeight: 1.4 }}>{n.text}</p>
+              <p style={{ color: '#5a675f', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
+            </div>
+          </>
+        );
+        const rowStyle = {
           padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'flex-start',
           borderBottom: '1px solid #232925',
           background: n.unread ? 'rgba(0, 200, 5,0.05)' : 'transparent',
-        }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: n.unread ? '#00c805' : 'transparent', marginTop: 6, flexShrink: 0 }} />
-          <div>
-            <p style={{ color: '#f8fafc', fontSize: 13, margin: 0, lineHeight: 1.4 }}>{n.text}</p>
-            <p style={{ color: '#5a675f', fontSize: 12, margin: '4px 0 0' }}>{n.time}</p>
-          </div>
-        </div>
-      ))}
+          textDecoration: 'none',
+        };
+        return n.to ? (
+          <Link key={n.id} to={n.to} onClick={onCloseAfterNav} style={rowStyle}>{inner}</Link>
+        ) : (
+          <div key={n.id} style={rowStyle}>{inner}</div>
+        );
+      })}
       <Link
         to="/notifications"
         onClick={onCloseAfterNav}

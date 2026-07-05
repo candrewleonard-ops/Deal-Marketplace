@@ -101,7 +101,7 @@ export default function BidRequest() {
       {/* Header */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 20,
-        background: 'rgba(10,10,15,0.92)',
+        background: 'rgba(10, 11, 10,0.92)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         borderBottom: '1px solid #232925',
@@ -151,7 +151,7 @@ export default function BidRequest() {
       {step < 6 && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: 'rgba(10,10,15,0.94)',
+          background: 'rgba(10, 11, 10,0.94)',
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
           borderTop: '1px solid #232925',
@@ -195,7 +195,7 @@ export default function BidRequest() {
       {step === 6 && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: 'rgba(10,10,15,0.94)',
+          background: 'rgba(10, 11, 10,0.94)',
           backdropFilter: 'blur(18px)',
           borderTop: '1px solid #232925',
           padding: '14px 16px calc(14px + env(safe-area-inset-bottom))',

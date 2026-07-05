@@ -166,7 +166,7 @@ export default function GroupDetail() {
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           onError={e => { e.target.style.background = 'linear-gradient(135deg,#1a1f1b,#131614)'; }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10,10,15,0.95) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 30%, rgba(10, 11, 10,0.95) 100%)' }} />
         <Link to="/groups" style={{ position: 'absolute', top: '16px', left: '20px', display: 'flex', alignItems: 'center', gap: '6px', color: '#f8fafc', textDecoration: 'none', fontSize: '14px', fontWeight: 600, background: 'rgba(0,0,0,0.5)', borderRadius: '20px', padding: '6px 14px', backdropFilter: 'blur(8px)' }}>
           <ArrowLeft size={15} /> Groups
         </Link>

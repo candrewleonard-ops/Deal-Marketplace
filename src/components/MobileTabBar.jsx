@@ -1,5 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Wrench, Plus, MessageSquare, User, GraduationCap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingBag, Wrench, Plus, MessageSquare, User, Radio } from 'lucide-react';
+import { totalUnread, subscribeInbox } from '../lib/inbox';
+import { liveNow } from '../data/liveTours';
 import { useAuth } from '../context/AuthContext';
 
 /**
@@ -11,6 +14,12 @@ export default function MobileTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
+  const [unreadDMs, setUnreadDMs] = useState(0);
+  useEffect(() => {
+    const refresh = () => setUnreadDMs(totalUnread());
+    refresh();
+    return subscribeInbox(refresh);
+  }, []);
 
   function goPostDeal() {
     // Guests get the sign-up prompt; signed-in users land on /my-deals
@@ -29,10 +38,10 @@ export default function MobileTabBar() {
 
   const tabs = [
     { to: '/marketplace', label: 'Deals',       icon: ShoppingBag },
-    { to: '/how-to',      label: 'How Tos',     icon: GraduationCap },
+    { to: '/live',        label: 'Live',        icon: Radio, isLive: liveNow.length > 0 },
     { to: '/contractors', label: 'Pros',        icon: Wrench },
     { type: 'fab',        label: 'Post' },
-    { to: '/messages',    label: 'DMs',         icon: MessageSquare },
+    { to: '/messages',    label: 'DMs',         icon: MessageSquare, badge: unreadDMs },
     { to: currentUser ? `/profile/${currentUser.id}` : '/auth', label: 'Profile', icon: User },
   ];
 
@@ -44,7 +53,7 @@ export default function MobileTabBar() {
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'rgba(13,13,26,0.94)',
+          background: 'rgba(13, 16, 13,0.94)',
           backdropFilter: 'blur(24px) saturate(180%)',
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
@@ -85,11 +94,11 @@ export default function MobileTabBar() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 10px 28px rgba(0, 200, 5,0.55), 0 0 0 4px rgba(10,10,15,0.95)',
+                    boxShadow: '0 10px 28px rgba(0, 200, 5,0.55), 0 0 0 4px rgba(10, 11, 10,0.95)',
                     transform: 'translateY(-18px)',
                   }}
                 >
-                  <Plus size={28} strokeWidth={2.6} color="#fff" />
+                  <Plus size={28} strokeWidth={2.6} color="#052012" />
                 </div>
                 <span style={{
                   fontSize: 10, fontWeight: 700, letterSpacing: 0.2,
@@ -129,7 +138,28 @@ export default function MobileTabBar() {
               onTouchStart={(e) => { e.currentTarget.style.transform = 'scale(0.94)'; }}
               onTouchEnd={(e)   => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+              <span style={{ position: 'relative', display: 'inline-flex' }}>
+                <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                {t.badge > 0 && (
+                  <span style={{
+                    position: 'absolute', top: -6, right: -10,
+                    background: '#ef4444', color: '#fff', borderRadius: 999,
+                    minWidth: 16, height: 16, padding: '0 4px',
+                    fontSize: 9, fontWeight: 900,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    !{t.badge}
+                  </span>
+                )}
+                {t.isLive && (
+                  <span style={{
+                    position: 'absolute', top: -3, right: -5,
+                    width: 8, height: 8, borderRadius: '50%',
+                    background: '#ef4444',
+                    animation: 'sponsored-shimmer 1.6s ease-in-out infinite',
+                  }} />
+                )}
+              </span>
               <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.2 }}>{t.label}</span>
             </Link>
           );

@@ -241,7 +241,7 @@ export default function SavedDeals() {
                       <div style={{
                         position: 'absolute', top: 10, left: 10, zIndex: 5,
                         width: 32, height: 32, borderRadius: 8,
-                        background: isChecked ? '#00c805' : 'rgba(10,10,15,0.85)',
+                        background: isChecked ? '#00c805' : 'rgba(10, 11, 10,0.85)',
                         border: `1.5px solid ${isChecked ? '#4ade80' : 'rgba(255,255,255,0.3)'}`,
                         backdropFilter: 'blur(8px)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
