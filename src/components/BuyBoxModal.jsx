@@ -201,7 +201,7 @@ export function BuyBoxSideButton({ onClick }) {
       onClick={onClick}
       aria-label="Open buy box filters"
       style={{
-        position: 'fixed', right: 0, top: '38%', zIndex: 90,
+        position: 'fixed', right: 0, top: '54%', zIndex: 90,
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
         padding: '13px 9px', borderRadius: '14px 0 0 14px',
         background: 'linear-gradient(160deg, #00c805, #00a344)',

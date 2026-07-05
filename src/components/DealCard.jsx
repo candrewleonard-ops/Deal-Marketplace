@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar, Lock, MapPin, TrendingUp } from 'lucide-react';
+import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar, Lock, MapPin } from 'lucide-react';
 import { useSavedDeals } from '../hooks/useSavedDeals';
 import { toggleHeart } from '../lib/engagement';
 import { useAuth } from '../context/AuthContext';
@@ -37,6 +37,8 @@ function blurStreetNumber(address) {
 }
 
 export default function DealCard({ deal, stats }) {
+  const sellerAvatar = deal.sellerAvatar
+    || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(deal.sellerName || 'ASL')}&backgroundColor=1a1f1b&textColor=4ade80`;
   const [hovered, setHovered] = useState(false);
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
   const { isAuthenticated, requireAuth, currentUser } = useAuth();
@@ -195,10 +197,17 @@ export default function DealCard({ deal, stats }) {
                 {fmt(deal.listingPrice || deal.price)}
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV</div>
-              <div style={{ color: '#10b981', fontWeight: 800, fontSize: 18, lineHeight: 1 }}>{fmt(deal.arv)}</div>
-            </div>
+            {deal.arv > 0 && (
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV</div>
+                <div style={{ color: '#10b981', fontWeight: 800, fontSize: 18, lineHeight: 1 }}>{fmt(deal.arv)}</div>
+                {(deal.listingPrice || deal.price) > 0 && (
+                  <div style={{ color: '#fbbf24', fontSize: 10, fontWeight: 900, marginTop: 3 }}>
+                    {Math.round(((deal.listingPrice || deal.price) / deal.arv) * 100)}% of ARV
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Address */}
@@ -212,32 +221,8 @@ export default function DealCard({ deal, stats }) {
             </div>
           </div>
 
-          {/* ARV / repairs factual strip (no profit claims) */}
-          {(deal.arv > 0 || deal.repairCost > 0) && (
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(16,185,129,0.10), rgba(16,185,129,0.03))',
-              border: '1px solid rgba(16,185,129,0.22)',
-              borderRadius: 12,
-              padding: '10px 12px',
-              display: 'flex', alignItems: 'center', gap: 10,
-              marginBottom: 12,
-            }}>
-              <TrendingUp size={18} style={{ color: '#10b981' }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>ARV (seller-reported)</div>
-                <div style={{ color: '#10b981', fontWeight: 900, fontSize: 18, lineHeight: 1.1 }}>{fmt(deal.arv)}</div>
-              </div>
-              {deal.repairCost > 0 && (
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ color: '#707d75', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Est. repairs</div>
-                  <div style={{ color: '#f59e0b', fontWeight: 700, fontSize: 13 }}>{fmt(deal.repairCost)}</div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Beds/baths/sqft */}
-          {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (
+          {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (deal.beds > 0 || deal.baths > 0 || deal.sqft > 0) && (
             <div style={{
               display: 'flex',
               background: '#0f0f18', borderRadius: 10,
@@ -266,7 +251,7 @@ export default function DealCard({ deal, stats }) {
           {/* Seller + days listed */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <img
-              src={deal.sellerAvatar}
+              src={sellerAvatar}
               alt={deal.sellerName}
               style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #232925' }}
             />
@@ -298,6 +283,9 @@ export default function DealCard({ deal, stats }) {
 
   // ─── Desktop layout (unchanged from before) ───
   const cardStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
     background: '#131614',
     border: deal.isFeatured
       ? 'none'
@@ -395,31 +383,31 @@ export default function DealCard({ deal, stats }) {
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(239,68,68,0.9)', textAlign: 'center', padding: '5px', fontSize: '11px', fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>UNDER CONTRACT</div>
         )}
       </div>
-      <div style={{ padding: '14px 16px 16px' }}>
+      <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '6px' }}>
           <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '22px', lineHeight: 1, letterSpacing: '-0.5px' }}>{fmt(deal.listingPrice || deal.price)}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span style={{ color: '#5a675f', fontSize: '11px' }}>ARV</span>
-            <span style={{ color: '#10b981', fontWeight: 700, fontSize: '13px' }}>{fmt(deal.arv)}</span>
-          </div>
+          {deal.arv > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#5a675f', fontSize: '11px' }}>ARV</span>
+              <span style={{ color: '#10b981', fontWeight: 700, fontSize: '13px' }}>{fmt(deal.arv)}</span>
+              {(deal.listingPrice || deal.price) > 0 && (
+                <span style={{
+                  background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)',
+                  color: '#fbbf24', borderRadius: 999, padding: '1px 7px',
+                  fontSize: 10, fontWeight: 900, whiteSpace: 'nowrap',
+                }}>
+                  {Math.round(((deal.listingPrice || deal.price) / deal.arv) * 100)}% of ARV
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div style={{ color: '#707d75', fontSize: '12px', fontFamily: 'monospace', marginBottom: '2px' }}>{blurStreetNumber(deal.address)}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#95a29b', fontSize: '13px', fontWeight: 600, marginBottom: '10px' }}>
           <MapPin size={11} style={{ color: '#00c805' }} />
           {deal.city}, {deal.state}
         </div>
-        {deal.arv > 0 && (
-          <div style={{
-            background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.18)',
-            borderRadius: 10, padding: '8px 12px', marginBottom: 12,
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <TrendingUp size={14} style={{ color: '#10b981' }} />
-            <span style={{ color: '#10b981', fontWeight: 800, fontSize: 14 }}>{fmt(deal.arv)} ARV</span>
-            <span style={{ color: '#707d75', fontSize: 12 }}>· seller-reported</span>
-          </div>
-        )}
-        {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (
+        {deal.dealType !== 'land' && deal.dealType !== 'commercial' && (deal.beds > 0 || deal.baths > 0 || deal.sqft > 0) && (
           <div style={{ display: 'flex', gap: '0', marginBottom: '12px', background: '#0f0f18', borderRadius: '8px', overflow: 'hidden', border: '1px solid #232925' }}>
             {[
               { icon: Bed, val: `${deal.beds} bd` },
@@ -434,9 +422,9 @@ export default function DealCard({ deal, stats }) {
             ))}
           </div>
         )}
-        <div style={{ height: '1px', background: '#232925', marginBottom: '12px' }} />
+        <div style={{ height: '1px', background: '#232925', margin: 'auto 0 12px' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={deal.sellerAvatar} alt={deal.sellerName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #232925' }} />
+          <img src={sellerAvatar} alt={deal.sellerName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #232925' }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{deal.sellerName}</div>
             <div style={{ color: '#707d75', fontSize: 11 }}>{listedLabel(deal)}</div>

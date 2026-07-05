@@ -10,6 +10,7 @@ const USMap = lazy(() => import('../components/USMap')); // d3 is heavy — load
 import { deals, dealTypes } from '../data/deals';
 import { listLiveDeals } from '../lib/deals';
 import { getViewCounts, getHeartCounts } from '../lib/engagement';
+import { signupForAlerts } from '../lib/alerts';
 import { useSEO } from '../hooks/useSEO';
 import { useAuth } from '../context/AuthContext';
 
@@ -86,6 +87,8 @@ export default function Marketplace() {
   const [liveDeals,       setLiveDeals]       = useState([]);
   const [dealStats,       setDealStats]       = useState({}); // id → {views, hearts}
   const [showBuyBox,      setShowBuyBox]      = useState(false);
+  const [alertEmail,      setAlertEmail]      = useState('');
+  const [alertDone,       setAlertDone]       = useState(false);
   const buyBoxSnapshot = useRef(null);
   const navigate = useNavigate();
   const { isAuthenticated, requireAuth } = useAuth();
@@ -245,7 +248,7 @@ export default function Marketplace() {
       <div style={{
         background: 'linear-gradient(180deg, #0e100e 0%, #0a0b0a 100%)',
         borderBottom: '1px solid #232925',
-        padding: isMobile ? '12px 14px' : '18px 20px',
+        padding: isMobile ? '12px 14px' : '14px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -263,7 +266,7 @@ export default function Marketplace() {
             <div>
               <h1 style={{
                 color: '#f8fafc', fontWeight: 800,
-                fontSize: isMobile ? 20 : 24, margin: 0,
+                fontSize: isMobile ? 20 : 22, margin: 0,
                 letterSpacing: '-0.5px',
               }}>
                 <span className="gradient-text">Deal</span> Marketplace
@@ -320,9 +323,6 @@ export default function Marketplace() {
                 ))}
               </select>
             )}
-            <button onClick={() => setNewestOnly(n => !n)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px 14px', borderRadius: '9px', background: newestOnly ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)', border: newestOnly ? 'none' : '1px solid #232925', color: newestOnly ? '#fff' : '#95a29b', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-              <TrendingUp size={13} /> Newest
-            </button>
             <button onClick={() => setShowFilters(f => !f)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px', borderRadius: '9px', background: showFilters ? 'rgba(0, 200, 5,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${showFilters ? 'rgba(0, 200, 5,0.3)' : '#232925'}`, color: showFilters ? '#00c805' : '#95a29b', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
               <SlidersHorizontal size={14} />
               Filters
@@ -376,9 +376,9 @@ export default function Marketplace() {
           )}
 
           {/* Deal type tabs */}
-          <div style={{ display: 'flex', gap: '6px', marginTop: '12px', flexWrap: 'wrap' }}>
+          <div className={isMobile ? 'scroll-x-hidden' : ''} style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: isMobile ? 'nowrap' : 'wrap', paddingRight: isMobile ? 24 : 0 }}>
             {dealTypes.map(({ value, label }) => (
-              <button key={value} onClick={() => setActiveType(value)} style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, background: activeType === value ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)', border: `1px solid ${activeType === value ? 'transparent' : '#232925'}`, color: activeType === value ? '#fff' : '#95a29b', cursor: 'pointer', transition: 'all 0.15s' }}>
+              <button key={value} onClick={() => setActiveType(value)} style={{ flexShrink: 0, whiteSpace: 'nowrap', padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, background: activeType === value ? 'linear-gradient(135deg,#00c805,#00e5a0)' : 'rgba(255,255,255,0.04)', border: `1px solid ${activeType === value ? 'transparent' : '#232925'}`, color: activeType === value ? '#fff' : '#95a29b', cursor: 'pointer', transition: 'all 0.15s' }}>
                 {label}
               </button>
             ))}
@@ -393,7 +393,7 @@ export default function Marketplace() {
              Filters live at the TOP of the rail so they're visible without
              scrolling; the state map sits underneath. */}
         <div style={{
-          width: 'clamp(320px, 27vw, 430px)', flexShrink: 0,
+          width: 'clamp(290px, 24vw, 370px)', flexShrink: 0,
           position: 'sticky', top: '0',
           height: 'calc(100vh - 64px)',
           overflowY: 'auto',
@@ -620,6 +620,39 @@ export default function Marketplace() {
             </div>
           )}
 
+          {/* ── Market pulse — live numbers straight from the inventory ── */}
+          {allDeals.length > 0 && !isMobile && (
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 18 }}>
+              {(() => {
+                const asks = allDeals.map(d => d.listingPrice || d.price).filter(Boolean).sort((a, b) => a - b);
+                // True median: average the middle pair on even-length sets.
+                const medianAsk = !asks.length ? 0
+                  : asks.length % 2 ? asks[(asks.length - 1) / 2]
+                  : Math.round((asks[asks.length / 2 - 1] + asks[asks.length / 2]) / 2);
+                const arvs = allDeals.map(d => d.arv).filter(Boolean);
+                const avgArv = arvs.length ? Math.round(arvs.reduce((a, b) => a + b, 0) / arvs.length) : 0;
+                const newThisWeek = allDeals.filter(d => d.createdAt && (Date.now() - new Date(d.createdAt)) < 7 * 86400000).length;
+                const money = (n) => n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`;
+                const tiles = [
+                  { label: 'DEALS LIVE', value: allDeals.length },
+                  { label: 'NEW THIS WEEK', value: newThisWeek },
+                  { label: 'MEDIAN ASK', value: medianAsk ? money(medianAsk) : '—' },
+                  { label: 'AVG ARV', value: avgArv ? money(avgArv) : '—' },
+                ];
+                return tiles.map(t => (
+                  <div key={t.label} style={{
+                    flex: '1 1 110px', minWidth: 110,
+                    background: '#131614', border: '1px solid #232925', borderRadius: 12,
+                    padding: '11px 14px',
+                  }}>
+                    <div style={{ color: '#707d75', fontSize: 9.5, fontWeight: 800, letterSpacing: 0.8 }}>{t.label}</div>
+                    <div style={{ color: '#00c805', fontWeight: 900, fontSize: 21, marginTop: 2, letterSpacing: '-0.3px' }}>{t.value}</div>
+                  </div>
+                ));
+              })()}
+            </div>
+          )}
+
           {allDeals.length === 0 ? (
             /* ── Launch state: the market is open and empty — own it ── */
             <div style={{ textAlign: 'center', padding: '70px 20px' }}>
@@ -660,9 +693,14 @@ export default function Marketplace() {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: isMobile ? '14px' : '18px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                alignItems: 'stretch',
+                gap: isMobile ? '14px' : '18px',
+              }}>
                 {sorted.map((deal, idx) => (
-                  <div key={deal.id}>
+                  <div key={deal.id} style={{ height: '100%' }}>
                     {idx === sorted.filter(d => d.isSponsored).length && idx > 0 && (
                       <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '10px', margin: '6px 0 14px' }}>
                         <span style={{ color: '#95a29b', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>ALL DEALS</span>
@@ -672,6 +710,86 @@ export default function Marketplace() {
                     <DealCard deal={deal} stats={dealStats[deal.id]} />
                   </div>
                 ))}
+
+                {/* Ghost slot: sell the next listing — makes a young market look alive */}
+                <button
+                  onClick={goPostDeal}
+                  style={{
+                    minHeight: isMobile ? 200 : 380, height: '100%',
+                    borderRadius: 16, cursor: 'pointer',
+                    border: '2px dashed #2e352f', background: 'rgba(255,255,255,0.015)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 12, padding: 24, textAlign: 'center',
+                    transition: 'border-color 0.15s, background 0.15s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#00c805'; e.currentTarget.style.background = 'rgba(0,200,5,0.04)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#2e352f'; e.currentTarget.style.background = 'rgba(255,255,255,0.015)'; }}
+                >
+                  <div style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #00c805, #00e05c)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#052012', fontSize: 28, fontWeight: 900, lineHeight: 1,
+                    boxShadow: '0 8px 24px rgba(0,200,5,0.35)',
+                  }}>
+                    +
+                  </div>
+                  <div>
+                    <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16, letterSpacing: '-0.2px' }}>Your deal here</div>
+                    <div style={{ color: '#707d75', fontSize: 12.5, marginTop: 5, lineHeight: 1.55, maxWidth: 220 }}>
+                      Free to list, takes about a minute — every buyer on this page sees it.
+                    </div>
+                  </div>
+                </button>
+
+                {/* Buyer capture: don't let a miss on today's inventory walk away */}
+                <div style={{
+                  minHeight: isMobile ? 170 : 380, height: '100%',
+                  borderRadius: 16,
+                  background: 'linear-gradient(160deg, rgba(0,200,5,0.07), rgba(0,229,160,0.03))',
+                  border: '1px solid rgba(0, 200, 5, 0.25)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  gap: 12, padding: 24, textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 30 }}>🔔</div>
+                  {alertDone ? (
+                    <>
+                      <div style={{ color: '#4ade80', fontWeight: 800, fontSize: 16 }}>You're on the list</div>
+                      <div style={{ color: '#95a29b', fontSize: 12.5, lineHeight: 1.55, maxWidth: 230 }}>
+                        We'll ping you when new deals hit the market.
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 16, letterSpacing: '-0.2px' }}>
+                          Nothing in your market yet?
+                        </div>
+                        <div style={{ color: '#707d75', fontSize: 12.5, marginTop: 5, lineHeight: 1.55, maxWidth: 230 }}>
+                          Get an alert the moment a new deal posts.
+                        </div>
+                      </div>
+                      <input
+                        type="email"
+                        value={alertEmail}
+                        onChange={e => setAlertEmail(e.target.value)}
+                        placeholder="you@email.com"
+                        className="input-dark"
+                        style={{ width: '100%', maxWidth: 230, padding: '11px 13px', borderRadius: 10, fontSize: 13 }}
+                      />
+                      <button
+                        onClick={async () => {
+                          const res = await signupForAlerts(alertEmail, selectedStates[0]);
+                          if (res.ok) setAlertDone(true);
+                        }}
+                        className="gradient-btn"
+                        style={{ width: '100%', maxWidth: 230, padding: '11px', borderRadius: 10, fontWeight: 800, fontSize: 13 }}
+                      >
+                        Notify me
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </>
           )}

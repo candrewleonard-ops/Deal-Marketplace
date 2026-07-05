@@ -198,12 +198,14 @@ export default function Navbar() {
             {!isMobile && isAuthenticated && (
               <Link
                 to="/post-deal"
-                className="gradient-btn"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '8px 16px', borderRadius: 8,
-                  color: '#fff', border: 'none', cursor: 'pointer',
-                  fontSize: 14, fontWeight: 600, textDecoration: 'none',
+                  background: 'transparent',
+                  border: '1px solid rgba(0, 200, 5, 0.55)',
+                  color: '#4ade80', cursor: 'pointer',
+                  fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 <Plus size={16} />
