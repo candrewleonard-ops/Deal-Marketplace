@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @theme {
   --color-bg: #0a0b0a;
@@ -119,10 +119,10 @@ body {
 
 /* ─── Desktop density ───
    The UI was designed at a large scale; at 100% browser zoom it overflowed
-   and users had to Ctrl-minus. Render the desktop app at 90% so everything
+   and users had to Ctrl-minus. Render the desktop app at 80% so everything
    fits a normal laptop screen out of the box. (Mobile keeps native scale.) */
 @media (min-width: 900px) {
-  body { zoom: 0.9; }
+  body { zoom: 0.8; }
 }
 
 /* ─── Mobile-first defaults ─── */
@@ -177,6 +177,29 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #00c805, #00e5a0);
+}
+
+/* Chrome autofill used to paint inputs a sickly yellow-green — keep them dark */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+input:autofill,
+input:-internal-autofill-selected {
+  -webkit-box-shadow: 0 0 0 1000px #0e100e inset !important;
+  box-shadow: 0 0 0 1000px #0e100e inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  background-color: #0e100e !important;
+  background-image: none !important;
+  caret-color: #f8fafc;
+  transition: background-color 99999s ease-in-out 0s;
+}
+
+/* Address box highlights as a unit when its inner input focuses */
+.addr-box { transition: border-color 0.15s, box-shadow 0.15s; }
+.addr-box:focus-within {
+  border-color: #00c805 !important;
+  box-shadow: 0 0 0 3px rgba(0, 200, 5, 0.14);
 }
 
 /* Selection color */
@@ -361,6 +384,14 @@ main, aside, nav, .scroll-y, .overflow-auto, .overflow-y-auto {
 .avatar-ring {
   box-shadow: 0 0 0 2px #0a0b0a, 0 0 0 3.5px rgba(0, 200, 5, 0.45);
 }
+
+/* Horizontal scroller with no visible scrollbar (state strip etc.) */
+.scroll-x-hidden {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-x-hidden::-webkit-scrollbar { display: none; }
 
 /* Buttery transitions for sticky elements */
 .sticky-smooth {

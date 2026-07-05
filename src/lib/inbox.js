@@ -12,8 +12,8 @@ const THREADS_KEY = 'asl-inbox-threads-v1'; // user-started DM threads [{userId,
 const FOLLOW_KEY = 'asl-following-v1';
 
 // conversation id → unread count (matches the seeded demo inbox)
-const UNREAD_SEED = { 1: 3, 2: 1 };
-const FOLLOW_SEED = [2, 4, 'admin-carson'];
+const UNREAD_SEED = {};
+const FOLLOW_SEED = [];
 
 function emit() {
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('asl-inbox-change'));

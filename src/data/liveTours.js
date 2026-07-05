@@ -5,60 +5,9 @@
  * turn them off globally or mute specific hosts (Settings on the Live page).
  */
 
-export const liveNow = [
-  {
-    id: 'live-1',
-    hostId: 1,
-    hostName: 'Marcus Johnson',
-    hostAvatar: 'https://picsum.photos/seed/user1/100/100',
-    title: 'Walking the Atlanta brick ranch — kitchen & roof up close',
-    dealId: 1,
-    viewers: 214,
-    startedMinutesAgo: 12,
-    thumbnail: 'https://picsum.photos/seed/house1/800/600',
-  },
-  {
-    id: 'live-2',
-    hostId: 2,
-    hostName: 'Diana Cruz',
-    hostAvatar: 'https://picsum.photos/seed/user2/100/100',
-    title: 'Phoenix fixer LIVE — bring your rehab questions',
-    dealId: 2,
-    viewers: 156,
-    startedMinutesAgo: 4,
-    thumbnail: 'https://picsum.photos/seed/house2/800/600',
-  },
-  {
-    id: 'live-3',
-    hostId: 5,
-    hostName: 'Angela Foster',
-    hostAvatar: 'https://picsum.photos/seed/user5/100/100',
-    title: 'Memphis drive-for-dollars: 3 streets, 3 leads',
-    dealId: null,
-    viewers: 89,
-    startedMinutesAgo: 31,
-    thumbnail: 'https://picsum.photos/seed/memphis/800/600',
-  },
-];
+export const liveNow = [];
 
-export const upcomingTours = [
-  {
-    id: 'up-1',
-    hostId: 4,
-    hostName: 'Sarah Kim',
-    hostAvatar: 'https://picsum.photos/seed/user4/100/100',
-    title: 'Houston subject-to walkthrough + Q&A',
-    when: 'Today · 6:00 PM CT',
-  },
-  {
-    id: 'up-2',
-    hostId: 7,
-    hostName: 'James Rivera',
-    hostAvatar: 'https://picsum.photos/seed/user7/100/100',
-    title: 'KC duplex tour — cash-flow math on camera',
-    when: 'Tomorrow · 1:00 PM CT',
-  },
-];
+export const upcomingTours = [];
 
 export function getLiveSession(id) {
   return liveNow.find(s => s.id === id) || null;

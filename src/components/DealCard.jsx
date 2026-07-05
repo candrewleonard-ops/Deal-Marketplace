@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Crown, Eye, Bed, Bath, Maximize2, Calendar, Lock, MapPin, TrendingUp } from 'lucide-react';
 import { useSavedDeals } from '../hooks/useSavedDeals';
+import { toggleHeart } from '../lib/engagement';
 import { useAuth } from '../context/AuthContext';
 import { dealPath } from '../utils/slug';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -34,10 +35,10 @@ function blurStreetNumber(address) {
   return address.replace(/^\d+\s*/, '**** ').trim();
 }
 
-export default function DealCard({ deal }) {
+export default function DealCard({ deal, stats }) {
   const [hovered, setHovered] = useState(false);
   const { isSaved, toggle: toggleSaved } = useSavedDeals();
-  const { isAuthenticated, requireAuth } = useAuth();
+  const { isAuthenticated, requireAuth, currentUser } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const saved = isSaved(deal.id);
@@ -55,6 +56,8 @@ export default function DealCard({ deal }) {
     e.stopPropagation();
     if (!requireAuth('save deals to your collection', 'save', dealPath(deal))) return;
     toggleSaved(deal.id);
+    // Also record it as a public heart so sellers see real demand.
+    toggleHeart(deal.id, currentUser).catch(() => {});
   }
 
   // ─── Mobile layout: bigger image, profit-first card ───
@@ -132,6 +135,24 @@ export default function DealCard({ deal }) {
           >
             <Heart size={18} fill={saved ? '#ef4444' : 'none'} style={{ color: saved ? '#ef4444' : '#f8fafc' }} />
           </button>
+
+
+          {stats && (stats.views > 0 || stats.hearts > 0) && (
+            <div style={{
+              position: 'absolute', bottom: 10, left: 10,
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: 'rgba(6,8,6,0.72)', backdropFilter: 'blur(6px)',
+              borderRadius: 999, padding: '4px 11px',
+              color: '#e4eae6', fontSize: 11, fontWeight: 800,
+            }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Eye size={11} style={{ color: '#00e5a0' }} /> {stats.views || 0}
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Heart size={11} fill="#ef4444" style={{ color: '#ef4444' }} /> {stats.hearts || 0}
+              </span>
+            </div>
+          )}
 
           {/* Sign-up overlay for guests */}
           {!isAuthenticated && (
@@ -257,14 +278,16 @@ export default function DealCard({ deal }) {
               </div>
             </div>
             <div style={{
-              padding: '8px 16px', borderRadius: 10,
-              background: 'linear-gradient(135deg,#00c805,#00e5a0)',
-              color: '#fff', fontWeight: 800, fontSize: 12,
-              boxShadow: '0 4px 14px rgba(0, 200, 5,0.35)',
-              display: 'flex', alignItems: 'center', gap: 4,
+              padding: '9px 15px', borderRadius: 10,
+              background: 'linear-gradient(135deg, #0b8a3c, #15a24b)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              color: '#eafff2', fontWeight: 800, fontSize: 12,
+              boxShadow: '0 4px 14px rgba(11, 138, 60, 0.45)',
+              display: 'flex', alignItems: 'center', gap: 5,
+              whiteSpace: 'nowrap',
             }}>
               {isAuthenticated ? <Eye size={12} /> : <Lock size={12} />}
-              {isAuthenticated ? 'View' : 'Sign Up'}
+              {isAuthenticated ? 'See All Details' : 'Sign Up'}
             </div>
           </div>
         </div>
@@ -350,6 +373,23 @@ export default function DealCard({ deal }) {
         <button onClick={handleSaveClick} style={{ position: 'absolute', top: '10px', right: '10px', width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(10, 11, 10,0.7)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backdropFilter: 'blur(6px)' }}>
           <Heart size={16} fill={saved ? '#ef4444' : 'none'} style={{ color: saved ? '#ef4444' : '#f8fafc' }} />
         </button>
+
+          {stats && (stats.views > 0 || stats.hearts > 0) && (
+            <div style={{
+              position: 'absolute', bottom: 10, left: 10,
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: 'rgba(6,8,6,0.72)', backdropFilter: 'blur(6px)',
+              borderRadius: 999, padding: '4px 11px',
+              color: '#e4eae6', fontSize: 11, fontWeight: 800,
+            }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Eye size={11} style={{ color: '#00e5a0' }} /> {stats.views || 0}
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Heart size={11} fill="#ef4444" style={{ color: '#ef4444' }} /> {stats.hearts || 0}
+              </span>
+            </div>
+          )}
         {deal.status === 'under contract' && (
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(239,68,68,0.9)', textAlign: 'center', padding: '5px', fontSize: '11px', fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>UNDER CONTRACT</div>
         )}
@@ -400,9 +440,9 @@ export default function DealCard({ deal }) {
             <div style={{ color: '#f8fafc', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{deal.sellerName}</div>
             <div style={{ color: '#707d75', fontSize: 11 }}>{deal.daysListed}d listed</div>
           </div>
-          <button onClick={(e) => { e.stopPropagation(); openDeal(e); }} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 14px', borderRadius: '9px', background: 'linear-gradient(135deg, #00c805, #00e5a0)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '12px', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(0, 200, 5,0.35)' }}>
+          <button onClick={(e) => { e.stopPropagation(); openDeal(e); }} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '9px 14px', borderRadius: '9px', background: 'linear-gradient(135deg, #0b8a3c, #15a24b)', border: '1px solid rgba(255,255,255,0.14)', color: '#eafff2', fontWeight: 800, fontSize: '12px', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(11, 138, 60, 0.45)', whiteSpace: 'nowrap' }}>
             {isAuthenticated ? <Eye size={12} /> : <Lock size={12} />}
-            {isAuthenticated ? 'View' : 'Sign Up'}
+            {isAuthenticated ? 'See All Details' : 'Sign Up'}
           </button>
         </div>
       </div>

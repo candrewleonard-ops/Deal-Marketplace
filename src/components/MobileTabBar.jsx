@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { ShoppingBag, Wrench, Plus, MessageSquare, User, Radio } from 'lucide-react';
-import { totalUnread, subscribeInbox } from '../lib/inbox';
+import { useUnreadDMs } from '../hooks/useUnreadDMs';
 import { liveNow } from '../data/liveTours';
 import { useAuth } from '../context/AuthContext';
 
@@ -14,12 +13,7 @@ export default function MobileTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, isAuthenticated, requireAuth, requireAuthForDM } = useAuth();
-  const [unreadDMs, setUnreadDMs] = useState(0);
-  useEffect(() => {
-    const refresh = () => setUnreadDMs(totalUnread());
-    refresh();
-    return subscribeInbox(refresh);
-  }, []);
+  const unreadDMs = useUnreadDMs();
 
   function goPostDeal() {
     // Guests get the sign-up prompt; signed-in users land on /my-deals

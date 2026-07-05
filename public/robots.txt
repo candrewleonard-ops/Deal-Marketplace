@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /super-admin
+Disallow: /admin
+Disallow: /messages
+
+Sitemap: https://allstreetlive.com/sitemap.xml

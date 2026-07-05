@@ -1,0 +1,19 @@
+{
+  "name": "AllStreet Live — Deal Marketplace",
+  "short_name": "AllStreet",
+  "description": "The live off-market real estate marketplace. Wholesale deals, live property tours, direct lines to wholesalers and cash buyers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0b0a",
+  "theme_color": "#0a0b0a",
+  "orientation": "portrait-primary",
+  "categories": ["business", "finance", "shopping"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

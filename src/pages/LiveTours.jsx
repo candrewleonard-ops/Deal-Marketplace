@@ -106,6 +106,21 @@ export default function LiveTours() {
           <h2 style={{ color: '#f8fafc', fontWeight: 800, fontSize: 17, margin: 0 }}>Live now</h2>
           <span style={{ color: '#707d75', fontSize: 13 }}>· {liveNow.length} streaming</span>
         </div>
+        {liveNow.length === 0 && (
+          <div style={{
+            textAlign: 'center', padding: '46px 20px',
+            background: '#131614', border: '1px dashed #2e352f', borderRadius: 18,
+          }}>
+            <div style={{ fontSize: 34, marginBottom: 10 }}>📡</div>
+            <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: 17, marginBottom: 6 }}>Nobody's live right now</div>
+            <div style={{ color: '#95a29b', fontSize: 13.5, lineHeight: 1.6, maxWidth: 380, margin: '0 auto 18px' }}>
+              Go first — walk a property on camera and every follower gets pinged the second you start.
+            </div>
+            <button onClick={openGoLive} className="gradient-btn" style={{ padding: '12px 26px', borderRadius: 12, fontWeight: 900, fontSize: 14 }}>
+              🔴 Go live now
+            </button>
+          </div>
+        )}
         <div style={{
           display: 'grid', gap: 16,
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',

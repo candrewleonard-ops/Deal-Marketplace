@@ -46,7 +46,6 @@ export default function PostDeal() {
     addressVisibility: 'public', // 'public' (default — buyers get it instantly) | 'request'
     scopeOfWork: {},             // { roof: 'yes'|'no'|'na', ... } — see data/scopeOfWork.js
   });
-  const [showVideoNudge, setShowVideoNudge] = useState(true);
   const [photos, setPhotos] = useState([]); // { id, url, name }
   const [dragOver, setDragOver] = useState(false);
   const dragIndex = useRef(null);
@@ -273,6 +272,63 @@ export default function PostDeal() {
           onMove={movePhoto}
         />
 
+        {/* ── Video walkthrough — front and center, red like a record light ── */}
+        <div style={{
+          marginTop: 12,
+          borderRadius: 16,
+          background: form.youtubeUrl
+            ? 'rgba(16,185,129,0.06)'
+            : 'linear-gradient(135deg, rgba(225,29,72,0.10), rgba(239,68,68,0.03))',
+          border: `1.5px solid ${form.youtubeUrl ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.35)'}`,
+          padding: '14px 16px',
+          display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+            background: 'linear-gradient(135deg, #e11d48, #ef4444)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 6px 20px rgba(239,68,68,0.45)',
+          }}>
+            <Video size={20} color="#fff" />
+          </div>
+          <div style={{ flex: '1 1 230px', minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif", color: '#f8fafc', fontWeight: 700, fontSize: 15.5, letterSpacing: '-0.2px' }}>
+                Video walkthrough
+              </span>
+              {form.youtubeUrl ? (
+                <span style={{ color: '#10b981', fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <CheckCircle2 size={12} /> ATTACHED
+                </span>
+              ) : (
+                <span style={{
+                  color: '#f87171', fontSize: 10, fontWeight: 900, letterSpacing: 0.8,
+                  border: '1px solid rgba(239,68,68,0.4)', borderRadius: 999, padding: '2px 8px',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'sponsored-shimmer 1.6s ease-in-out infinite' }} />
+                  REC
+                </span>
+              )}
+            </div>
+            <div style={{ color: '#95a29b', fontSize: 12, marginTop: 2, lineHeight: 1.45 }}>
+              Deals with video get far more serious buyers — paste any YouTube link and it embeds on your listing.
+            </div>
+          </div>
+          <input
+            value={form.youtubeUrl}
+            onChange={e => update('youtubeUrl', e.target.value)}
+            placeholder="https://youtube.com/watch?v=…"
+            style={{
+              flex: '1 1 260px', minWidth: 200,
+              padding: '12px 14px', borderRadius: 10,
+              background: '#0a0b0a',
+              border: `1px solid ${form.youtubeUrl ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.35)'}`,
+              color: '#f8fafc', fontSize: 14, fontWeight: 600, outline: 'none',
+            }}
+          />
+        </div>
+
         {/* Two-column body on desktop */}
         <div style={{
           display: 'grid', gap: 18, marginTop: 24,
@@ -284,10 +340,11 @@ export default function PostDeal() {
             <Label>Property address *</Label>
             <div
               ref={addressBoxRef}
+              className="addr-box"
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                background: '#0e100e', border: '1px solid #232925',
-                borderRadius: 10, padding: '4px 12px', marginBottom: 8,
+                background: '#0e100e', border: '1px solid #2e352f',
+                borderRadius: 12, padding: '4px 14px', marginBottom: 8,
               }}
             >
               <MapPin size={16} style={{ color: '#4ade80', flexShrink: 0 }} />
@@ -346,34 +403,6 @@ export default function PostDeal() {
                 })}
               </div>
             </div>
-
-            {/* Subtle, dismissible video nudge — right under the address */}
-            {showVideoNudge && !form.youtubeUrl && (
-              <div style={{
-                marginBottom: 16,
-                display: 'flex', alignItems: 'flex-start', gap: 10,
-                padding: '10px 14px', borderRadius: 10,
-                background: 'linear-gradient(135deg, rgba(239,68,68,0.07), rgba(0, 200, 5,0.06))',
-                border: '1px solid rgba(239,68,68,0.18)',
-              }}>
-                <Video size={15} style={{ color: '#f87171', flexShrink: 0, marginTop: 2 }} />
-                <span style={{ color: '#cdd6d0', fontSize: 12.5, lineHeight: 1.5, flex: 1 }}>
-                  Deals with a <strong style={{ color: '#f8fafc' }}>video walkthrough</strong> get far
-                  more serious buyers. Add a YouTube link below — it embeds right on your listing.
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowVideoNudge(false)}
-                  aria-label="Dismiss"
-                  style={{
-                    background: 'none', border: 'none', color: '#707d75',
-                    cursor: 'pointer', flexShrink: 0, padding: 2, lineHeight: 0,
-                  }}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
 
             <Label>Deal type</Label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
@@ -525,8 +554,8 @@ export default function PostDeal() {
           </div>
         </Card>
 
-        {/* Description + video — larger on desktop */}
-        <Card title="Description & video" icon={Video} style={{ marginTop: 18 }}>
+        {/* Description — larger on desktop */}
+        <Card title="Description" icon={Tag} style={{ marginTop: 18 }}>
           <Box label="Deal description">
             <textarea
               value={form.description} onChange={e => update('description', e.target.value)}
@@ -543,31 +572,6 @@ export default function PostDeal() {
               }}
             />
           </Box>
-          <div style={{ marginTop: 16 }}>
-            <label style={{
-              color: '#95a29b', fontSize: 13, fontWeight: 700,
-              display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8,
-            }}>
-              <Video size={15} style={{ color: '#f87171' }} /> YouTube walkthrough URL
-              <span style={{ color: '#707d75', fontWeight: 600 }}>(optional, but recommended)</span>
-            </label>
-            <input
-              value={form.youtubeUrl}
-              onChange={e => update('youtubeUrl', e.target.value)}
-              placeholder="https://youtube.com/watch?v=..."
-              className="input-dark"
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                borderRadius: 10,
-                fontSize: isMobile ? 14 : 16,
-                fontWeight: 600,
-              }}
-            />
-            <div style={{ color: '#707d75', fontSize: 12, marginTop: 6 }}>
-              Paste any YouTube link — it embeds automatically on your live listing.
-            </div>
-          </div>
         </Card>
       </form>
 
@@ -626,19 +630,9 @@ function PhotoGallery({
   photos, dragOver, overIndex, fileInputRef, onPick, onFiles, onDrop,
   setDragOver, onRemove, onTileDragStart, onTileDragOver, onTileDrop, onMove,
 }) {
+  const display = "'Space Grotesk', 'Inter', sans-serif";
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <ImageIcon size={16} style={{ color: '#4ade80' }} />
-          <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 15 }}>Photo gallery</span>
-          <span style={{ color: '#707d75', fontSize: 12 }}>{photos.length}/{MAX_PHOTOS}</span>
-        </div>
-        {photos.length > 0 && (
-          <span style={{ color: '#707d75', fontSize: 12 }}>Drag to reorder · first photo is the cover</span>
-        )}
-      </div>
-
       <input
         ref={fileInputRef}
         type="file"
@@ -648,6 +642,62 @@ function PhotoGallery({
         style={{ display: 'none' }}
       />
 
+      {/* ── The drop strip — one big, unmissable target ── */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onPick}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onPick(); }}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        aria-label="Add photos"
+        style={{
+          display: 'flex', alignItems: 'center', gap: 16,
+          padding: '18px 20px', borderRadius: 18, cursor: 'pointer',
+          background: dragOver
+            ? 'linear-gradient(135deg, rgba(0,200,5,0.14), rgba(0,200,5,0.05))'
+            : 'linear-gradient(135deg, #11140f, #0e100e)',
+          border: `2px dashed ${dragOver ? '#00c805' : '#38403a'}`,
+          boxShadow: dragOver ? '0 0 0 4px rgba(0,200,5,0.15)' : '0 4px 20px rgba(0,0,0,0.25)',
+          transition: 'all 0.15s',
+          marginBottom: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{
+          width: 54, height: 54, borderRadius: '50%', flexShrink: 0,
+          background: 'linear-gradient(135deg, #e11d48, #ef4444)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(239,68,68,0.45)',
+        }}>
+          <Camera size={24} color="#fff" />
+        </div>
+        <div style={{ flex: '1 1 240px', minWidth: 0 }}>
+          <div style={{ fontFamily: display, color: '#f8fafc', fontWeight: 700, fontSize: 'clamp(16px, 2.4vw, 21px)', letterSpacing: '-0.3px', lineHeight: 1.2 }}>
+            {photos.length === 0
+              ? 'Drop your property photos here'
+              : `${photos.length}/${MAX_PHOTOS} photos in — keep going`}
+          </div>
+          <div style={{ color: '#95a29b', fontSize: 12.5, marginTop: 4 }}>
+            {photos.length === 0
+              ? 'or click anywhere in this box · JPG · PNG · HEIC · listings with photos get far more buyers'
+              : 'Drag the tiles below to reorder — the first photo is your cover.'}
+          </div>
+        </div>
+        <div style={{
+          fontFamily: display,
+          padding: '11px 20px', borderRadius: 999, flexShrink: 0,
+          background: '#f8fafc', color: '#0a0b0a',
+          fontWeight: 700, fontSize: 13.5, letterSpacing: 0.2,
+          boxShadow: '0 6px 18px rgba(0,0,0,0.4)',
+          display: 'flex', alignItems: 'center', gap: 7,
+        }}>
+          <Upload size={15} /> Browse files
+        </div>
+      </div>
+
+      {/* ── Photo grid (+ quiet placeholder slots) ── */}
       <div style={{
         display: 'grid', gap: 10,
         gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
@@ -676,11 +726,11 @@ function PhotoGallery({
                 position: 'absolute', top: 8, left: 8,
                 display: 'flex', alignItems: 'center', gap: 4,
                 padding: '5px 10px', borderRadius: 999,
-                background: 'linear-gradient(135deg, #00c805, #00e5a0)',
-                color: '#fff', fontSize: 10, fontWeight: 900, letterSpacing: 0.5,
+                background: 'linear-gradient(135deg, #00c805, #00e05c)',
+                color: '#052012', fontSize: 10, fontWeight: 900, letterSpacing: 0.5,
                 boxShadow: '0 4px 14px rgba(0, 200, 5,0.6)',
               }}>
-                <Star size={10} fill="#fff" /> COVER
+                <Star size={10} fill="#052012" /> COVER
               </div>
             )}
 
@@ -719,43 +769,8 @@ function PhotoGallery({
           </div>
         ))}
 
-        {/* Upload tile — the one loud element in an otherwise calm gallery */}
-        {photos.length < MAX_PHOTOS && (
-          <button
-            type="button"
-            onClick={onPick}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
-            style={{
-              aspectRatio: '4 / 3', borderRadius: 12, border: 'none',
-              background: 'linear-gradient(135deg, #00c805, #00e05c)',
-              color: '#052012', cursor: 'pointer', position: 'relative', overflow: 'hidden',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-              boxShadow: dragOver
-                ? '0 0 0 3px rgba(255,255,255,0.7), 0 12px 30px rgba(0, 200, 5,0.45)'
-                : '0 8px 24px rgba(0, 200, 5, 0.25)',
-              transform: dragOver ? 'scale(1.02)' : 'scale(1)',
-              transition: 'all 0.15s',
-            }}
-          >
-            <div style={{
-              width: 46, height: 46, borderRadius: 12,
-              background: 'rgba(255,255,255,0.30)',
-              border: '1px solid rgba(255,255,255,0.45)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {photos.length === 0 ? <Camera size={20} color="#052012" /> : <Upload size={20} color="#052012" />}
-            </div>
-            <div style={{ fontSize: 13, fontWeight: 900 }}>
-              {photos.length === 0 ? 'Add photos' : 'Add more'}
-            </div>
-            <div style={{ fontSize: 10, fontWeight: 700, opacity: 0.75 }}>Drop or click · JPG · PNG · HEIC</div>
-          </button>
-        )}
-
-        {/* Quiet placeholder slots — clean dashed tiles, not a rainbow */}
-        {Array.from({ length: Math.max(0, Math.min(6, MAX_PHOTOS) - photos.length - 1) }).map((_, k) => {
+        {/* Quiet placeholder slots */}
+        {Array.from({ length: Math.max(0, Math.min(6, MAX_PHOTOS) - photos.length) }).map((_, k) => {
           const slot = photos.length + 1 + k;
           return (
             <button
@@ -781,16 +796,6 @@ function PhotoGallery({
           );
         })}
       </div>
-
-      {photos.length === 0 && (
-        <div style={{
-          marginTop: 10, padding: '10px 14px', borderRadius: 8,
-          background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.18)',
-          color: '#fbbf24', fontSize: 12, lineHeight: 1.5,
-        }}>
-          💡 Listings with photos get far more address requests. The first photo becomes the cover.
-        </div>
-      )}
     </div>
   );
 }

@@ -22,17 +22,17 @@ import { useSEO } from '../hooks/useSEO';
  * Comments/viewers are presence-simulated until realtime infra lands.
  */
 
+// Ambience for the broadcast preview until realtime viewers exist —
+// clearly generic, no fake personas.
 const COMMENT_POOL = [
-  { userId: 8, text: 'What are taxes running on this one?' },
-  { userId: 5, text: 'That roof looks newer than I expected 👀' },
-  { userId: 6, text: 'Can you show the electrical panel?' },
-  { userId: 9, text: 'Numbers? ARV and asking?' },
-  { userId: 10, text: '🔥🔥🔥' },
-  { userId: 7, text: 'How bad is the foundation on the back side?' },
-  { userId: 4, text: 'DM me the address please!' },
-  { userId: 8, text: 'Is the seller flexible on the fee?' },
-  { userId: 5, text: 'This street has great comps, I know the area' },
-  { userId: 6, text: 'Walk the backyard if you can 🙏' },
+  { name: 'Viewer', text: 'What are taxes running on this one?' },
+  { name: 'Viewer', text: 'That roof looks newer than I expected 👀' },
+  { name: 'Viewer', text: 'Can you show the electrical panel?' },
+  { name: 'Viewer', text: 'Numbers? ARV and asking?' },
+  { name: 'Viewer', text: '🔥🔥🔥' },
+  { name: 'Viewer', text: 'How bad is the foundation on the back side?' },
+  { name: 'Viewer', text: 'DM me the address please!' },
+  { name: 'Viewer', text: 'Is the seller flexible on the fee?' },
 ];
 
 const findUser = (id) => users.find(u => String(u.id) === String(id));
@@ -112,7 +112,7 @@ export default function LiveRoom() {
     const iv = setInterval(() => {
       const c = COMMENT_POOL[i % COMMENT_POOL.length];
       i += 1;
-      setComments(prev => [...prev.slice(-40), { id: `sim-${Date.now()}`, userId: c.userId, text: c.text }]);
+      setComments(prev => [...prev.slice(-40), { id: `sim-${Date.now()}`, name: c.name, text: c.text }]);
     }, 3500);
     return () => clearInterval(iv);
   }, []);
@@ -155,7 +155,7 @@ export default function LiveRoom() {
   }
 
   function acceptJoin() {
-    setCoHost(findUser(8) || users[3]);
+    setCoHost(users[1] || users[0]);
     setJoinState('cohost');
   }
 
@@ -407,12 +407,15 @@ export default function LiveRoom() {
         <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
           {comments.map(c => {
             const u = c.mine ? currentUser : findUser(c.userId);
+            const label = c.mine ? 'You' : (u?.name || c.name || 'Viewer');
+            const avatar = c.mine ? currentUser?.avatar
+              : (u?.avatar || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(label)}&backgroundColor=232925&textColor=95a29b`);
             return (
               <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                <img src={u?.avatar} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                <img src={avatar} alt="" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                 <div style={{ minWidth: 0 }}>
                   <span style={{ color: c.mine ? '#4ade80' : '#95a29b', fontSize: 11.5, fontWeight: 800 }}>
-                    {c.mine ? 'You' : u?.name}
+                    {label}
                   </span>
                   <div style={{ color: '#e4eae6', fontSize: 13, lineHeight: 1.45, wordBreak: 'break-word' }}>{c.text}</div>
                 </div>
@@ -429,9 +432,9 @@ export default function LiveRoom() {
             background: 'rgba(0, 200, 5, 0.10)', border: '1px solid rgba(0, 200, 5, 0.35)',
             display: 'flex', alignItems: 'center', gap: 10,
           }}>
-            <img src={findUser(8)?.avatar} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
+            <img src={users[1]?.avatar} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: '#f8fafc', fontSize: 12.5, fontWeight: 800 }}>{findUser(8)?.name}</div>
+              <div style={{ color: '#f8fafc', fontSize: 12.5, fontWeight: 800 }}>{users[1]?.name}</div>
               <div style={{ color: '#95a29b', fontSize: 11.5 }}>wants to join your screen</div>
             </div>
             <button onClick={acceptJoin} className="gradient-btn" style={{ padding: '7px 12px', borderRadius: 9, fontWeight: 900, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>

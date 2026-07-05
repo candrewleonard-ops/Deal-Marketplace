@@ -196,9 +196,9 @@ export default function AddressAutocomplete({
               position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
               fontSize: 9, fontWeight: 800, letterSpacing: 0.6,
               padding: '2px 7px', borderRadius: 999,
-              background: 'rgba(0, 200, 5,0.15)',
-              border: '1px solid rgba(0, 200, 5,0.3)',
-              color: '#4ade80',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid #38403a',
+              color: '#95a29b',
               pointerEvents: 'none',
               textTransform: 'uppercase',
             }}

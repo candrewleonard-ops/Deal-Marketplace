@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Heart, Share2, MapPin, Calendar, CheckCircle, X,
-  MessageSquare, Shield, Hammer, ClipboardList, Sparkles, KeyRound,
+  MessageSquare, Shield, Hammer, ClipboardList, Sparkles, KeyRound, Eye,
 } from 'lucide-react';
 import { getDealById, getSimilarDeals } from '../data/deals';
 import { getLiveDeal, isLiveDealId } from '../lib/deals';
@@ -18,6 +18,7 @@ import { hasDMd } from '../lib/dmHistory';
 import { logActivity } from '../lib/activityLog';
 import ProfitCalculator from '../components/ProfitCalculator';
 import { getDisplayAddress } from '../utils/address';
+import { recordView, getViewCount, getHeartCount, hasHearted, toggleHeart } from '../lib/engagement';
 import { dealPath, dealUrl, idFromSlug } from '../utils/slug';
 import { visibleScopeEntries } from '../data/scopeOfWork';
 import { useAuth } from '../context/AuthContext';
@@ -92,6 +93,35 @@ export default function DealDetail() {
   const [showSignupSlider, setShowSignupSlider] = useState(false);
   const [showOwnerModal, setShowOwnerModal] = useState(false);
   const [detailsTab, setDetailsTab] = useState('details'); // 'details' | 'scope'
+  const [viewCount, setViewCount] = useState(null);
+  const [heartCount, setHeartCount] = useState(0);
+  const [hearted, setHearted] = useState(false);
+
+  // Real engagement: count this visit once per user (ever), pull live counts.
+  useEffect(() => {
+    if (!deal?.id) return;
+    let alive = true;
+    (async () => {
+      await recordView(deal.id, currentUser);
+      const [v, h, mine] = await Promise.all([
+        getViewCount(deal.id),
+        getHeartCount(deal.id),
+        hasHearted(deal.id, currentUser),
+      ]);
+      if (alive) { setViewCount(v); setHeartCount(h); setHearted(mine); }
+    })();
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deal?.id]);
+
+  async function onHeart() {
+    if (!isAuthenticated) { setShowSignupSlider(true); return; }
+    setHearted(h => !h); // optimistic
+    setHeartCount(c => hearted ? Math.max(0, c - 1) : c + 1);
+    const res = await toggleHeart(deal.id, currentUser);
+    setHearted(res.hearted);
+    setHeartCount(res.count);
+  }
 
   // Address policy set by the seller when posting. Default is "public":
   // any signed-in buyer can Get Address instantly, unless the seller
@@ -304,6 +334,37 @@ export default function DealDetail() {
                   </button>
                 )}
               </div>
+
+              {/* Live engagement — unique views + hearts */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '6px 12px', borderRadius: 999,
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid #232925',
+                  color: '#95a29b', fontSize: 12.5, fontWeight: 700,
+                }}>
+                  <Eye size={14} style={{ color: '#00e5a0' }} />
+                  {viewCount == null ? '—' : viewCount.toLocaleString()} unique view{viewCount === 1 ? '' : 's'}
+                </span>
+                <button
+                  onClick={onHeart}
+                  aria-pressed={hearted}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '6px 14px', borderRadius: 999, cursor: 'pointer',
+                    background: hearted ? 'rgba(239,68,68,0.14)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${hearted ? 'rgba(239,68,68,0.5)' : '#232925'}`,
+                    color: hearted ? '#f87171' : '#95a29b',
+                    fontSize: 12.5, fontWeight: 800,
+                    transition: 'transform 0.12s',
+                  }}
+                  onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.94)'; }}
+                  onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                >
+                  <Heart size={14} fill={hearted ? '#ef4444' : 'none'} />
+                  {heartCount.toLocaleString()} heart{heartCount === 1 ? '' : 's'}
+                </button>
+              </div>
             </div>
 
             {/* ── The numbers (projected figures — nothing here is "bad") ── */}
@@ -505,13 +566,17 @@ export default function DealDetail() {
                       requireAuthForDM('deal-detail-seller-card');
                     }
                   }}
-                  className="gradient-btn"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     padding: '11px 18px', borderRadius: 11,
+                    background: '#f8fafc', color: '#0a0b0a',
                     textDecoration: 'none', fontWeight: 800, fontSize: 14,
-                    flexShrink: 0,
+                    flexShrink: 0, border: '1px solid rgba(255,255,255,0.2)',
+                    boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
                   <MessageSquare size={15} />
                   Message Seller

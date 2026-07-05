@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search, SlidersHorizontal, X, TrendingUp, ChevronDown, ChevronUp,
@@ -6,9 +6,10 @@ import {
 } from 'lucide-react';
 import DealCard from '../components/DealCard';
 import BuyBoxModal, { BuyBoxSideButton } from '../components/BuyBoxModal';
-import USMap from '../components/USMap';
+const USMap = lazy(() => import('../components/USMap')); // d3 is heavy — load after first paint
 import { deals, dealTypes } from '../data/deals';
 import { listLiveDeals } from '../lib/deals';
+import { getViewCounts, getHeartCounts } from '../lib/engagement';
 import { useSEO } from '../hooks/useSEO';
 import { useAuth } from '../context/AuthContext';
 
@@ -83,6 +84,7 @@ export default function Marketplace() {
   const [selectedStates,  setSelectedStates]  = useState([]);
   const [newestOnly,      setNewestOnly]      = useState(false);
   const [liveDeals,       setLiveDeals]       = useState([]);
+  const [dealStats,       setDealStats]       = useState({}); // id → {views, hearts}
   const [showBuyBox,      setShowBuyBox]      = useState(false);
   const buyBoxSnapshot = useRef(null);
   const navigate = useNavigate();
@@ -123,14 +125,42 @@ export default function Marketplace() {
   }
 
   // Pull user-posted deals from the database (no-op if Supabase isn't set up).
+  // Stale-while-revalidate: paint instantly from the session cache, then
+  // refresh from Supabase in the background.
   useEffect(() => {
     let alive = true;
-    listLiveDeals().then(rows => { if (alive) setLiveDeals(rows); }).catch(() => {});
+    try {
+      const cached = sessionStorage.getItem('asl-live-deals-cache-v1');
+      if (cached) setLiveDeals(JSON.parse(cached));
+    } catch { /* ignore */ }
+    listLiveDeals().then(rows => {
+      if (!alive) return;
+      setLiveDeals(rows);
+      try { sessionStorage.setItem('asl-live-deals-cache-v1', JSON.stringify(rows)); } catch { /* ignore */ }
+    }).catch(() => {});
     return () => { alive = false; };
   }, []);
 
   // Posted deals appear first, then the seed/sample deals.
   const allDeals = useMemo(() => [...liveDeals, ...deals], [liveDeals]);
+
+  // Real engagement counts for everything on screen (one bulk query each).
+  useEffect(() => {
+    if (!allDeals.length) return;
+    let alive = true;
+    const ids = allDeals.map(d => d.id);
+    Promise.all([getViewCounts(ids), getHeartCounts(ids)])
+      .then(([views, hearts]) => {
+        if (!alive) return;
+        const merged = {};
+        for (const id of ids) {
+          merged[id] = { views: views[String(id)] || 0, hearts: hearts[String(id)] || 0 };
+        }
+        setDealStats(merged);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [allDeals]);
 
   function goPostDeal() {
     if (!isAuthenticated) {
@@ -198,12 +228,12 @@ export default function Marketplace() {
     const arr = [...filtered];
     if (sortBy === 'price-low')  arr.sort((a, b) => (a.listingPrice || a.price) - (b.listingPrice || b.price));
     else if (sortBy === 'price-high') arr.sort((a, b) => (b.listingPrice || b.price) - (a.listingPrice || a.price));
-    else if (sortBy === 'views') arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+    else if (sortBy === 'views') arr.sort((a, b) => (dealStats[b.id]?.views || 0) - (dealStats[a.id]?.views || 0));
     else arr.sort((a, b) => a.daysListed - b.daysListed);
     const sponsored = arr.filter(d => d.isSponsored);
     const regular   = arr.filter(d => !d.isSponsored);
     return [...sponsored, ...regular];
-  }, [filtered, sortBy]);
+  }, [filtered, sortBy, dealStats]);
 
   const hasActiveFilters = activeType !== 'all' || search || city !== 'All Cities'
     || priceValue < 1000000 || minBeds > 0 || selectedStates.length > 0 || newestOnly;
@@ -240,7 +270,7 @@ export default function Marketplace() {
               </h1>
               <p style={{ color: '#95a29b', margin: '2px 0 0', fontSize: '13px' }}>
                 <span style={{ color: '#00c805', fontWeight: 700 }}>{sorted.length}</span>
-                {' '}of {deals.length} off-market deals
+                {' '}of {allDeals.length} off-market deals
                 {selectedStates.length > 0 && ` · ${selectedStates.join(', ')}`}
               </p>
             </div>
@@ -498,7 +528,9 @@ export default function Marketplace() {
             Click any state to filter deals. Click again to deselect.
           </p>
 
-          <USMap deals={deals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
+          <Suspense fallback={<div className="skeleton" style={{ width: '100%', aspectRatio: '1.6', borderRadius: 10 }} />}>
+            <USMap deals={allDeals} selectedStates={selectedStates} onStateToggle={handleStateToggle} />
+          </Suspense>
 
           {/* Active state chips */}
           {selectedStates.length > 0 && (
@@ -533,7 +565,83 @@ export default function Marketplace() {
 
         {/* ── RIGHT: deal listings ── */}
         <div style={{ flex: 1, padding: isMobile ? '14px 12px 32px' : '20px 20px 40px', minWidth: 0 }}>
-          {sorted.length === 0 ? (
+
+          {/* ── Shop by State — big, scrollable, drives the map selection too ── */}
+          {statesWithDeals.length > 0 && (
+            <div style={{ marginBottom: isMobile ? 14 : 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
+                <MapPin size={14} style={{ color: '#00c805' }} />
+                <span style={{ color: '#f8fafc', fontWeight: 800, fontSize: 13, letterSpacing: 0.3 }}>SHOP BY STATE</span>
+                <span style={{ color: '#5a675f', fontSize: 12 }}>· tap to filter, tap again to clear</span>
+              </div>
+              <div className="scroll-x-hidden" style={{ display: 'flex', gap: 8, paddingBottom: 4 }}>
+                <button
+                  onClick={() => setSelectedStates([])}
+                  style={{
+                    flexShrink: 0, padding: isMobile ? '10px 16px' : '11px 20px', borderRadius: 14,
+                    cursor: 'pointer', fontSize: 14, fontWeight: 800,
+                    background: selectedStates.length === 0 ? 'linear-gradient(135deg, #00c805, #00e05c)' : 'rgba(255,255,255,0.04)',
+                    border: selectedStates.length === 0 ? 'none' : '1px solid #232925',
+                    color: selectedStates.length === 0 ? '#052012' : '#95a29b',
+                    boxShadow: selectedStates.length === 0 ? '0 6px 18px rgba(0,200,5,0.35)' : 'none',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  🇺🇸 All States
+                </button>
+                {statesWithDeals.map(({ abbr, count, name }) => {
+                  const on = selectedStates.includes(abbr);
+                  return (
+                    <button
+                      key={abbr}
+                      onClick={() => handleStateToggle(abbr)}
+                      style={{
+                        flexShrink: 0, padding: isMobile ? '8px 14px' : '9px 18px', borderRadius: 14,
+                        cursor: 'pointer', textAlign: 'left',
+                        background: on ? 'linear-gradient(135deg, #00c805, #00e05c)' : '#131614',
+                        border: on ? 'none' : '1px solid #232925',
+                        boxShadow: on ? '0 6px 18px rgba(0,200,5,0.35)' : 'none',
+                        transition: 'transform 0.12s',
+                        whiteSpace: 'nowrap',
+                      }}
+                      onMouseEnter={(e) => { if (!on) e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                    >
+                      <span style={{ display: 'block', color: on ? '#052012' : '#f8fafc', fontWeight: 900, fontSize: 15, letterSpacing: 0.2 }}>
+                        {abbr}
+                      </span>
+                      <span style={{ display: 'block', color: on ? 'rgba(5,32,18,0.75)' : '#707d75', fontSize: 10.5, fontWeight: 700 }}>
+                        {name.length > 12 ? abbr : name} · {count} deal{count === 1 ? '' : 's'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {allDeals.length === 0 ? (
+            /* ── Launch state: the market is open and empty — own it ── */
+            <div style={{ textAlign: 'center', padding: '70px 20px' }}>
+              <div style={{
+                width: 88, height: 88, borderRadius: 26, margin: '0 auto 18px',
+                background: 'linear-gradient(135deg, rgba(0,200,5,0.16), rgba(0,229,160,0.08))',
+                border: '1px solid rgba(0,200,5,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38,
+              }}>
+                🏁
+              </div>
+              <h3 style={{ color: '#f8fafc', fontWeight: 900, fontSize: 24, marginBottom: 8, letterSpacing: '-0.4px' }}>
+                The market just opened
+              </h3>
+              <p style={{ color: '#95a29b', fontSize: 14.5, marginBottom: 22, lineHeight: 1.6, maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
+                Be the first wholesaler on AllStreet Live — the first deals posted get every buyer's eyes.
+              </p>
+              <button onClick={goPostDeal} className="gradient-btn" style={{ padding: '14px 32px', borderRadius: 12, fontWeight: 900, fontSize: 16 }}>
+                + Post the first deal
+              </button>
+            </div>
+          ) : sorted.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 20px' }}>
               <div style={{ fontSize: '40px', marginBottom: '14px' }}>🏚️</div>
               <h3 style={{ color: '#f8fafc', fontWeight: 700, marginBottom: '6px' }}>No deals found</h3>
@@ -561,7 +669,7 @@ export default function Marketplace() {
                         <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #232925, transparent)' }} />
                       </div>
                     )}
-                    <DealCard deal={deal} />
+                    <DealCard deal={deal} stats={dealStats[deal.id]} />
                   </div>
                 ))}
               </div>

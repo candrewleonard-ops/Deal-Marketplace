@@ -34,7 +34,7 @@ Environment variables): `VITE_GOOGLE_MAPS_API_KEY` for address autocomplete +
 Street View, `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` to override the
 baked-in database.
 
-### Supabase migration for Scope of Work
+### Supabase migrations (run once in the SQL editor)
 
 Posted deals save their 15-question condition report to a `scope_of_work`
 jsonb column. If the column doesn't exist yet, run this once in the Supabase
@@ -42,7 +42,33 @@ SQL editor (posting still works without it — the scope is just dropped):
 
 ```sql
 alter table deals add column if not exists scope_of_work jsonb;
+
+-- Real engagement: one view per user per deal, hearts saved per user
+create table if not exists deal_views (
+  deal_id text not null, user_key text not null,
+  created_at timestamptz default now(), primary key (deal_id, user_key));
+create table if not exists deal_hearts (
+  deal_id text not null, user_key text not null,
+  created_at timestamptz default now(), primary key (deal_id, user_key));
+
+-- Direct messages (cross-device)
+create table if not exists dms (
+  id bigint generated always as identity primary key,
+  from_key text not null, to_key text not null, text text not null,
+  created_at timestamptz default now());
+create index if not exists dms_pair on dms (from_key, to_key, created_at);
+
+alter table deal_views  enable row level security;
+alter table deal_hearts enable row level security;
+alter table dms         enable row level security;
+create policy "anon views"  on deal_views  for all using (true) with check (true);
+create policy "anon hearts" on deal_hearts for all using (true) with check (true);
+create policy "anon dms"    on dms         for all using (true) with check (true);
 ```
+
+Everything degrades gracefully to localStorage until these exist — the UI
+never breaks, but views/hearts/DMs only become cross-device after the
+migration runs.
 
 ## Layout
 

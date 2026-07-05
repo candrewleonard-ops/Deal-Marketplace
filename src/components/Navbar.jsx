@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -7,9 +7,10 @@ import {
   Crown, Shield, UsersRound, Heart, GraduationCap, Radio
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { users as testUsers } from '../data/users';
 import { useIsMobile } from '../hooks/useIsMobile';
 import CyclingText from './CyclingText';
-import { totalUnread, subscribeInbox } from '../lib/inbox';
+import { useUnreadDMs } from '../hooks/useUnreadDMs';
 import { liveNow, notifiableLiveSessions } from '../data/liveTours';
 import { getFollowing } from '../lib/inbox';
 import Logo from './Logo';
@@ -49,21 +50,15 @@ const drawerMore = [
 export default function Navbar() {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { currentUser, isAuthenticated, isSuperAdmin } = useAuth();
+  const { currentUser, isAuthenticated, setCurrentUserId } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchVal, setSearchVal] = useState('');
-  const [unreadDMs, setUnreadDMs] = useState(0);
+  const unreadDMs = useUnreadDMs();
 
-  // Live unread-DM badge — refreshes whenever any conversation is read or bumped.
-  useEffect(() => {
-    const refresh = () => setUnreadDMs(totalUnread());
-    refresh();
-    return subscribeInbox(refresh);
-  }, []);
-
-  // Live-tour alerts for wholesalers you follow (default on; managed on /live)
+  // Live-tour alerts for wholesalers you follow (default on; managed on /live).
+  // Demo notifications are gone — this list is real signals only now.
   const liveAlerts = notifiableLiveSessions(getFollowing()).map(s => ({
     id: `live-${s.id}`,
     text: `🔴 ${s.hostName} is LIVE — ${s.title}`,
@@ -71,15 +66,8 @@ export default function Navbar() {
     unread: true,
     to: `/live/${s.id}`,
   }));
-  const notifications = [
-    ...liveAlerts,
-    { id: 1, text: 'Marcus Johnson liked your post', time: '2m ago', unread: true },
-    { id: 2, text: 'New deal in Atlanta matches your saved search', time: '15m ago', unread: true },
-    { id: 3, text: 'Diana Cruz sent you a message', time: '1h ago', unread: true, to: '/messages?to=2' },
-    { id: 4, text: 'Your deal "Phoenix Fixer" got 12 views today', time: '2h ago', unread: false },
-    { id: 5, text: 'Kevin Washington started following you', time: '3h ago', unread: false },
-  ];
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const notifications = [...liveAlerts];
+  const unreadCount = notifications.filter(n => n.unread).length + unreadDMs;
 
   return (
     <nav
@@ -193,21 +181,6 @@ export default function Navbar() {
 
           {/* Right cluster */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
-            {isSuperAdmin && (
-              <Link
-                to="/super-admin"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 12px', borderRadius: 8,
-                  background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2))',
-                  border: '1px solid rgba(239,68,68,0.5)',
-                  color: '#f87171', textDecoration: 'none', fontSize: 13, fontWeight: 800,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <Shield size={14} /> Super Admin
-              </Link>
-            )}
             {currentUser?.isAdmin && !isMobile && (
               <Link
                 to="/admin"
@@ -406,7 +379,7 @@ export default function Navbar() {
                   />
                   <ChevronDown size={14} color="#95a29b" />
                 </button>
-                {userMenuOpen && <UserMenu currentUser={currentUser} onClose={() => setUserMenuOpen(false)} />}
+                {userMenuOpen && <UserMenu currentUser={currentUser} onClose={() => setUserMenuOpen(false)} onSwitchAccount={setCurrentUserId} />}
               </div>
             )}
           </div>
@@ -550,7 +523,6 @@ export default function Navbar() {
                   />
                 ))}
                 <DrawerItem to={currentUser ? `/profile/${currentUser.id}` : '/auth'} icon={User} label="View Profile" onClick={() => setDrawerOpen(false)} />
-                {isSuperAdmin && <DrawerItem to="/super-admin" icon={Shield} label="Super Admin" onClick={() => setDrawerOpen(false)} danger />}
                 {currentUser?.isAdmin && <DrawerItem to="/admin" icon={Shield} label="Admin" onClick={() => setDrawerOpen(false)} danger />}
               </DrawerSection>
 
@@ -588,7 +560,7 @@ export default function Navbar() {
   );
 }
 
-function UserMenu({ currentUser, onClose }) {
+function UserMenu({ currentUser, onClose, onSwitchAccount }) {
   return (
     <div style={{
       position: 'absolute', right: 0, top: 48,
@@ -621,6 +593,27 @@ function UserMenu({ currentUser, onClose }) {
           <Icon size={16} /> {label}
         </Link>
       ))}
+      <div style={{ borderTop: '1px solid #232925', padding: '8px 16px 4px' }}>
+        <p style={{ color: '#5a675f', fontSize: 10, fontWeight: 800, letterSpacing: 0.8, margin: '0 0 6px' }}>SWITCH TEST ACCOUNT</p>
+        <div style={{ display: 'flex', gap: 6, paddingBottom: 8 }}>
+          {testUsers.map(u => (
+            <button
+              key={u.id}
+              onClick={() => { onSwitchAccount?.(u.id); onClose(); }}
+              title={u.name}
+              style={{
+                flex: 1, padding: '6px 0', borderRadius: 8, cursor: 'pointer',
+                background: String(currentUser?.id) === String(u.id) ? 'rgba(0, 200, 5, 0.16)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${String(currentUser?.id) === String(u.id) ? '#00c805' : '#232925'}`,
+                color: String(currentUser?.id) === String(u.id) ? '#4ade80' : '#95a29b',
+                fontSize: 11, fontWeight: 800,
+              }}
+            >
+              {u.name.replace('Test ', 'T')}
+            </button>
+          ))}
+        </div>
+      </div>
       <div style={{ borderTop: '1px solid #232925' }}>
         <Link
           to="/auth"
@@ -681,8 +674,16 @@ function NotifList({ notifications, onCloseAfterNav }) {
     <>
       <div style={{ padding: 14, borderBottom: '1px solid #232925', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontWeight: 700, color: '#f8fafc' }}>Notifications</span>
-        <button style={{ background: 'none', border: 'none', color: '#00c805', cursor: 'pointer', fontSize: 13 }}>Mark all read</button>
       </div>
+      {notifications.length === 0 && (
+        <div style={{ padding: '28px 18px', textAlign: 'center' }}>
+          <div style={{ fontSize: 26, marginBottom: 8 }}>✅</div>
+          <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 14 }}>You're all caught up</div>
+          <div style={{ color: '#707d75', fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+            Deal views, hearts, messages, and live tours from people you follow land here.
+          </div>
+        </div>
+      )}
       {notifications.map(n => {
         const inner = (
           <>

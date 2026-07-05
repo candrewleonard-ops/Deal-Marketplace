@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -6,34 +7,50 @@ import AuthPromptModal from './components/AuthPromptModal';
 import DMShowcaseModal from './components/DMShowcaseModal';
 import OnboardingModal from './components/OnboardingModal';
 import { useIsMobile } from './hooks/useIsMobile';
-import Landing from './pages/Landing';
+// Hot path stays in the main bundle: browse → open a deal → sign up.
 import Marketplace from './pages/Marketplace';
 import DealDetail from './pages/DealDetail';
-import Social from './pages/Social';
-import Profile from './pages/Profile';
-import Messages from './pages/Messages';
-import Contractors from './pages/Contractors';
-import Meetups from './pages/Meetups';
 import Auth from './pages/Auth';
-import MyDeals from './pages/MyDeals';
-import Groups from './pages/Groups';
-import CityDiscussion from './pages/CityDiscussion';
-import Admin from './pages/Admin';
-import Premium from './pages/Premium';
-import GroupDetail from './pages/GroupDetail';
-import SavedDeals from './pages/SavedDeals';
-import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
-import BidRequest from './pages/BidRequest';
-import HowTo from './pages/HowTo';
-import PostDeal from './pages/PostDeal';
-import LiveTours from './pages/LiveTours';
-import LiveRoom from './pages/LiveRoom';
-import SuperAdmin from './pages/SuperAdmin';
-import SuperAdminUser from './pages/SuperAdminUser';
 import { DMGuard, AuthGuard } from './components/RouteGuards';
 import ScrollToTop from './components/ScrollToTop';
 import './index.css';
+
+// Everything else loads on demand — cuts the first paint bundle massively.
+const Landing        = lazy(() => import('./pages/Landing'));
+const Social         = lazy(() => import('./pages/Social'));
+const Profile        = lazy(() => import('./pages/Profile'));
+const Messages       = lazy(() => import('./pages/Messages'));
+const Contractors    = lazy(() => import('./pages/Contractors'));
+const Meetups        = lazy(() => import('./pages/Meetups'));
+const MyDeals        = lazy(() => import('./pages/MyDeals'));
+const Groups         = lazy(() => import('./pages/Groups'));
+const CityDiscussion = lazy(() => import('./pages/CityDiscussion'));
+const Admin          = lazy(() => import('./pages/Admin'));
+const Premium        = lazy(() => import('./pages/Premium'));
+const GroupDetail    = lazy(() => import('./pages/GroupDetail'));
+const SavedDeals     = lazy(() => import('./pages/SavedDeals'));
+const Notifications  = lazy(() => import('./pages/Notifications'));
+const BidRequest     = lazy(() => import('./pages/BidRequest'));
+const HowTo          = lazy(() => import('./pages/HowTo'));
+const PostDeal       = lazy(() => import('./pages/PostDeal'));
+const LiveTours      = lazy(() => import('./pages/LiveTours'));
+const LiveRoom       = lazy(() => import('./pages/LiveRoom'));
+const SuperAdmin     = lazy(() => import('./pages/SuperAdmin'));
+const SuperAdminUser = lazy(() => import('./pages/SuperAdminUser'));
+
+function PageLoader() {
+  return (
+    <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{
+        width: 34, height: 34, borderRadius: '50%',
+        border: '3px solid #232925', borderTopColor: '#00c805',
+        animation: 'spin 0.8s linear infinite',
+      }} />
+      <style>{'@keyframes spin { to { transform: rotate(360deg); } }'}</style>
+    </div>
+  );
+}
 
 function AppLayout({ children, hideFooter, hideTabBar }) {
   const isMobile = useIsMobile();
@@ -73,6 +90,7 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Suspense fallback={<AppLayout hideFooter><PageLoader /></AppLayout>}>
       <Routes>
         <Route path="/" element={<AppLayout hideFooter><Marketplace /></AppLayout>} />
         <Route path="/landing" element={<Landing />} />
@@ -103,6 +121,7 @@ export default function App() {
         <Route path="/super-admin/user/:id" element={<AppLayout hideFooter><SuperAdminUser /></AppLayout>} />
         <Route path="*" element={<AppLayout hideFooter><NotFound /></AppLayout>} />
       </Routes>
+      </Suspense>
     </Router>
   );
 }
