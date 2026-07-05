@@ -84,17 +84,19 @@ export async function createDeal(form, photoUrls, seller) {
     address_visibility: form.addressVisibility || 'public',
     scope_of_work: form.scopeOfWork || null,
   };
-  let { data, error } = await supabase
-    .from('deals')
-    .insert(payload)
-    .select()
-    .single();
-  // Older databases may not have the scope_of_work column yet — post the
-  // deal anyway rather than failing. (Migration: `alter table deals add
-  // column scope_of_work jsonb;` in the Supabase SQL editor.)
-  if (error && /scope_of_work/i.test(error.message || '')) {
-    const { scope_of_work: _dropped, ...withoutScope } = payload;
-    ({ data, error } = await supabase.from('deals').insert(withoutScope).select().single());
+  // The live database can lag behind the code (e.g. address_visibility or
+  // scope_of_work not migrated yet). Never fail the post over a missing
+  // column: strip whichever column the error names and retry. The dropped
+  // fields simply don't persist until the migration in the README runs.
+  let attempt = { ...payload };
+  let data = null;
+  let error = null;
+  for (let i = 0; i < Object.keys(payload).length; i++) {
+    ({ data, error } = await supabase.from('deals').insert(attempt).select().single());
+    if (!error) break;
+    const m = (error.message || '').match(/Could not find the '([^']+)' column/i);
+    if (!m || !(m[1] in attempt)) break;
+    delete attempt[m[1]];
   }
   if (error) return { ok: false, reason: error.message };
   return { ok: true, deal: rowToDeal(data) };
