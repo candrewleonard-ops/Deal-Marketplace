@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -53,8 +53,29 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [searchVal, setSearchVal] = useState('');
   const unreadDMs = useUnreadDMs();
+
+  // The nav must fit ANY viewport without pushing the right-side buttons
+  // off-screen (Windows display scaling makes 1920 screens ~1280 CSS px).
+  // Three desktop tiers: full ≥1500, condensed ≥1200, compact below that.
+  const [navW, setNavW] = useState(typeof window !== 'undefined' ? window.innerWidth : 1600);
+  useEffect(() => {
+    const onResize = () => setNavW(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const tier = navW >= 1500 ? 'full' : navW >= 1200 ? 'condensed' : 'compact';
+  // Compact screens tuck the low-traffic links into a More menu.
+  const inlineNav = tier === 'compact'
+    ? primaryNav.filter(n => ['/marketplace', '/live', '/my-deals'].includes(n.to))
+    : primaryNav.filter(n => n.to !== '/how-to');
+  const moreNav = tier === 'compact'
+    ? primaryNav
+        .filter(n => !['/marketplace', '/live', '/my-deals'].includes(n.to))
+        .map(n => (n.to === '/how-to' ? { ...n, label: 'How Tos' } : n))
+    : [];
 
   // Live-tour alerts for wholesalers you follow (default on; managed on /live).
   // Demo notifications are gone — this list is real signals only now.
@@ -82,7 +103,7 @@ export default function Navbar() {
       }}
     >
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: isMobile ? '0 12px' : '0 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 56 : 64, gap: isMobile ? 8 : 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: isMobile ? 56 : 64, gap: isMobile ? 8 : (tier === 'full' ? 20 : 10) }}>
           {/* Logo */}
           <Link to="/marketplace" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <Logo size={isMobile ? 'sm' : 'sm'} />
@@ -90,8 +111,8 @@ export default function Navbar() {
 
           {/* DESKTOP: inline nav links */}
           {!isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
-              {primaryNav.filter(n => n.to !== '/how-to').map(({ to, label, icon: Icon, isLive }) => {
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              {inlineNav.map(({ to, label, icon: Icon, isLive }) => {
                 const active = location.pathname === to || (to === '/marketplace' && location.pathname === '/');
                 const liveCount = isLive ? liveNow.length : 0;
                 return (
@@ -126,8 +147,8 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              {/* How Tos (with cycling text) */}
-              {(() => {
+              {/* How Tos (with cycling text) — shortens as the viewport tightens */}
+              {tier !== 'compact' && (() => {
                 const active = location.pathname === '/how-to';
                 return (
                   <Link
@@ -145,8 +166,8 @@ export default function Navbar() {
                     }}
                   >
                     <GraduationCap size={16} />
-                    <span>How Tos &mdash; All Industries</span>{' '}
-                    <CyclingText
+                    <span>{tier === 'full' ? 'How Tos \u2014 All Industries' : 'How Tos'}</span>{' '}
+                    {tier === 'full' && <CyclingText
                       phrases={HOWTO_PHRASES}
                       interval={3000}
                       textStyle={{
@@ -157,23 +178,71 @@ export default function Navbar() {
                         color: 'transparent',
                         fontWeight: 800,
                       }}
-                    />
+                    />}
                   </Link>
                 );
               })()}
+
+              {/* Compact screens: overflow links live in a More menu */}
+              {moreNav.length > 0 && (
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <button
+                    onClick={() => { setMoreOpen(!moreOpen); setUserMenuOpen(false); setNotifOpen(false); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      padding: '6px 10px 4px', borderRadius: 8,
+                      background: moreOpen ? 'rgba(0, 200, 5,0.1)' : 'transparent',
+                      border: 'none', cursor: 'pointer',
+                      fontSize: 14, fontWeight: 600, color: '#95a29b',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    More <ChevronDown size={14} style={{ transform: moreOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                  </button>
+                  {moreOpen && (
+                    <div style={{
+                      position: 'absolute', left: 0, top: 42,
+                      background: '#131614', border: '1px solid #232925',
+                      borderRadius: 12, width: 200, zIndex: 100,
+                      boxShadow: '0 20px 60px rgba(0,0,0,0.5)', overflow: 'hidden',
+                    }}>
+                      {moreNav.map(({ to, label, icon: Icon }) => (
+                        <Link
+                          key={to}
+                          to={to}
+                          onClick={() => setMoreOpen(false)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '10px 14px', color: location.pathname === to ? '#4ade80' : '#e4eae6',
+                            textDecoration: 'none', fontSize: 14, fontWeight: 600,
+                            background: location.pathname === to ? 'rgba(0, 200, 5,0.08)' : 'transparent',
+                          }}
+                        >
+                          <Icon size={16} /> {label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {/* Search (desktop only) */}
           {!isMobile && (
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 1, minWidth: 120 }}>
               <Search size={16} style={{ position: 'absolute', left: 12, color: '#5a675f', pointerEvents: 'none' }} />
               <input
                 value={searchVal}
                 onChange={e => setSearchVal(e.target.value)}
-                placeholder="Search deals, investors..."
+                placeholder={tier === 'full' ? 'Search deals, investors...' : 'Search…'}
                 className="input-dark"
-                style={{ paddingLeft: 36, paddingRight: 12, paddingTop: 8, paddingBottom: 8, borderRadius: 8, fontSize: 14, width: 220 }}
+                style={{
+                  paddingLeft: 36, paddingRight: 12, paddingTop: 8, paddingBottom: 8,
+                  borderRadius: 8, fontSize: 14,
+                  width: tier === 'full' ? 220 : tier === 'condensed' ? 170 : 140,
+                  maxWidth: '100%',
+                }}
               />
             </div>
           )}
@@ -550,10 +619,10 @@ export default function Navbar() {
       ), document.body)}
 
       {/* Backdrop for desktop dropdowns */}
-      {!isMobile && (userMenuOpen || notifOpen) && (
+      {!isMobile && (userMenuOpen || notifOpen || moreOpen) && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 40 }}
-          onClick={() => { setUserMenuOpen(false); setNotifOpen(false); }}
+          onClick={() => { setUserMenuOpen(false); setNotifOpen(false); setMoreOpen(false); }}
         />
       )}
 
